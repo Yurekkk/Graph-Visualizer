@@ -1,25 +1,41 @@
-import { type Node, type Link } from './graphInterfaces';
+import Graph from 'graphology';
 
-export function calculateGraphMetrics(nodes: Node[], links: Link[]) {
-  const numNodes = nodes.length;
-  const numLinks = links.length;
-  const maxPossibleLinks = numNodes * (numNodes - 1) / 2;
-  const density = numLinks / maxPossibleLinks;
-  const avgDegree = (2 * numLinks) / numNodes;
+// Все это пока не учитывает, что граф может быть ориентированным
+// Может потом добавлю
+
+export function calculateGraphMetrics(graph: Graph) {
+  const numNodes = graph.nodes().length;
+  const numEdges = graph.edges().length;
+  const maxPossibleEdges = numNodes * (numNodes - 1) / 2;
+  const density = maxPossibleEdges > 0 ? numEdges / maxPossibleEdges : 0;
+  const avgDegree = numNodes > 0 ? (2 * numEdges) / numNodes : 0;
   
   // Степени узлов
   const degreeMap = new Map<string, number>();
-  nodes.forEach(n => degreeMap.set(n.id, 0));
-  links.forEach(l => {
-    degreeMap.set(l.source, (degreeMap.get(l.source) || 0) + 1);
-    degreeMap.set(l.target, (degreeMap.get(l.target) || 0) + 1);
+  graph.forEachNode(n => degreeMap.set(n, 0));
+  graph.forEachEdge((_edgeId, attributes, source, target) => {
+    degreeMap.set(source, (degreeMap.get(source) || 0) + (attributes.weight || 1));
+    degreeMap.set(target, (degreeMap.get(target) || 0) + (attributes.weight || 1));
   });
   
   const maxDegree = Math.max(...Array.from(degreeMap.values()));
   const minDegree = Math.min(...Array.from(degreeMap.values()));
 
   // Строим список смежности
-  const adjList: Map<string, string[]> = buildAdjList(nodes, links);
+  const adjList: Map<string, string[]> = buildAdjList(graph);
+  
+  return {
+    numNodes,
+    numEdges,
+    density,
+    avgDegree,
+    maxDegree,
+    minDegree
+  };
+}
+
+// Нахождение компонент связности, диаметра, радиуса и длины среднего пути
+function findEccentricitiesAndSuch(graph: Graph, adjList: Map<string, string[]>) {
 
   // Нахождение эксцентриситета каждого узла, суммы всех путей, 
   // кол-ва связанных пар и компонент связности
@@ -28,22 +44,22 @@ export function calculateGraphMetrics(nodes: Node[], links: Link[]) {
   let pairCount = 0;
   let componentsNum = 0;
   const componentIndices = new Map<string, number>(); // к какой компоненте относится нода
-  nodes.forEach(n => componentIndices.set(n.id, 0));
+  graph.forEachNode(n => componentIndices.set(n, 0));
 
-  for (const node of nodes) {
-    const distances = bfsDistances(node.id, nodes, adjList);
+  graph.forEachNode(n => {
+    const distances = bfsDistances(n, graph, adjList);
 
     const maxDist = Math.max(...Array.from(distances.values()).filter(d => d !== Infinity));
     eccentricities.push(maxDist);
 
     for (const [targetId, dist] of distances) {
-      if (targetId !== node.id && dist !== Infinity) {
+      if (targetId !== n && dist !== Infinity) {
         totalDist += dist;
         pairCount++;
       }
     }
 
-    if (componentIndices.get(node.id) === 0) {
+    if (componentIndices.get(n) === 0) {
       componentsNum++;
       for (const [targetId, dist] of distances) {
         if (dist !== Infinity) {
@@ -51,31 +67,25 @@ export function calculateGraphMetrics(nodes: Node[], links: Link[]) {
         }
       }
     }
-  }
+  })
   
-  // Диаметр, радиус и длина среднего пути
+  // Нахождение диаметра, радиуса и длины среднего пути
   const diameter = Math.max(...eccentricities);
   const radius = Math.min(...eccentricities);
   const avgPathLen = pairCount > 0 ? totalDist / pairCount : 0;
-  
+
   return {
-    numNodes,
-    numLinks,
-    density,
-    avgDegree,
-    maxDegree,
-    minDegree,
+    componentIndices,
     diameter,
     radius,
-    avgPathLen,
-    componentsNum
-  };
+    avgPathLen
+  }
 }
 
 // Поиск кратчайших путей от одного узла (BFS)
-function bfsDistances(startId: string, nodes: Node[], adjList: Map<string, string[]>): Map<string, number> {
+function bfsDistances(startId: string, graph: Graph, adjList: Map<string, string[]>): Map<string, number> {
   const distances = new Map<string, number>();
-  nodes.forEach(n => distances.set(n.id, Infinity));
+  graph.forEachNode(n => distances.set(n, Infinity));
   distances.set(startId, 0);
   
   const queue = [startId];
@@ -96,12 +106,12 @@ function bfsDistances(startId: string, nodes: Node[], adjList: Map<string, strin
 }
 
 // Построение списка смежности
-function buildAdjList(nodes: Node[], links: Link[]): Map<string, string[]> {
+function buildAdjList(graph: Graph): Map<string, string[]> {
   const adjList = new Map<string, string[]>();
-  nodes.forEach(n => adjList.set(n.id, []));
-  links.forEach(l => {
-    adjList.get(l.source)!.push(l.target);
-    adjList.get(l.target)!.push(l.source);
+  graph.forEachNode(n => adjList.set(n, []));
+  graph.forEachEdge((_edgeId, _attributes, source, target) => {
+    adjList.get(source)!.push(target);
+    adjList.get(target)!.push(source);
   });
   return adjList;
 }
