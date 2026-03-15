@@ -1,4 +1,5 @@
 import Graph from 'graphology';
+import {labelPropagation} from "./labelPropagation";
 
 // Все это пока не учитывает, что граф может быть ориентированным
 // Может потом добавлю
@@ -21,16 +22,16 @@ export function calculateGraphMetrics(graph: Graph) {
   const maxDegree = Math.max(...Array.from(degreeMap.values()));
   const minDegree = Math.min(...Array.from(degreeMap.values()));
 
-  // Строим список смежности
-  const adjList: Map<string, string[]> = buildAdjList(graph);
-  
+  const numCommunities = labelPropagation(graph);
+
   return {
     numNodes,
     numEdges,
     density,
     avgDegree,
     maxDegree,
-    minDegree
+    minDegree,
+    numCommunities
   };
 }
 

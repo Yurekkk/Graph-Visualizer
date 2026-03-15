@@ -6,22 +6,7 @@ import { hsvToRgb } from './hsvToRgb';
 import { type Data } from './graphInterfaces';
 import { calculateGraphMetrics } from './calculateGraphMetrics';
 
-function logMetrics(graph: Graph) {
-  const {
-    numNodes,
-    numEdges,
-    density,
-    avgDegree,
-    maxDegree,
-    minDegree
-  } = calculateGraphMetrics(graph);
-  console.log(`Кол-во узлов: ${numNodes}`);
-  console.log(`Кол-во ребер: ${numEdges}`);
-  console.log(`Плотность: ${density}`);
-  console.log(`Средняя степень: ${avgDegree}`);
-  console.log(`Максимальная степень: ${maxDegree}`);
-  console.log(`Минимальная степень: ${minDegree}`);
-}
+
 
 async function initGraph() {
 
@@ -33,25 +18,20 @@ async function initGraph() {
   const graph = new Graph();
 
   const response = await fetch('../miserables.json');
-  if (!response.ok) throw new Error('Не удалось загрузить miserables.json');
+  if (!response.ok) throw new Error('Не удалось загрузить файл.');
   
   const data: Data = await response.json();
-  const maxGroup = Math.max(...data.nodes.map(n => n.group));
-  const maxValue = Math.max(...data.links.map(l => l.value || 1));
+  const maxEdgeWeight = Math.max(...data.links.map(l => l.value || 1));
 
 
 
   // Добавляем узлы
   data.nodes.forEach(node => {
-    const hue = (node.group / maxGroup) * 360;
-    const {r, g, b} = hsvToRgb(hue, 90, 75);
     graph.addNode(node.id, {
       label: '',                          // Пустой изначально
       hiddenLabel: node.label || node.id, // Сохраняем настоящий
       size: 10,
       labelSize: 0,
-      originalColor: `rgb(${r}, ${g}, ${b})`,
-      color: `rgb(${r}, ${g}, ${b})`,
       x: Math.random() * 10 - 5,
       y: Math.random() * 10 - 5,
     });
@@ -62,7 +42,7 @@ async function initGraph() {
   // Добавляем связи
   data.links.forEach(link => {
     const value = link.value || 1;
-    const ratio = value / maxValue;  // 0.0 - 1.0
+    const ratio = value / maxEdgeWeight;  // 0.0 - 1.0
     const hue = 240 - Math.round(240 * ratio);
     const {r, g, b} = hsvToRgb(hue, 70, 55);
     graph.addEdge(link.source, link.target, {
@@ -75,15 +55,41 @@ async function initGraph() {
 
 
   
-  logMetrics(graph);
+  // Считаем и выводим метрики
+  const {
+    numNodes,
+    numEdges,
+    density,
+    avgDegree,
+    maxDegree,
+    minDegree,
+    numCommunities
+  } = calculateGraphMetrics(graph);
+  console.log(`Кол-во узлов: ${numNodes}`);
+  console.log(`Кол-во ребер: ${numEdges}`);
+  console.log(`Плотность: ${density}`);
+  console.log(`Средняя степень: ${avgDegree}`);
+  console.log(`Максимальная степень: ${maxDegree}`);
+  console.log(`Минимальная степень: ${minDegree}`);
+  console.log(`Кол-во сообществ: ${numCommunities}`);
+
+
+
+  // Окрашиваем узлы в зависимости от номера сообщества
+  graph.forEachNode((node, attributes) => {
+    const hue = (attributes.community / numCommunities) * 360;
+    const {r, g, b} = hsvToRgb(hue, 90, 75);
+    graph.setNodeAttribute(node, 'color', `rgb(${r}, ${g}, ${b})`)
+    graph.setNodeAttribute(node, 'originalColor', `rgb(${r}, ${g}, ${b})`)
+  })
 
 
 
   // Запускаем ForceAtlas2 для раскладки
   const sensibleSettings = forceAtlas2.inferSettings(graph);
   forceAtlas2.assign(graph, {
-      iterations: 50,
-      settings: sensibleSettings
+    iterations: 50,
+    settings: sensibleSettings
   });
 
 
