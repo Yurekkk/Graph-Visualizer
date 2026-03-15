@@ -3,7 +3,7 @@ import Sigma from 'sigma';
 import Graph from 'graphology';
 import forceAtlas2 from 'graphology-layout-forceatlas2';
 import { hsvToRgb } from './hsvToRgb';
-import { calculateGraphMetrics } from './calculateGraphMetrics';
+import calculateGraphMetrics from './calculateGraphMetrics';
 import { createNodeBorderProgram } from "@sigma/node-border";
 import parseGraphFile from './parser.ts';
 
@@ -60,7 +60,8 @@ async function initGraph(path: string, title: string) {
     maxDegree,
     minDegree,
     maxEdgeWeight,
-    numCommunities
+    numCommunities,
+    modularity
   } = calculateGraphMetrics(graph);
   console.log(`========== Отрисовка графа ${title} ==========`)
   console.log(`Кол-во узлов: ${numNodes}`);
@@ -71,6 +72,7 @@ async function initGraph(path: string, title: string) {
   console.log(`Минимальная степень: ${minDegree}`);
   console.log(`Максимальный вес ребра: ${maxEdgeWeight}`);
   console.log(`Кол-во сообществ: ${numCommunities}`);
+  console.log(`Модулярность: ${modularity}`);
 
 
 

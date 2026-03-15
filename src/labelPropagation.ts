@@ -1,7 +1,7 @@
 import Graph from 'graphology';
 
 // Возвращает кол-во найденных сообществ
-export function labelPropagation(
+export default function labelPropagation(
   graph: Graph,
   maxIterations: number = 100,
   seed: number = Math.random()

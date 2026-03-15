@@ -1,10 +1,11 @@
 import Graph from 'graphology';
-import {labelPropagation} from "./labelPropagation";
+import labelPropagation from "./labelPropagation";
+import calculateModularity from 'graphology-metrics/graph/modularity';
 
 // Все это пока не учитывает, что граф может быть ориентированным
 // Может потом добавлю
 
-export function calculateGraphMetrics(graph: Graph) {
+export default function calculateGraphMetrics(graph: Graph) {
   const numNodes = graph.nodes().length;
   const numEdges = graph.edges().length;
   const maxPossibleEdges = numNodes * (numNodes - 1) / 2;
@@ -31,6 +32,11 @@ export function calculateGraphMetrics(graph: Graph) {
       maxEdgeWeight = weight;
   })
 
+  const modularity = calculateModularity(graph, {
+    getNodeCommunity: 'community',
+    getEdgeWeight: 'weight'
+  });
+
   return {
     numNodes,
     numEdges,
@@ -39,7 +45,8 @@ export function calculateGraphMetrics(graph: Graph) {
     maxDegree,
     minDegree,
     maxEdgeWeight,
-    numCommunities
+    numCommunities,
+    modularity
   };
 }
 
