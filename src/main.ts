@@ -24,7 +24,9 @@ const nodeSizeHover = 20;
 const nodeSaturation = 90;
 const nodeValue = 75;
 
-const edgeSize = 3;
+const edgeMinSize = 2;
+const edgeMaxSize = 6;
+const edgeMinHue = 0;
 const edgeMaxHue = 240;
 const edgeDefaultHue = 240;
 const edgeSaturation = 70;
@@ -101,12 +103,14 @@ async function initGraph(path: string, title: string) {
 
   // Расставляем атрибуты ребер
   graph.forEachEdge((_edge, attributes, source, target) => {
-    // Окрашиваем ребра в зависимости от их веса
-    let hue;
+    // Окрашиваем ребра и ставим их ширину в зависимости от их веса
+    let hue, size;
     if (maxEdgeWeight !== minEdgeWeight) {
       const ratio = (attributes.weight - minEdgeWeight) / 
                     (maxEdgeWeight - minEdgeWeight); // 0.0 - 1.0
-      hue = edgeMaxHue * (1 - ratio); // синий - красный
+      hue = (edgeMaxHue - edgeMinHue) * 
+            (1 - ratio) + edgeMinHue; // синий - красный
+      size = (edgeMaxSize - edgeMinSize) * ratio + edgeMinSize;
     }
     else {
       hue = edgeDefaultHue;
@@ -114,7 +118,7 @@ async function initGraph(path: string, title: string) {
     const {r, g, b} = hsvToRgb(hue, edgeSaturation, edgeValue);
 
     graph!.mergeEdgeAttributes(source, target, {
-      size: edgeSize,
+      size: size,
       color: `rgb(${r}, ${g}, ${b})`,
       zIndex: attributes.weight
     });
