@@ -3,14 +3,23 @@ import Sigma from 'sigma';
 import Graph from 'graphology';
 import forceAtlas2 from 'graphology-layout-forceatlas2';
 import { hsvToRgb } from './hsvToRgb';
-import { type Data } from './graphInterfaces';
 import { calculateGraphMetrics } from './calculateGraphMetrics';
 import { createNodeBorderProgram } from "@sigma/node-border";
+import parseGraphFile from './parser.ts';
 
 
 
-// Некоторые константы
-const nodeSize = 12;
+const container = document.getElementById('sigma-container') as HTMLSelectElement;
+if (!container) throw new Error('Контейнер для графа не найден!');
+const selector = document.getElementById('graph-selector') as HTMLSelectElement;
+if (!selector) throw new Error('Селектор не найден!');
+let renderer: Sigma | null = null;
+let graph: Graph | null = null;
+
+
+
+// Константы
+const nodeSize = 10;
 const nodeSizeHover = 20;
 const nodeSaturation = 90;
 const nodeValue = 75;
@@ -21,63 +30,27 @@ const edgeSaturation = 70;
 const edgeValue = 55;
 
 const borderColor = '#ffffff';
-const borderSizeDefault = 0.05; // Дробь от размера всего узла, [0, 1]
+const borderSizeDefault = 0.075; // Дробь от размера всего узла, [0, 1]
 const borderSizeNeighbor = 0.35; // [0, 1]
-const borderSizeHover = 0.2; // [0, 1]
+const borderSizeHover = 0.2;     // [0, 1]
 
 const labelColor = '#000000';
 const labelSize = 20;
 
 
 
-async function initGraph() {
+async function initGraph(path: string, title: string) {
 
-  const container = document.getElementById('sigma-container');
-  if (!container) {
-    throw new Error('Контейнер для графа не найден!');
+  if (renderer) {
+    renderer.kill(); 
+    renderer = null;
   }
-
-  const graph = new Graph();
-
-  const response = await fetch('../miserables.json');
-  if (!response.ok) throw new Error('Не удалось загрузить файл.');
+  graph = null;
   
-  const data: Data = await response.json();
-  const maxEdgeWeight = Math.max(...data.links.map(l => l.value || 1));
 
 
+  graph = await parseGraphFile(path);
 
-  // Добавляем узлы
-  data.nodes.forEach(node => {
-    graph.addNode(node.id, {
-      label: '',                          // Пустой изначально
-      hiddenLabel: node.label || node.id, // Сохраняем настоящий
-      size: nodeSize,
-      x: Math.random() * 10 - 5,
-      y: Math.random() * 10 - 5,
-      borderColor: borderColor,
-      borderSize: 0.0
-    });
-  });
-
-
-
-  // Добавляем связи
-  data.links.forEach(link => {
-    const value = link.value || 1;
-    const ratio = value / maxEdgeWeight;  // 0.0 - 1.0
-    const hue = edgeMaxHue * (1 - ratio); // синий - красный
-    const {r, g, b} = hsvToRgb(hue, edgeSaturation, edgeValue);
-    graph.addEdge(link.source, link.target, {
-      weight: link.value,
-      size: edgeSize,
-      color: `rgb(${r}, ${g}, ${b})`,
-      type: 'line',
-    });
-  });
-
-
-  
   // Считаем и выводим метрики
   const {
     numNodes,
@@ -86,24 +59,51 @@ async function initGraph() {
     avgDegree,
     maxDegree,
     minDegree,
+    maxEdgeWeight,
     numCommunities
   } = calculateGraphMetrics(graph);
+  console.log(`========== Отрисовка графа ${title} ==========`)
   console.log(`Кол-во узлов: ${numNodes}`);
   console.log(`Кол-во ребер: ${numEdges}`);
   console.log(`Плотность: ${density}`);
   console.log(`Средняя степень: ${avgDegree}`);
   console.log(`Максимальная степень: ${maxDegree}`);
   console.log(`Минимальная степень: ${minDegree}`);
+  console.log(`Максимальный вес ребра: ${maxEdgeWeight}`);
   console.log(`Кол-во сообществ: ${numCommunities}`);
 
 
 
-  // Окрашиваем узлы в зависимости от номера сообщества
+  // Расставляем атрибуты узлов
   graph.forEachNode((node, attributes) => {
+    // Окрашиваем узлы в зависимости от номера сообщества
     const hue = (attributes.community / numCommunities) * 360;
     const {r, g, b} = hsvToRgb(hue, nodeSaturation, nodeValue);
-    graph.setNodeAttribute(node, 'color', `rgb(${r}, ${g}, ${b})`)
-  })
+    graph!.mergeNodeAttributes(node, {
+      label: '',                     // Пустой изначально
+      hiddenLabel: attributes.label, // Сохраняем настоящий
+      size: nodeSize,
+      color: `rgb(${r}, ${g}, ${b})`,
+      x: Math.random() * 10 - 5,
+      y: Math.random() * 10 - 5,
+      borderColor: borderColor,
+      borderSize: borderSizeDefault
+    });
+  });
+
+
+
+  // Расставляем атрибуты ребер
+  graph.forEachEdge((_edge, attributes, source, target) => {
+    const ratio = attributes.weight / maxEdgeWeight;  // 0.0 - 1.0
+    const hue = edgeMaxHue * (1 - ratio); // синий - красный
+    const {r, g, b} = hsvToRgb(hue, edgeSaturation, edgeValue);
+    graph!.mergeEdgeAttributes(source, target, {
+      size: edgeSize,
+      color: `rgb(${r}, ${g}, ${b})`,
+      zIndex: attributes.weight
+    });
+  });
 
 
 
@@ -117,11 +117,12 @@ async function initGraph() {
 
 
   // Инициализируем Sigma
-  const renderer = new Sigma(graph, container, {
+  renderer = new Sigma(graph, container!, {
     defaultNodeType: 'circle',
     defaultEdgeType: 'line',
     labelColor: { color: labelColor },
     labelSize: labelSize,
+    zIndex: true,
     nodeProgramClasses: {
       circle: createNodeBorderProgram({
         borders: [
@@ -140,38 +141,62 @@ async function initGraph() {
   // Hover с подсветкой соседей
   renderer.on('enterNode', ({ node }) => {
     // Показываем лейбл и увеличиваем узел
-    const hiddenLabel = graph.getNodeAttribute(node, 'hiddenLabel');
-    graph.setNodeAttribute(node, 'label', hiddenLabel);
-    graph.setNodeAttribute(node, 'size', nodeSizeHover);
-    graph.setNodeAttribute(node, 'borderSize', borderSizeHover);
+    const hiddenLabel = graph!.getNodeAttribute(node, 'hiddenLabel');
+    graph!.setNodeAttribute(node, 'label', hiddenLabel);
+    graph!.setNodeAttribute(node, 'size', nodeSizeHover);
+    graph!.setNodeAttribute(node, 'borderSize', borderSizeHover);
 
     // Подсвечиваем соседей
-    graph.forEachNeighbor(node, (neighbor) => {
-      graph.setNodeAttribute(neighbor, 'borderSize', borderSizeNeighbor);
+    graph!.forEachNeighbor(node, (neighbor) => {
+      graph!.setNodeAttribute(neighbor, 'borderSize', borderSizeNeighbor);
     });
 
-    renderer.refresh();
+    renderer!.refresh();
   });
 
   renderer.on('leaveNode', ({ node }) => {
     // Скрываем лейбл и уменьшаем узел
-    graph.setNodeAttribute(node, 'label', '');
-    graph.setNodeAttribute(node, 'size', nodeSize);
-    graph.setNodeAttribute(node, 'borderSize', borderSizeDefault);
+    graph!.setNodeAttribute(node, 'label', '');
+    graph!.setNodeAttribute(node, 'size', nodeSize);
+    graph!.setNodeAttribute(node, 'borderSize', borderSizeDefault);
 
     // Убираем подсветку у соседей
-    graph.forEachNeighbor(node, (neighbor) => {
-      graph.setNodeAttribute(neighbor, 'borderSize', borderSizeDefault);
+    graph!.forEachNeighbor(node, (neighbor) => {
+      graph!.setNodeAttribute(neighbor, 'borderSize', borderSizeDefault);
     });
 
-    renderer.refresh();
+    renderer!.refresh();
   });
 
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initGraph);
-} else {
-  initGraph();
+
+
+function initSelector() {
+  const graphFiles = import.meta.glob<{ nodes: any[]; edges: any[] }>
+    ('../graphs/*', { eager: false });
+
+  selector!.innerHTML = '';
+  
+  Object.keys(graphFiles).forEach((path) => {
+    const option = document.createElement('option');
+    option.value = path;
+    // Красивое имя файла без расширения и пути
+    option.textContent = path.replace('../graphs/', '').replace(/\.[^.]+$/, ''); 
+    selector!.appendChild(option);
+  });
+
+  // Загружаем miserables.json по умолчанию
+  const miserablesPath = '../graphs/miserables.json';
+  selector!.value = '../graphs/miserables.json';
+  initGraph(miserablesPath, 'miserables');
 }
 
+selector.addEventListener('change', (e) => {
+    initGraph((e.target as HTMLSelectElement).value,
+              (e.target as HTMLSelectElement).selectedOptions[0].text);
+});
+
+
+
+initSelector();

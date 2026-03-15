@@ -24,6 +24,13 @@ export function calculateGraphMetrics(graph: Graph) {
 
   const numCommunities = labelPropagation(graph);
 
+  let maxEdgeWeight = -Infinity;
+  graph.forEachEdge((_edgeId, attributes, _source, _target) => {
+    const weight = attributes.weight || 1;
+    if (weight > maxEdgeWeight) 
+      maxEdgeWeight = weight;
+  })
+
   return {
     numNodes,
     numEdges,
@@ -31,6 +38,7 @@ export function calculateGraphMetrics(graph: Graph) {
     avgDegree,
     maxDegree,
     minDegree,
+    maxEdgeWeight,
     numCommunities
   };
 }
