@@ -26,6 +26,7 @@ const nodeValue = 75;
 
 const edgeMinSize = 2;
 const edgeMaxSize = 6;
+const edgeDefaultSize = 3;
 const edgeMinHue = 0;
 const edgeMaxHue = 240;
 const edgeDefaultHue = 240;
@@ -114,6 +115,7 @@ async function initGraph(path: string, title: string) {
     }
     else {
       hue = edgeDefaultHue;
+      size = edgeDefaultSize;
     }
     const {r, g, b} = hsvToRgb(hue, edgeSaturation, edgeValue);
 
