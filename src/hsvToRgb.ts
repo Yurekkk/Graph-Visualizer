@@ -1,4 +1,4 @@
-export function hsvToRgb(h: number, s: number, v: number): { r: number; g: number; b: number } {
+export default function hsvToRgb(h: number, s: number, v: number): { r: number; g: number; b: number } {
   h = h % 360;
   s = s / 100;
   v = v / 100;

@@ -2,7 +2,7 @@ import './style.css';
 import Sigma from 'sigma';
 import Graph from 'graphology';
 import forceAtlas2 from 'graphology-layout-forceatlas2';
-import { hsvToRgb } from './hsvToRgb';
+import hsvToRgb from './hsvToRgb';
 import calculateGraphMetrics from './calculateGraphMetrics';
 import { createNodeBorderProgram } from "@sigma/node-border";
 import parseGraphFile from './parser.ts';
@@ -26,6 +26,7 @@ const nodeValue = 75;
 
 const edgeSize = 3;
 const edgeMaxHue = 240;
+const edgeDefaultHue = 240;
 const edgeSaturation = 70;
 const edgeValue = 55;
 
@@ -60,6 +61,7 @@ async function initGraph(path: string, title: string) {
     maxDegree,
     minDegree,
     maxEdgeWeight,
+    minEdgeWeight,
     numCommunities,
     modularity
   } = calculateGraphMetrics(graph);
@@ -71,6 +73,7 @@ async function initGraph(path: string, title: string) {
   console.log(`Максимальная степень: ${maxDegree}`);
   console.log(`Минимальная степень: ${minDegree}`);
   console.log(`Максимальный вес ребра: ${maxEdgeWeight}`);
+  console.log(`Минимальный вес ребра: ${minEdgeWeight}`);
   console.log(`Кол-во сообществ: ${numCommunities}`);
   console.log(`Модулярность: ${modularity}`);
 
@@ -81,6 +84,7 @@ async function initGraph(path: string, title: string) {
     // Окрашиваем узлы в зависимости от номера сообщества
     const hue = (attributes.community / numCommunities) * 360;
     const {r, g, b} = hsvToRgb(hue, nodeSaturation, nodeValue);
+
     graph!.mergeNodeAttributes(node, {
       label: '',                     // Пустой изначально
       hiddenLabel: attributes.label, // Сохраняем настоящий
@@ -97,9 +101,18 @@ async function initGraph(path: string, title: string) {
 
   // Расставляем атрибуты ребер
   graph.forEachEdge((_edge, attributes, source, target) => {
-    const ratio = attributes.weight / maxEdgeWeight;  // 0.0 - 1.0
-    const hue = edgeMaxHue * (1 - ratio); // синий - красный
+    // Окрашиваем ребра в зависимости от их веса
+    let hue;
+    if (maxEdgeWeight !== minEdgeWeight) {
+      const ratio = (attributes.weight - minEdgeWeight) / 
+                    (maxEdgeWeight - minEdgeWeight); // 0.0 - 1.0
+      hue = edgeMaxHue * (1 - ratio); // синий - красный
+    }
+    else {
+      hue = edgeDefaultHue;
+    }
     const {r, g, b} = hsvToRgb(hue, edgeSaturation, edgeValue);
+
     graph!.mergeEdgeAttributes(source, target, {
       size: edgeSize,
       color: `rgb(${r}, ${g}, ${b})`,
@@ -112,7 +125,7 @@ async function initGraph(path: string, title: string) {
   // Запускаем ForceAtlas2 для раскладки
   const sensibleSettings = forceAtlas2.inferSettings(graph);
   forceAtlas2.assign(graph, {
-    iterations: 100,
+    iterations: 50,
     settings: sensibleSettings
   });
 

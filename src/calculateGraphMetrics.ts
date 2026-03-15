@@ -26,10 +26,13 @@ export default function calculateGraphMetrics(graph: Graph) {
   const numCommunities = labelPropagation(graph);
 
   let maxEdgeWeight = -Infinity;
+  let minEdgeWeight = +Infinity;
   graph.forEachEdge((_edgeId, attributes, _source, _target) => {
     const weight = attributes.weight || 1;
     if (weight > maxEdgeWeight) 
       maxEdgeWeight = weight;
+    if (weight < minEdgeWeight) 
+      minEdgeWeight = weight;
   })
 
   const modularity = calculateModularity(graph, {
@@ -45,6 +48,7 @@ export default function calculateGraphMetrics(graph: Graph) {
     maxDegree,
     minDegree,
     maxEdgeWeight,
+    minEdgeWeight,
     numCommunities,
     modularity
   };
