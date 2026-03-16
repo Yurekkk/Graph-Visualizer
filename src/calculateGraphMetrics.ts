@@ -1,5 +1,5 @@
 import Graph from 'graphology';
-import labelPropagation from "./labelPropagation";
+// import labelPropagation from "./labelPropagation";
 import calculateModularity from 'graphology-metrics/graph/modularity';
 import louvain from 'graphology-communities-louvain';
 
@@ -23,21 +23,23 @@ export default function calculateGraphMetrics(graph: Graph) {
   end = performance.now();
   console.log(`Время вычисления простых метрик: ${end - start} мс`)
 
+  /*
   start = performance.now();
-  const numCommunities = labelPropagation(graph);
+  const numCommunities = labelPropagation(graph, 100);
   end = performance.now();
   console.log(`Время нахождения сообществ (LPA): ${end - start} мс`)
+  //*/
 
+  //*
   start = performance.now();
   louvain.assign(graph);
+  const numCommunities = findCommunitiesNum(graph);
   end = performance.now();
   console.log(`Время нахождения сообществ (louvain): ${end - start} мс`)
+  //*/
 
   start = performance.now();
-  const modularity = calculateModularity(graph, {
-    getNodeCommunity: 'community',
-    getEdgeWeight: 'weight'
-  });
+  const modularity = calculateModularity(graph);
   end = performance.now();
   console.log(`Время нахождения модулярности: ${end - start} мс`)
 
@@ -53,6 +55,15 @@ export default function calculateGraphMetrics(graph: Graph) {
     numCommunities,
     modularity
   };
+}
+
+// Нахождение кол-ва сообществ
+function findCommunitiesNum(graph: Graph): number {
+  const uniqueCommunities = new Set();
+  graph.forEachNode((_node, attributes) => {
+    uniqueCommunities.add(attributes.community);
+  })
+  return uniqueCommunities.size;
 }
 
 // Нахождение простых метрик

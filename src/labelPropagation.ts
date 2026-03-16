@@ -20,13 +20,15 @@ export default function labelPropagation(
     return rand / 2**31;
   }
 
+  const counts = new Map<string, number>();
+  
   // Основной цикл
   for (let iter = 0; iter < maxIterations; iter++) {
     let changed = false;
     const shuffled = [...nodes].sort(() => random() - 0.5);
     
     for (const currNode of shuffled) {
-      const counts = new Map<string, number>();
+      counts.clear();
       
       graph.forEachNeighbor(currNode, (neighbor, _attributes) => {
         const edge = graph.edge(currNode, neighbor) || 

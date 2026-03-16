@@ -29,7 +29,7 @@ const edgeMaxSize = 6;
 const edgeDefaultSize = 3;
 const edgeMinHue = 0;
 const edgeMaxHue = 240;
-const edgeDefaultHue = 240;
+const edgeDefaultHue = 0;
 const edgeSaturation = 70;
 const edgeValue = 55;
 
