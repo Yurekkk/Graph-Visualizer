@@ -7,8 +7,6 @@ import { parse as parseGEXFGraphology } from "graphology-gexf/browser";
 // то, скорее всего, это не веса, а временные метки
 const TIMESTAMP_THRESHOLD = 500_000_000;
 
-// gexf parser has not been tested
-
 
 
 interface Node {
@@ -45,6 +43,8 @@ export default async function parseGraphFile(
       return parseMTX(content);
     case 'csv':
       return parseCSV(content);
+    case 'dot':
+      return parseDOT(content);
     default:
       throw new Error(`Неподдерживаемый формат: ${format}`);
   }
@@ -67,6 +67,8 @@ function detectFormat(filePath: string): string {
     case 'tsv':
     case 'edges':
       return 'csv';
+    case 'dot':
+      return 'dot';
     default:
       return ext ?? 'unknown';
   }
@@ -104,6 +106,7 @@ function parseJSON(content: string): Graph {
 
 
 function parseGEXF(content: string): Graph {
+  // Этот парсер еще не тестировался
   const graph = parseGEXFGraphology(Graph, content);
   return graph;
 }
@@ -233,6 +236,54 @@ function parseCSV(content: string): Graph {
         oldWeight + (valuesAreTimestamps ? 1 : edge.weight));
     }
   });
+
+  return graph;
+}
+
+
+
+function parseDOT(content: string): Graph {
+  const graph = new Graph();
+  
+  // Удаляем комментарии // и /* */
+  const clean = content.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
+
+  // Находим все объявления узлов: n0; n1; ...
+  const nodeRegex = /^\s*(\w+)\s*;/gm;
+  let match;
+  while ((match = nodeRegex.exec(clean)) !== null) {
+    const id = match[1];
+    if (!graph.hasNode(id)) {
+      graph.addNode(id, { label: id });
+    }
+  }
+
+  // Находим все ребра: n0 -- n9 [attrs];
+  // Группа 1: источник, 2: тип (-- или -->), 3: цель, 4: атрибуты (опционально)
+  const edgeRegex = /(\w+)\s*(--|->)\s*(\w+)(?:\s*\[(.*?)\])?/g;
+  
+  while ((match = edgeRegex.exec(clean)) !== null) {
+    const source = match[1];
+    const target = match[3];
+    const attrsString = match[4]; // "id=e42"
+
+    // Парсинг атрибутов из строки "id=e42, weight=5"
+    const attributes: any = {};
+    if (attrsString) {
+      const attrPairs = attrsString.split(',');
+      attrPairs.forEach(pair => {
+        const [key, val] = pair.trim().split('=');
+        if (key && val) {
+          // Убираем кавычки если есть
+          attributes[key.trim()] = val.trim().replace(/^["']|["']$/g, '');
+        }
+      });
+    }
+
+    if (!graph.hasEdge(source, target)) {
+      graph.addEdge(source, target, attributes);
+    }
+  }
 
   return graph;
 }
