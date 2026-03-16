@@ -5,7 +5,7 @@ import forceAtlas2 from 'graphology-layout-forceatlas2';
 import hsvToRgb from './hsvToRgb';
 import calculateGraphMetrics from './calculateGraphMetrics';
 import { createNodeBorderProgram } from "@sigma/node-border";
-import parseGraphFile from './parser.ts';
+import parseGraphFile from './graphParser.ts';
 
 
 
