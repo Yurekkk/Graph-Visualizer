@@ -15,10 +15,13 @@
   },
   "dependencies": {
     "@sigma/node-border": "^3.0.0",
+    "@ts-graphviz/parser": "^0.6.1",
     "graphology": "^0.26.0",
     "graphology-communities-louvain": "^2.0.2",
+    "graphology-gexf": "^0.13.2",
     "graphology-layout-forceatlas2": "^0.10.1",
     "graphology-metrics": "^2.4.0",
-    "sigma": "^3.0.2"
+    "sigma": "^3.0.2",
+    "ts-graphviz": "^3.0.7"
   }
 }

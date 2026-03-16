@@ -1,11 +1,62 @@
 import Graph from 'graphology';
 import labelPropagation from "./labelPropagation";
 import calculateModularity from 'graphology-metrics/graph/modularity';
+import louvain from 'graphology-communities-louvain';
 
 // Все это пока не учитывает, что граф может быть ориентированным
 // Может потом добавлю
 
 export default function calculateGraphMetrics(graph: Graph) {
+  let start, end;
+
+  start = performance.now();
+  const {
+    numNodes,
+    numEdges,
+    density,
+    avgDegree,
+    maxDegree,
+    minDegree,
+    maxEdgeWeight,
+    minEdgeWeight,
+  } = findSimpleMetrics(graph);
+  end = performance.now();
+  console.log(`Время вычисления простых метрик: ${end - start} мс`)
+
+  start = performance.now();
+  const numCommunities = labelPropagation(graph);
+  end = performance.now();
+  console.log(`Время нахождения сообществ (LPA): ${end - start} мс`)
+
+  start = performance.now();
+  louvain.assign(graph);
+  end = performance.now();
+  console.log(`Время нахождения сообществ (louvain): ${end - start} мс`)
+
+  start = performance.now();
+  const modularity = calculateModularity(graph, {
+    getNodeCommunity: 'community',
+    getEdgeWeight: 'weight'
+  });
+  end = performance.now();
+  console.log(`Время нахождения модулярности: ${end - start} мс`)
+
+  return {
+    numNodes,
+    numEdges,
+    density,
+    avgDegree,
+    maxDegree,
+    minDegree,
+    maxEdgeWeight,
+    minEdgeWeight,
+    numCommunities,
+    modularity
+  };
+}
+
+// Нахождение простых метрик
+function findSimpleMetrics(graph: Graph) {
   const numNodes = graph.nodes().length;
   const numEdges = graph.edges().length;
   const maxPossibleEdges = numNodes * (numNodes - 1) / 2;
@@ -23,8 +74,6 @@ export default function calculateGraphMetrics(graph: Graph) {
   const maxDegree = Math.max(...Array.from(degreeMap.values()));
   const minDegree = Math.min(...Array.from(degreeMap.values()));
 
-  const numCommunities = labelPropagation(graph);
-
   let maxEdgeWeight = -Infinity;
   let minEdgeWeight = +Infinity;
   graph.forEachEdge((_edgeId, attributes, _source, _target) => {
@@ -35,11 +84,6 @@ export default function calculateGraphMetrics(graph: Graph) {
       minEdgeWeight = weight;
   })
 
-  const modularity = calculateModularity(graph, {
-    getNodeCommunity: 'community',
-    getEdgeWeight: 'weight'
-  });
-
   return {
     numNodes,
     numEdges,
@@ -49,9 +93,7 @@ export default function calculateGraphMetrics(graph: Graph) {
     minDegree,
     maxEdgeWeight,
     minEdgeWeight,
-    numCommunities,
-    modularity
-  };
+  }
 }
 
 // Нахождение компонент связности, диаметра, радиуса и длины среднего пути

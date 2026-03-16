@@ -44,6 +44,7 @@ const labelSize = 20;
 
 
 async function initGraph(path: string, title: string) {
+  console.log(`========== Отрисовка графа ${title} ==========`)
 
   if (renderer) {
     renderer.kill(); 
@@ -68,7 +69,6 @@ async function initGraph(path: string, title: string) {
     numCommunities,
     modularity
   } = calculateGraphMetrics(graph);
-  console.log(`========== Отрисовка графа ${title} ==========`)
   console.log(`Кол-во узлов: ${numNodes}`);
   console.log(`Кол-во ребер: ${numEdges}`);
   console.log(`Плотность: ${density}`);

@@ -1,10 +1,13 @@
 import Graph from 'graphology';
+import { parse as parseGEXFGraphology } from "graphology-gexf/browser";
 
 
 
 // Если все значения ребер больше этого порога, 
 // то, скорее всего, это не веса, а временные метки
 const TIMESTAMP_THRESHOLD = 500_000_000;
+
+// gexf parser has not been tested
 
 
 
@@ -101,75 +104,7 @@ function parseJSON(content: string): Graph {
 
 
 function parseGEXF(content: string): Graph {
-  const graph = new Graph();
-  const parser = new DOMParser();
-  const xml = parser.parseFromString(content, 'application/xml');
-
-  // Проверка на ошибки парсинга
-  const parseError = xml.querySelector('parsererror');
-  if (parseError) {
-    throw new Error('Ошибка парсинга GEXF: неверный XML');
-  }
-
-  const nodesXML = xml.querySelectorAll('node');
-  const edgesXML = xml.querySelectorAll('edge');
-
-  nodesXML.forEach((nodeXML) => {
-    const id = nodeXML.getAttribute('id') || '';
-    const label = nodeXML.getAttribute('label') || id;
-
-    // Парсинг атрибутов узла
-    const attributes: Record<string, any> = { label };
-
-    const attvalues = nodeXML.querySelectorAll('attvalue');
-    attvalues.forEach((att) => {
-      const key = att.getAttribute('for') || att.getAttribute('title');
-      const value = att.getAttribute('value');
-      if (key && value) {
-        attributes[key] = value;
-      }
-    });
-
-    // Парсинг viz:position (координаты)
-    const vizNs = xml.lookupNamespaceURI('viz');
-    if (vizNs) {
-      const position = nodeXML.getElementsByTagNameNS(vizNs, 'position');
-      if (position.length > 0) {
-        attributes.x = parseFloat(position[0].getAttribute('x') || '0');
-        attributes.y = parseFloat(position[0].getAttribute('y') || '0');
-        const z = position[0].getAttribute('z');
-        if (z) attributes.z = parseFloat(z);
-      }
-
-      const size = nodeXML.getElementsByTagNameNS(vizNs, 'size');
-      if (size.length > 0) {
-        attributes.size = parseFloat(size[0].getAttribute('value') || '1');
-      }
-
-      const color = nodeXML.getElementsByTagNameNS(vizNs, 'color');
-      if (color.length > 0) {
-        const r = parseFloat(color[0].getAttribute('r') || '0') * 255;
-        const g = parseFloat(color[0].getAttribute('g') || '0') * 255;
-        const b = parseFloat(color[0].getAttribute('b') || '0') * 255;
-        attributes.color = `rgb(${r},${g},${b})`;
-      }
-    }
-
-    graph.addNode(id, attributes);
-  });
-
-  edgesXML.forEach((edgeXML) => {
-    const id = edgeXML.getAttribute('id') || '';
-    const source = edgeXML.getAttribute('source') || '';
-    const target = edgeXML.getAttribute('target') || '';
-    const weight = parseFloat(edgeXML.getAttribute('weight') || '1');
-
-    graph.addEdge(source, target, {
-      id,
-      weight,
-    });
-  });
-
+  const graph = parseGEXFGraphology(Graph, content);
   return graph;
 }
 
