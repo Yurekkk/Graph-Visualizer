@@ -81,6 +81,10 @@ function findSimpleMetrics(graph: Graph) {
     degreeMap.set(source, (degreeMap.get(source) || 0) + (attributes.weight || 1));
     degreeMap.set(target, (degreeMap.get(target) || 0) + (attributes.weight || 1));
   });
+
+  graph.forEachNode((node) => {
+    graph.setNodeAttribute(node, 'degree', degreeMap.get(node)!);
+  });
   
   const maxDegree = Math.max(...Array.from(degreeMap.values()));
   const minDegree = Math.min(...Array.from(degreeMap.values()));

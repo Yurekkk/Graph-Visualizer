@@ -6,6 +6,7 @@ import hsvToRgb from './hsvToRgb';
 import calculateGraphMetrics from './calculateGraphMetrics';
 import { createNodeBorderProgram } from "@sigma/node-border";
 import parseGraphFile from './graphParser.ts';
+import smartLayout from './layoutEngine.ts';
 
 
 
@@ -29,7 +30,7 @@ const edgeMaxSize = 6;
 const edgeDefaultSize = 3;
 const edgeMinHue = 0;
 const edgeMaxHue = 240;
-const edgeDefaultHue = 0;
+const edgeDefaultHue = 240;
 const edgeSaturation = 70;
 const edgeValue = 55;
 
@@ -47,11 +48,13 @@ async function initGraph(path: string, title: string) {
   console.log(`========== Отрисовка графа ${title} ==========`)
 
   if (renderer) {
+    renderer.removeAllListeners();
     renderer.kill(); 
     renderer = null;
   }
   graph = null;
-  
+  let start, end;
+
 
 
   graph = await parseGraphFile(path);
@@ -83,6 +86,7 @@ async function initGraph(path: string, title: string) {
 
 
   // Расставляем атрибуты узлов
+  const numNodesSqrt = Math.sqrt(numNodes);
   graph.forEachNode((node, attributes) => {
     // Окрашиваем узлы в зависимости от номера сообщества
     const hue = (attributes.community / numCommunities) * 360;
@@ -93,8 +97,8 @@ async function initGraph(path: string, title: string) {
       hiddenLabel: attributes.label, // Сохраняем настоящий
       size: nodeSize,
       color: `rgb(${r}, ${g}, ${b})`,
-      x: Math.random() * 10 - 5,
-      y: Math.random() * 10 - 5,
+      x: (Math.random() - 0.5) * numNodesSqrt,
+      y: (Math.random() - 0.5) * numNodesSqrt,
       borderColor: borderColor,
       borderSize: borderSizeDefault
     });
@@ -128,16 +132,16 @@ async function initGraph(path: string, title: string) {
 
 
 
-  // Запускаем ForceAtlas2 для раскладки
-  const sensibleSettings = forceAtlas2.inferSettings(graph);
-  forceAtlas2.assign(graph, {
-    iterations: 50,
-    settings: sensibleSettings
-  });
+  // Раскладываем граф
+  start = performance.now();
+  smartLayout(graph);
+  end = performance.now();
+  console.log(`Время работы раскладки: ${end - start} мс`)
 
 
 
   // Инициализируем Sigma
+  start = performance.now();
   renderer = new Sigma(graph, container!, {
     defaultNodeType: 'circle',
     defaultEdgeType: 'line',
@@ -154,8 +158,10 @@ async function initGraph(path: string, title: string) {
           { size: { fill: true }, color: { attribute: "color" } },
         ]
       }),
-    },
+    }
   });
+  end = performance.now();
+  console.log(`Время отрисовки: ${end - start} мс`)
 
 
 
@@ -188,7 +194,6 @@ async function initGraph(path: string, title: string) {
 
     renderer!.refresh();
   });
-
 }
 
 
