@@ -8,12 +8,24 @@ import stratifiedSampling from './stratifiedSampling';
 
 export default async function smartLayout(
   graph: Graph, 
+  metrics: any, // TODO: сделать нормальный интерфейс
   sampleSize = 500,
   iterations = 50
 ): Promise<void> {
   // Должно вызываться после вычисления метрик
 
-  const numNodes = graph.order;
+  const {
+    numNodes,
+    numEdges,
+    density,
+    avgDegree,
+    maxDegree,
+    minDegree,
+    maxEdgeWeight,
+    minEdgeWeight,
+    numCommunities,
+    modularity
+  } = metrics;
 
   if (numNodes <= sampleSize) {
     // Прямая раскладка

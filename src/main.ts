@@ -1,10 +1,10 @@
 import './style.css';
 import Sigma from 'sigma';
 import Graph from 'graphology';
-import forceAtlas2 from 'graphology-layout-forceatlas2';
 import hsvToRgb from './hsvToRgb';
 import calculateGraphMetrics from './calculateGraphMetrics';
 import { createNodeBorderProgram } from "@sigma/node-border";
+import EdgeCurveProgram from '@sigma/edge-curve';
 import parseGraphFile from './graphParser.ts';
 import smartLayout from './layoutEngine.ts';
 
@@ -45,7 +45,7 @@ const labelSize = 20;
 
 
 async function initGraph(path: string, title: string) {
-  console.log(`========== Отрисовка графа ${title} ==========`)
+  console.log(`=============== Отрисовка графа ${title} ===============`)
 
   if (renderer) {
     renderer.removeAllListeners();
@@ -60,6 +60,7 @@ async function initGraph(path: string, title: string) {
   graph = await parseGraphFile(path);
 
   // Считаем и выводим метрики
+  const metrics = calculateGraphMetrics(graph);
   const {
     numNodes,
     numEdges,
@@ -71,7 +72,7 @@ async function initGraph(path: string, title: string) {
     minEdgeWeight,
     numCommunities,
     modularity
-  } = calculateGraphMetrics(graph);
+  } = metrics;
   console.log(`Кол-во узлов: ${numNodes}`);
   console.log(`Кол-во ребер: ${numEdges}`);
   console.log(`Плотность: ${density}`);
@@ -126,7 +127,8 @@ async function initGraph(path: string, title: string) {
     graph!.mergeEdgeAttributes(source, target, {
       size: size,
       color: `rgb(${r}, ${g}, ${b})`,
-      zIndex: attributes.weight
+      zIndex: attributes.weight,
+      type: 'curved'
     });
   });
 
@@ -134,7 +136,7 @@ async function initGraph(path: string, title: string) {
 
   // Раскладываем граф
   start = performance.now();
-  smartLayout(graph);
+  smartLayout(graph, metrics);
   end = performance.now();
   console.log(`Время работы раскладки: ${end - start} мс`)
 
@@ -158,6 +160,9 @@ async function initGraph(path: string, title: string) {
           { size: { fill: true }, color: { attribute: "color" } },
         ]
       }),
+    },
+    edgeProgramClasses: {
+      curved: EdgeCurveProgram,
     }
   });
   end = performance.now();
