@@ -7,15 +7,8 @@ import type graphMetrics from './graphMetricsInterface';
 import { subgraph } from 'graphology-operators';
 import interpolatePositions from './interpolatePositions';
 import stratifiedSampling from './stratifiedSampling';
+import * as alg from './configs/algorithmicConfig.ts';
 
-
-const circularMinDensity = 0.25;
-const circularMaxNumNodes = 50;
-const radialMinDegreeGini = 0.75;
-const radialMinHubDominance = 25;
-const samplingMinNumNodes = 500;
-
-const forceAtlasIterations = 50;
 
 
 export default async function smartLayout(
@@ -38,15 +31,15 @@ export default async function smartLayout(
     degreeGini
   } = metrics;
 
-  if (density >= circularMinDensity && 
-    numNodes <= circularMaxNumNodes) {
+  if (density >= alg.circularMinDensity && 
+    numNodes <= alg.circularMaxNumNodes) {
     await circularLayout(graph);
   }
-  else if (degreeGini >= radialMinDegreeGini || 
-    hubDominance >= radialMinHubDominance) {
+  else if (degreeGini >= alg.radialMinDegreeGini || 
+    hubDominance >= alg.radialMinHubDominance) {
     await radialLayout(graph);
   }
-  else if (numNodes <= samplingMinNumNodes) {
+  else if (numNodes <= alg.samplingMinNumNodes) {
     await forceAtlas2Layout(graph);
   } 
   else {
@@ -65,7 +58,7 @@ async function forceAtlas2Layout(graph: Graph) {
   // Прямая раскладка
   const sensibleSettings = forceAtlas2.inferSettings(graph);
   await forceAtlas2.assign(graph, {
-    iterations: forceAtlasIterations,
+    iterations: alg.forceAtlasIterations,
     settings: sensibleSettings
   });
 }
@@ -74,7 +67,7 @@ async function forceAtlas2SamplingLayout(graph: Graph) {
   // Сэмплируем, раскладываем подграф, интерполируем остальное
 
   const sampledNodes = stratifiedSampling(graph, {
-    sampleSize: samplingMinNumNodes, 
+    sampleSize: alg.samplingMinNumNodes, 
     method: "proportional", 
     prioritizeHighDegree: true
   });
@@ -83,7 +76,7 @@ async function forceAtlas2SamplingLayout(graph: Graph) {
 
   const sensibleSettings = forceAtlas2.inferSettings(sub);
   await forceAtlas2.assign(sub, {
-    iterations: forceAtlasIterations,
+    iterations: alg.forceAtlasIterations,
     settings: sensibleSettings
   });
 

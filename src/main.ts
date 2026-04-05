@@ -8,7 +8,7 @@ import EdgeCurveProgram from '@sigma/edge-curve';
 import parseGraphFile from './graphParser.ts';
 import smartLayout from './layoutEngine.ts';
 import { hoverNode, unhoverNode, selectNode, deselectNode } from './graphVisualsHandler.ts';
-import * as vis from './configs/visual.ts';
+import * as vis from './configs/visualConfig.ts';
 
 
 
@@ -92,6 +92,7 @@ async function initGraph(path: string, title: string) {
       hiddenLabel: attributes.label, // Сохраняем настоящий
       size: vis.nodeSizeDefault,
       color: `rgba(${r}, ${g}, ${b})`,
+      labelColor: vis.labelColor,
       alpha: vis.nodeDefaultAlpha,
       x: (Math.random() - 0.5) * numNodesSqrt,
       y: (Math.random() - 0.5) * numNodesSqrt,
@@ -144,7 +145,6 @@ async function initGraph(path: string, title: string) {
   renderer = new Sigma(graph, container!, {
     defaultNodeType: 'circle',
     defaultEdgeType: 'line',
-    labelColor: { color: vis.labelColor },
     labelSize: vis.labelSize,
     zIndex: true,
 

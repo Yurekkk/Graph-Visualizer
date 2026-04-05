@@ -2,7 +2,7 @@ import Sigma from 'sigma';
 import Graph from 'graphology';
 import findCloseImportantNeighbours from './findCloseImportantNeigbors.ts';
 import { fitViewportToNodes } from '@sigma/utils';
-import * as vis from './configs/visual.ts';
+import * as vis from './configs/visualConfig.ts';
 
 
 
@@ -20,10 +20,12 @@ export function hoverNode(newHoveredNodeId: string, graph: Graph, renderer: Sigm
   hoveredNodeId = newHoveredNodeId;
 
   // Показываем лейбл и увеличиваем узел
-  const hiddenLabel = graph.getNodeAttribute(hoveredNodeId, 'hiddenLabel');
-  graph.setNodeAttribute(hoveredNodeId, 'label', hiddenLabel);
-  if (hoveredNodeId !== selectedNodeId)
+  
+  if (hoveredNodeId !== selectedNodeId) {
+    const hiddenLabel = graph.getNodeAttribute(hoveredNodeId, 'hiddenLabel');
+    graph.setNodeAttribute(hoveredNodeId, 'label', hiddenLabel);
     graph.setNodeAttribute(hoveredNodeId, 'size', vis.nodeSizeHover);
+  }
   graph.setNodeAttribute(hoveredNodeId, 'borderSize', vis.borderSizeHover);
 
   // Подсвечиваем соседей
@@ -40,9 +42,10 @@ export function unhoverNode(graph: Graph, renderer: Sigma, refresh: boolean = tr
   if (hoveredNodeId == null) return;
 
   // Скрываем лейбл и уменьшаем узел
-  graph.setNodeAttribute(hoveredNodeId, 'label', '');
-  if (hoveredNodeId !== selectedNodeId)
+  if (hoveredNodeId !== selectedNodeId) {
+    graph.setNodeAttribute(hoveredNodeId, 'label', '');
     graph.setNodeAttribute(hoveredNodeId, 'size', vis.nodeSizeDefault);
+  }
   graph.setNodeAttribute(hoveredNodeId, 'borderSize', vis.borderSizeDefault);
 
   // Убираем подсветку у соседей
@@ -61,12 +64,15 @@ export function selectNode(newSelectedNodeId: string, graph: Graph, renderer: Si
   if (selectedNodeId === newSelectedNodeId) return;
 
   if (selectedNodeId != null) {
+    graph.setNodeAttribute(selectedNodeId, 'label', '');
     graph.setNodeAttribute(selectedNodeId, 'size', vis.nodeSizeDefault);
     graph.setNodeAttribute(selectedNodeId, 'borderSize', vis.borderSizeDefault);
   }
   selectedNodeId = newSelectedNodeId;
+  const hiddenLabel = graph.getNodeAttribute(selectedNodeId, 'hiddenLabel');
+  graph.setNodeAttribute(selectedNodeId, 'label', hiddenLabel);
   graph.setNodeAttribute(selectedNodeId, 'size', vis.nodeSizeSelected);
-  graph.setNodeAttribute(selectedNodeId, 'borderSize', vis.borderSizeSelect);
+  graph.setNodeAttribute(selectedNodeId, 'borderSize', vis.borderSizeHover);
 
   const importantIds = findCloseImportantNeighbours(selectedNodeId, graph);
 
@@ -97,6 +103,7 @@ export function selectNode(newSelectedNodeId: string, graph: Graph, renderer: Si
 
 export function deselectNode(graph: Graph, renderer: Sigma) {
   if (selectedNodeId == null) return;
+  graph.setNodeAttribute(selectedNodeId, 'label', '');
   graph.setNodeAttribute(selectedNodeId, 'size', vis.nodeSizeDefault);
   graph.setNodeAttribute(selectedNodeId, 'borderSize', vis.borderSizeDefault);
   selectedNodeId = null;
