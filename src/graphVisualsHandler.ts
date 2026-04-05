@@ -3,6 +3,7 @@ import Graph from 'graphology';
 import findCloseImportantNeighbours from './findCloseImportantNeigbors.ts';
 import { fitViewportToNodes } from '@sigma/utils';
 import * as vis from './configs/visualConfig.ts';
+import type graphMetrics from './graphMetricsInterface.ts';
 
 
 
@@ -60,8 +61,12 @@ export function unhoverNode(graph: Graph, renderer: Sigma, refresh: boolean = tr
 
 
 
-export function selectNode(newSelectedNodeId: string, graph: Graph, renderer: Sigma) {
+export function selectNode(newSelectedNodeId: string, graph: Graph, 
+  renderer: Sigma, metrics: graphMetrics) {
   if (selectedNodeId === newSelectedNodeId) return;
+
+  const degreeRange = metrics.maxDegree - metrics.minDegree;
+  const weightsRange = metrics.maxEdgeWeight - metrics.minEdgeWeight;
 
   if (selectedNodeId != null) {
     graph.setNodeAttribute(selectedNodeId, 'label', '');
@@ -69,6 +74,7 @@ export function selectNode(newSelectedNodeId: string, graph: Graph, renderer: Si
     graph.setNodeAttribute(selectedNodeId, 'borderSize', vis.borderSizeDefault);
   }
   selectedNodeId = newSelectedNodeId;
+
   const hiddenLabel = graph.getNodeAttribute(selectedNodeId, 'hiddenLabel');
   graph.setNodeAttribute(selectedNodeId, 'label', hiddenLabel);
   graph.setNodeAttribute(selectedNodeId, 'size', vis.nodeSizeSelected);
@@ -76,25 +82,37 @@ export function selectNode(newSelectedNodeId: string, graph: Graph, renderer: Si
 
   const importantIds = findCloseImportantNeighbours(selectedNodeId, graph);
 
+  // Делаем важные узлы и ребра непрозрачными и возвращаем их zIndex
+  // zIndex выбранного узла поднимаем
+  // Делаем все остальные узлы и ребра полупрозрачными и опускаем их zIndex
+  graph.forEachNode((node, attrs) => {
+    if (importantIds.includes(node) || node === selectedNodeId) {
+      graph.setNodeAttribute(node, 'alpha', vis.nodeDefaultAlpha);
+      if (node === selectedNodeId)
+        graph.setNodeAttribute(node, 'zIndex', attrs.degree + degreeRange);
+      else
+        graph.setNodeAttribute(node, 'zIndex', attrs.degree);
+    }
+    else {
+      graph.setNodeAttribute(node, 'alpha', vis.nodeHiddenAlpha);
+      graph.setNodeAttribute(node, 'zIndex', attrs.degree - degreeRange);
+    }
+  })
+
+  graph.forEachEdge((edge, attrs, source, target) => {
+    if ((importantIds.includes(source) || source === selectedNodeId) &&
+        (importantIds.includes(target) || target === selectedNodeId)) {
+      graph.setEdgeAttribute(edge, 'alpha', vis.edgeDefaultAlpha);
+      graph.setEdgeAttribute(edge, 'zIndex', attrs.weight);
+    }
+    else {
+      graph.setEdgeAttribute(edge, 'alpha', vis.edgeHiddenAlpha);
+      graph.setEdgeAttribute(edge, 'zIndex', attrs.weight - weightsRange);
+    }
+  })
+
   // Подстраиваем вид под нужные узлы
   fitViewportToNodes(renderer, [...importantIds, selectedNodeId], { animate: true });
-
-  // Делаем важные узлы и ребра непрозрачными
-  // Делаем все остальные узлы и ребра полупрозрачными
-  graph.forEachNode((node, _attrs) => {
-    if (importantIds.includes(node) || node === selectedNodeId)
-      graph.setNodeAttribute(node, 'alpha', vis.nodeDefaultAlpha);
-    else
-      graph.setNodeAttribute(node, 'alpha', vis.nodeHiddenAlpha);
-  })
-
-  graph.forEachEdge((edge, _attrs, source, target) => {
-    if ((importantIds.includes(source) || source === selectedNodeId) &&
-        (importantIds.includes(target) || target === selectedNodeId))
-      graph.setEdgeAttribute(edge, 'alpha', vis.edgeDefaultAlpha);
-    else
-      graph.setEdgeAttribute(edge, 'alpha', vis.edgeHiddenAlpha);
-  })
   
   renderer.refresh();
 }
@@ -108,13 +126,15 @@ export function deselectNode(graph: Graph, renderer: Sigma) {
   graph.setNodeAttribute(selectedNodeId, 'borderSize', vis.borderSizeDefault);
   selectedNodeId = null;
 
-  // Возвращаем непрозрачность всем узлам и ребрам
-  graph.forEachNode((node, _attrs) => {
+  // Возвращаем непрозрачность всем узлам и ребрам и возвращаем их zIndex
+  graph.forEachNode((node, attrs) => {
     graph.setNodeAttribute(node, 'alpha', vis.nodeDefaultAlpha);
+    graph.setNodeAttribute(node, 'zIndex', attrs.degree);
   })
 
-  graph.forEachEdge((edge, _attrs, _source, _target) => {
+  graph.forEachEdge((edge, attrs, _source, _target) => {
     graph.setEdgeAttribute(edge, 'alpha', vis.edgeDefaultAlpha);
+    graph.setEdgeAttribute(edge, 'zIndex', attrs.weight);
   })
 
   renderer.refresh();

@@ -82,14 +82,14 @@ async function initGraph(path: string, title: string) {
 
   // Расставляем атрибуты узлов
   const numNodesSqrt = Math.sqrt(numNodes);
-  graph.forEachNode((node, attributes) => {
+  graph.forEachNode((node, attrs) => {
     // Окрашиваем узлы в зависимости от номера сообщества
-    const hue = (attributes.community / numCommunities) * 360;
+    const hue = (attrs.community / numCommunities) * 360;
     const {r, g, b} = hsvToRgb(hue, vis.nodeSaturation, vis.nodeValue);
 
     graph!.mergeNodeAttributes(node, {
-      label: '',                     // Пустой изначально
-      hiddenLabel: attributes.label, // Сохраняем настоящий
+      label: '',                // Пустой изначально
+      hiddenLabel: attrs.label, // Сохраняем настоящий
       size: vis.nodeSizeDefault,
       color: `rgba(${r}, ${g}, ${b})`,
       labelColor: vis.labelColor,
@@ -97,18 +97,19 @@ async function initGraph(path: string, title: string) {
       x: (Math.random() - 0.5) * numNodesSqrt,
       y: (Math.random() - 0.5) * numNodesSqrt,
       borderColor: vis.borderColor,
-      borderSize: vis.borderSizeDefault
+      borderSize: vis.borderSizeDefault,
+      zIndex: attrs.degree
     });
   });
 
 
 
   // Расставляем атрибуты ребер
-  graph.forEachEdge((_edge, attributes, source, target) => {
+  graph.forEachEdge((_edge, attrs, source, target) => {
     // Окрашиваем ребра и ставим их ширину в зависимости от их веса
     let hue, size;
     if (maxEdgeWeight !== minEdgeWeight) {
-      const ratio = (attributes.weight - minEdgeWeight) / 
+      const ratio = (attrs.weight - minEdgeWeight) / 
                     (maxEdgeWeight - minEdgeWeight); // 0.0 - 1.0
       hue = (vis.edgeMaxHue - vis.edgeMinHue) * 
             (1 - ratio) + vis.edgeMinHue; // синий - красный
@@ -124,7 +125,7 @@ async function initGraph(path: string, title: string) {
       size: size,
       color: `rgba(${r}, ${g}, ${b})`,
       alpha: vis.edgeDefaultAlpha,
-      zIndex: attributes.weight,
+      zIndex: attrs.weight,
       type: 'curved'
     });
   });
@@ -194,7 +195,7 @@ async function initGraph(path: string, title: string) {
   renderer.on('leaveNode', () => unhoverNode(graph!, renderer!));
 
   // Подсветка узла и его соседей по клику
-  renderer.on('clickNode', ({ node }) => selectNode(node, graph!, renderer!));
+  renderer.on('clickNode', ({ node }) => selectNode(node, graph!, renderer!, metrics));
 
   // Клик по пустому месту для сброса выделения
   renderer.on('clickStage', () => deselectNode(graph!, renderer!));
