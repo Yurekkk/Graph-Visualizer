@@ -8,8 +8,7 @@ interface RadialLayoutOptions {
 
 export default function radialLayout(graph: Graph, opts: RadialLayoutOptions = {}) {
   const {
-    ringSpacing = 60,
-    angleOffset = 0,
+    ringSpacing = 1,
     sortByDegreeOnRing = true
   } = opts;
 
@@ -62,7 +61,7 @@ export default function radialLayout(graph: Graph, opts: RadialLayoutOptions = {
     }
 
     ringNodes.forEach((node, i) => {
-      const angle = (2 * Math.PI * i) / count + angleOffset;
+      const angle = (2 * Math.PI * i) / count;
       graph.setNodeAttribute(node, 'x', Math.cos(angle) * radius);
       graph.setNodeAttribute(node, 'y', Math.sin(angle) * radius);
     });

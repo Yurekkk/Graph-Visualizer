@@ -11,8 +11,8 @@ import stratifiedSampling from './stratifiedSampling';
 
 const circularMinDensity = 0.25;
 const circularMaxNumNodes = 50;
-const radialMinDegreeGini = 0.5;
-const radialMinHubDominance = 10;
+const radialMinDegreeGini = 0.75;
+const radialMinHubDominance = 25;
 const samplingMinNumNodes = 500;
 
 const forceAtlasIterations = 50;
@@ -37,8 +37,6 @@ export default async function smartLayout(
     hubDominance,
     degreeGini
   } = metrics;
-
-  console.log(density > circularMinDensity);
 
   if (density >= circularMinDensity && 
     numNodes <= circularMaxNumNodes) {
