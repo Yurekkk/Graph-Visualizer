@@ -16,6 +16,7 @@
   "dependencies": {
     "@sigma/edge-curve": "^3.1.0",
     "@sigma/node-border": "^3.0.0",
+    "@sigma/utils": "^3.0.0",
     "@ts-graphviz/parser": "^0.6.1",
     "graphology": "^0.26.0",
     "graphology-communities-louvain": "^2.0.2",
