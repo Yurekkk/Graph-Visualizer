@@ -9,25 +9,21 @@ export default function findCloseImportantNeighbours(
   const queue: { node: string; cost: number }[] = [{ node: selectedNodeId, cost: 0 }];
 
   while (queue.length > 0) {
-    // Извлекаем узел с минимальной стоимостью (линейный поиск для простоты)
-    let minIdx = 0;
-    for (let i = 1; i < queue.length; i++) {
-      if (queue[i].cost < queue[minIdx].cost) minIdx = i;
-    }
-    const { node: u, cost } = queue.splice(minIdx, 1)[0];
+    // Извлекаем узел
+    const { node, cost } = queue.splice(0, 1)[0];
 
     // Если вышли за порог "близости", не идём дальше по этой ветке
     if (cost > maxCost) continue;
 
     // Релаксация соседей
-    graph.forEachNeighbor(u, (v, attrs) => {
+    graph.forEachNeighbor(node, (neighbor, attrs) => {
       const weight = attrs?.weight ?? 1;
-      const edgeCost = 1 / Math.max(weight, 1e-9); // защита от деления на 0
+      const edgeCost = 1 / (weight || 1e-9); // защита от деления на 0
       const newCost = cost + edgeCost;
 
-      if (!dist.has(v) || newCost < dist.get(v)!) {
-        dist.set(v, newCost);
-        queue.push({ node: v, cost: newCost });
+      if (!dist.has(neighbor) || newCost < dist.get(neighbor)!) {
+        dist.set(neighbor, newCost);
+        queue.push({ node: neighbor, cost: newCost });
       }
     });
   }

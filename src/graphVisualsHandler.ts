@@ -65,8 +65,8 @@ export function selectNode(newSelectedNodeId: string, graph: Graph,
   renderer: Sigma, metrics: graphMetrics) {
   if (selectedNodeId === newSelectedNodeId) return;
 
-  const degreeRange = metrics.maxDegree - metrics.minDegree;
-  const weightsRange = metrics.maxEdgeWeight - metrics.minEdgeWeight;
+  const degreeRange = (metrics.maxDegree - metrics.minDegree) || 1;
+  const weightsRange = (metrics.maxEdgeWeight - metrics.minEdgeWeight) || 1;
 
   if (selectedNodeId != null) {
     graph.setNodeAttribute(selectedNodeId, 'label', '');
