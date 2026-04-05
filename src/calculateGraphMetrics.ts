@@ -2,11 +2,12 @@ import Graph from 'graphology';
 // import labelPropagation from "./labelPropagation";
 import calculateModularity from 'graphology-metrics/graph/modularity';
 import louvain from 'graphology-communities-louvain';
+import type graphMetrics from './graphMetricsInterface';
 
 // Все это пока не учитывает, что граф может быть ориентированным
 // Может потом добавлю
 
-export default function calculateGraphMetrics(graph: Graph) {
+export default function calculateGraphMetrics(graph: Graph): graphMetrics {
   let start, end;
 
   start = performance.now();
@@ -19,7 +20,9 @@ export default function calculateGraphMetrics(graph: Graph) {
     minDegree,
     maxEdgeWeight,
     minEdgeWeight,
+    hubDominance
   } = findSimpleMetrics(graph);
+  const degreeGini = findDegreeGini(graph);
   end = performance.now();
   console.log(`Время вычисления простых метрик: ${end - start} мс`)
 
@@ -53,7 +56,9 @@ export default function calculateGraphMetrics(graph: Graph) {
     maxEdgeWeight,
     minEdgeWeight,
     numCommunities,
-    modularity
+    modularity,
+    hubDominance,
+    degreeGini
   };
 }
 
@@ -99,6 +104,8 @@ function findSimpleMetrics(graph: Graph) {
       minEdgeWeight = weight;
   })
 
+  const hubDominance = maxDegree / avgDegree;
+
   return {
     numNodes,
     numEdges,
@@ -108,6 +115,7 @@ function findSimpleMetrics(graph: Graph) {
     minDegree,
     maxEdgeWeight,
     minEdgeWeight,
+    hubDominance
   }
 }
 
@@ -191,4 +199,34 @@ function buildAdjList(graph: Graph): Map<string, string[]> {
     adjList.get(target)!.push(source);
   });
   return adjList;
+}
+
+function findDegreeGini(graph: Graph): number {
+  const n = graph.order;
+  if (n <= 1) return 0;
+
+  // Собираем степени всех узлов
+  const degrees: number[] = [];
+  graph.forEachNode((node) => {
+    degrees.push(graph.degree(node));
+  });
+
+  degrees.sort((a, b) => a - b);
+
+  // Считаем по формуле
+  let sumDegrees = 0;
+  let weightedSum = 0;
+  
+  for (let i = 0; i < n; i++) {
+    const d = degrees[i];
+    sumDegrees += d;
+    weightedSum += (i + 1) * d; // i+1 потому что формула 1-based
+  }
+
+  if (sumDegrees === 0) return 0; // граф без рёбер
+
+  const gini = (2 * weightedSum) / (n * sumDegrees) - (n + 1) / n;
+  
+  // Численная стабилизация
+  return Math.max(0, Math.min(1, gini));
 }

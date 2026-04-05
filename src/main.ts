@@ -2,7 +2,7 @@ import './style.css';
 import Sigma from 'sigma';
 import Graph from 'graphology';
 import hsvToRgb from './hsvToRgb';
-import calculateGraphMetrics from './calculateGraphMetrics';
+import calculateGraphMetrics from './calculateGraphMetrics.ts';
 import { createNodeBorderProgram } from "@sigma/node-border";
 import EdgeCurveProgram from '@sigma/edge-curve';
 import parseGraphFile from './graphParser.ts';
@@ -71,7 +71,9 @@ async function initGraph(path: string, title: string) {
     maxEdgeWeight,
     minEdgeWeight,
     numCommunities,
-    modularity
+    modularity,
+    hubDominance,
+    degreeGini
   } = metrics;
   console.log(`Кол-во узлов: ${numNodes}`);
   console.log(`Кол-во ребер: ${numEdges}`);
@@ -83,6 +85,8 @@ async function initGraph(path: string, title: string) {
   console.log(`Минимальный вес ребра: ${minEdgeWeight}`);
   console.log(`Кол-во сообществ: ${numCommunities}`);
   console.log(`Модулярность: ${modularity}`);
+  console.log(`hubDominance: ${hubDominance}`);
+  console.log(`degreeGini: ${degreeGini}`);
 
 
 
