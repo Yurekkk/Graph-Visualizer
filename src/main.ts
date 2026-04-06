@@ -14,10 +14,15 @@ import seedrandom from 'seedrandom';
 
 
 
-const container = document.getElementById('sigma-container') as HTMLSelectElement;
+const container = document.getElementById('sigma-container') as HTMLDivElement;
 if (!container) throw new Error('Контейнер для графа не найден!');
 const selector = document.getElementById('graph-selector') as HTMLSelectElement;
 if (!selector) throw new Error('Селектор не найден!');
+const loader = document.getElementById('loader');
+if (!loader) throw new Error('Загрузчик не найден!');
+const statusSpan = document.getElementById('loader-status') as HTMLSpanElement;
+if (!statusSpan) throw new Error('Span статуса не найден!');
+
 let renderer: Sigma | null = null;
 let graph: Graph | null = null;
 
@@ -40,6 +45,7 @@ async function initGraph(path: string, title: string) {
   console.log(`=============== Отрисовка графа ${title} ===============`)
 
   if (renderer) {
+    await setStatus('Чистим предыдущий граф...');
     renderer.removeAllListeners();
     renderer.kill(); 
     renderer = null;
@@ -49,7 +55,7 @@ async function initGraph(path: string, title: string) {
 
 
 
-  // Парсим граф
+  await setStatus('Парсим граф...');
   start = performance.now();
   graph = await parseGraphFile(path);
   end = performance.now();
@@ -57,15 +63,16 @@ async function initGraph(path: string, title: string) {
 
 
 
-  // Считаем и выводим метрики
+  await setStatus('Считаем метрики...');
   const metrics = calculateGraphMetrics(graph);
   for (const [key, value] of Object.entries(metrics)) {
-    console.log(`${key}: ${value}`);
+    console.log(`--- ${key}: ${value}`);
   }
   
 
 
-  // Расставляем атрибуты узлов
+  await setStatus('Расставляем атрибуты узлов...');
+  start = performance.now();
   const numNodesSqrt = Math.sqrt(metrics.numNodes);
   const rng = seedrandom(alg.seed);
   graph.forEachNode((node, attrs) => {
@@ -87,10 +94,13 @@ async function initGraph(path: string, title: string) {
       zIndex: attrs.degree
     });
   });
+  end = performance.now();
+  console.log(`Время расставления атрибутов узлов: ${end - start} мс`)
 
 
 
-  // Расставляем атрибуты ребер
+  await setStatus('Расставляем атрибуты рёбер...');
+  start = performance.now();
   graph.forEachEdge((_edge, attrs, source, target) => {
     const size = edgeSize(attrs.weight, metrics);
     const color = edgeColor(attrs.weight, metrics);
@@ -104,10 +114,12 @@ async function initGraph(path: string, title: string) {
       type: 'curved'
     });
   });
+  end = performance.now();
+  console.log(`Время расставления атрибутов рёбер: ${end - start} мс`)
 
 
 
-  // Раскладываем граф
+  await setStatus('Раскладываем граф...');
   start = performance.now();
   smartLayout(graph, metrics);
   end = performance.now();
@@ -115,7 +127,7 @@ async function initGraph(path: string, title: string) {
 
 
 
-  // Инициализируем Sigma и отрисовываем граф
+  await setStatus('Отрисовываем граф...');
   start = performance.now();
 
   renderer = new Sigma(graph, container!, {
@@ -141,7 +153,7 @@ async function initGraph(path: string, title: string) {
     },
 
     // Смешиваем цвет узлов и ребер с цветом фона в зависимости от альфы
-    // Sigma.js, по-видимому, не поддерживает альфа-канал, поэтому так
+    // WebGL, по-видимому, не поддерживает альфа-канал, поэтому так
     nodeReducer: (node, data) => {
       const alpha = graph!.getNodeAttribute(node, 'alpha') ?? 1;
       const bgColor = getBackgroundColor();
@@ -160,6 +172,7 @@ async function initGraph(path: string, title: string) {
 
   end = performance.now();
   console.log(`Время отрисовки: ${end - start} мс`)
+  await setStatus('Почти готово...');
 
 
 
@@ -198,9 +211,26 @@ function initSelector() {
   initGraph(miserablesPath, 'miserables');
 }
 
-selector.addEventListener('change', (e) => {
-    initGraph((e.target as HTMLSelectElement).value,
-              (e.target as HTMLSelectElement).selectedOptions[0].text);
+
+
+async function setStatus(text: string) {
+  statusSpan.textContent = text;
+  await new Promise(r => setTimeout(r, 0)); // отдаём поток на repaint
+}
+
+
+
+selector.addEventListener('change', async (e) => {
+  loader.style.display = 'flex'; // показываем крутилку
+  
+  // Ждём 1 кадр, чтобы браузер успел отрисовать лоадер
+  await new Promise(r => setTimeout(r, 0));
+  
+  // Запускаем тяжёлую инициализацию
+  const target = e.target as HTMLSelectElement;
+  await initGraph(target.value, target.selectedOptions[0].text);
+
+  loader.style.display = 'none'; // скрываем по завершении
 });
 
 
