@@ -12,6 +12,11 @@ let hoveredNodeId:  string | null = null;
 
 
 
+// TODO: Лучше сделать просто 4 уровня важности:
+// Hovered, selected (для узла), usual, hidden
+
+
+
 export function hoverNode(newHoveredNodeId: string, graph: Graph, 
   renderer: Sigma, metrics: graphMetrics) {
   if (hoveredNodeId === newHoveredNodeId) return;
@@ -117,7 +122,8 @@ export function selectNode(newSelectedNodeId: string, graph: Graph,
     if ((importantIds.includes(source) || source === selectedNodeId) &&
         (importantIds.includes(target) || target === selectedNodeId)) {
       graph.setEdgeAttribute(edge, 'alpha', vis.edgeDefaultAlpha);
-      graph.setEdgeAttribute(edge, 'zIndex', attrs.weight);
+      if (source !== hoveredNodeId && target !== hoveredNodeId)
+        graph.setEdgeAttribute(edge, 'zIndex', attrs.weight);
     }
     else {
       graph.setEdgeAttribute(edge, 'alpha', vis.edgeHiddenAlpha);

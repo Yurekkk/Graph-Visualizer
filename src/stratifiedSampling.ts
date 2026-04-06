@@ -34,7 +34,7 @@ export default function stratifiedSampling(
 
   if (method === 'proportional') {
     // Пропорционально размеру страты
-    for (const [_stratum, nodes] of strata) {
+    for (const [, nodes] of strata) {
       const proportion = nodes.length / totalNodes;
       const count = Math.max(1, Math.round(sampleSize * proportion));
       let shuffled;
