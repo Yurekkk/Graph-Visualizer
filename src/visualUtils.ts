@@ -1,3 +1,8 @@
+import * as vis from './configs/visualConfig.ts';
+import type graphMetrics from './graphMetricsInterface.ts';
+
+
+
 export function hsvToRgb(h: number, s: number, v: number): { r: number; g: number; b: number } {
   h = h % 360;
   s = s / 100;
@@ -67,4 +72,46 @@ export function blendWithBackground(
   const b = fg.b * alpha + bg.b * (1 - alpha);
   
   return `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`;
+}
+
+
+
+export function nodeColor(community: number, metrics: graphMetrics): string {
+  const hue = (community / metrics.numCommunities) * 360;
+  const {r, g, b} = hsvToRgb(hue, vis.nodeSaturation, vis.nodeValue);
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
+
+
+export function nodeSize(): number {
+  return vis.nodeSizeDefault;
+}
+
+
+
+export function edgeColor(weight: number, metrics: graphMetrics): string {
+  // Окрашиваем ребра в зависимости от их веса
+  let hue;
+  if (metrics.maxEdgeWeight !== metrics.minEdgeWeight) {
+    const ratio = (weight - metrics.minEdgeWeight) / 
+                  (metrics.maxEdgeWeight - metrics.minEdgeWeight); // 0.0 - 1.0
+    hue = (vis.edgeMaxHue - vis.edgeMinHue) * 
+          (1 - ratio) + vis.edgeMinHue; // синий - красный
+  }
+  else hue = vis.edgeDefaultHue;
+  const {r, g, b} = hsvToRgb(hue, vis.edgeSaturation, vis.edgeValue);
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
+
+
+export function edgeSize(weight: number, metrics: graphMetrics): number {
+  // Ставим ширину ребер в зависимости от их веса
+  if (metrics.maxEdgeWeight !== metrics.minEdgeWeight) {
+    const ratio = (weight - metrics.minEdgeWeight) / 
+                  (metrics.maxEdgeWeight - metrics.minEdgeWeight); // 0.0 - 1.0
+    return (vis.edgeMaxSize - vis.edgeMinSize) * ratio + vis.edgeMinSize;
+  }
+  else return vis.edgeDefaultSize;
 }

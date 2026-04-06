@@ -1,7 +1,7 @@
 import './style.css';
 import Sigma from 'sigma';
 import Graph from 'graphology';
-import { blendWithBackground, hsvToRgb } from './colorUtils.ts';
+import { blendWithBackground, edgeColor, edgeSize, nodeColor, nodeSize } from './visualUtils.ts';
 import calculateGraphMetrics from './calculateGraphMetrics.ts';
 import { createNodeBorderProgram } from "@sigma/node-border";
 import EdgeCurveProgram from '@sigma/edge-curve';
@@ -49,53 +49,32 @@ async function initGraph(path: string, title: string) {
 
 
 
+  // Парсим граф
   graph = await parseGraphFile(path);
+
+
 
   // Считаем и выводим метрики
   const metrics = calculateGraphMetrics(graph);
-  const {
-    numNodes,
-    numEdges,
-    density,
-    avgDegree,
-    maxDegree,
-    minDegree,
-    maxEdgeWeight,
-    minEdgeWeight,
-    numCommunities,
-    modularity,
-    hubDominance,
-    degreeGini
-  } = metrics;
-  console.log(`Кол-во узлов: ${numNodes}`);
-  console.log(`Кол-во ребер: ${numEdges}`);
-  console.log(`Плотность: ${density}`);
-  console.log(`Средняя степень: ${avgDegree}`);
-  console.log(`Максимальная степень: ${maxDegree}`);
-  console.log(`Минимальная степень: ${minDegree}`);
-  console.log(`Максимальный вес ребра: ${maxEdgeWeight}`);
-  console.log(`Минимальный вес ребра: ${minEdgeWeight}`);
-  console.log(`Кол-во сообществ: ${numCommunities}`);
-  console.log(`Модулярность: ${modularity}`);
-  console.log(`hubDominance: ${hubDominance}`);
-  console.log(`degreeGini: ${degreeGini}`);
-
+  for (const [key, value] of Object.entries(metrics)) {
+    console.log(`${key}: ${value}`);
+  }
+  
 
 
   // Расставляем атрибуты узлов
-  const numNodesSqrt = Math.sqrt(numNodes);
+  const numNodesSqrt = Math.sqrt(metrics.numNodes);
   const rng = seedrandom(alg.seed);
   graph.forEachNode((node, attrs) => {
     // Окрашиваем узлы в зависимости от номера сообщества
-    const hue = (attrs.community / numCommunities) * 360;
-    const {r, g, b} = hsvToRgb(hue, vis.nodeSaturation, vis.nodeValue);
-
+    const size = nodeSize();
+    const color = nodeColor(attrs.community, metrics);
     // Некоторые атрибуты могут перезаписываться, сохраняем настоящие как hidden
     graph!.mergeNodeAttributes(node, {
       label: '',
       hiddenLabel: attrs.label,
-      size: vis.nodeSizeDefault,
-      color: `rgba(${r}, ${g}, ${b})`,
+      size: size,
+      color: color,
       labelColor: vis.labelColor,
       alpha: vis.nodeDefaultAlpha,
       x: (rng() - 0.5) * numNodesSqrt,
@@ -110,26 +89,13 @@ async function initGraph(path: string, title: string) {
 
   // Расставляем атрибуты ребер
   graph.forEachEdge((_edge, attrs, source, target) => {
-    // Окрашиваем ребра и ставим их ширину в зависимости от их веса
-    let hue, size;
-    if (maxEdgeWeight !== minEdgeWeight) {
-      const ratio = (attrs.weight - minEdgeWeight) / 
-                    (maxEdgeWeight - minEdgeWeight); // 0.0 - 1.0
-      hue = (vis.edgeMaxHue - vis.edgeMinHue) * 
-            (1 - ratio) + vis.edgeMinHue; // синий - красный
-      size = (vis.edgeMaxSize - vis.edgeMinSize) * ratio + vis.edgeMinSize;
-    }
-    else {
-      hue = vis.edgeDefaultHue;
-      size = vis.edgeDefaultSize;
-    }
-    const {r, g, b} = hsvToRgb(hue, vis.edgeSaturation, vis.edgeValue);
-
+    const size = edgeSize(attrs.weight, metrics);
+    const color = edgeColor(attrs.weight, metrics);
     // Некоторые атрибуты могут перезаписываться, сохраняем настоящие как hidden
     graph!.mergeEdgeAttributes(source, target, {
       size: size,
-      color: `rgba(${r}, ${g}, ${b})`,
-      hiddenColor: `rgba(${r}, ${g}, ${b})`,
+      color: color,
+      hiddenColor: color,
       alpha: vis.edgeDefaultAlpha,
       zIndex: attrs.weight,
       type: 'curved'
@@ -146,7 +112,7 @@ async function initGraph(path: string, title: string) {
 
 
 
-  // Инициализируем Sigma
+  // Инициализируем Sigma и отрисовываем граф
   start = performance.now();
 
   renderer = new Sigma(graph, container!, {
@@ -200,10 +166,10 @@ async function initGraph(path: string, title: string) {
   // Unhover
   renderer.on('leaveNode', () => unhoverNode(graph!, renderer!));
 
-  // Подсветка узла и его соседей по клику
+  // Node focus по клику
   renderer.on('clickNode', ({ node }) => selectNode(node, graph!, renderer!, metrics));
 
-  // Клик по пустому месту для сброса выделения
+  // Клик по пустому месту для сброса фокуса
   renderer.on('clickStage', () => deselectNode(graph!, renderer!));
 }
 
