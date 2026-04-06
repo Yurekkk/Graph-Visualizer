@@ -7,7 +7,7 @@ import { createNodeBorderProgram } from "@sigma/node-border";
 import EdgeCurveProgram from '@sigma/edge-curve';
 import parseGraphFile from './graphParser.ts';
 import smartLayout from './layoutEngine.ts';
-import { hoverNode, unhoverNode, selectNode, deselectNode } from './graphVisualsHandler.ts';
+import { hoverNode, unhoverNode, selectNode, deselectNode } from './graphHoverClickHandler.ts';
 import * as vis from './configs/visualConfig.ts';
 
 
@@ -87,9 +87,10 @@ async function initGraph(path: string, title: string) {
     const hue = (attrs.community / numCommunities) * 360;
     const {r, g, b} = hsvToRgb(hue, vis.nodeSaturation, vis.nodeValue);
 
+    // Некоторые атрибуты могут перезаписываться, сохраняем настоящие как hidden
     graph!.mergeNodeAttributes(node, {
-      label: '',                // Пустой изначально
-      hiddenLabel: attrs.label, // Сохраняем настоящий
+      label: '',
+      hiddenLabel: attrs.label,
       size: vis.nodeSizeDefault,
       color: `rgba(${r}, ${g}, ${b})`,
       labelColor: vis.labelColor,
@@ -121,9 +122,11 @@ async function initGraph(path: string, title: string) {
     }
     const {r, g, b} = hsvToRgb(hue, vis.edgeSaturation, vis.edgeValue);
 
+    // Некоторые атрибуты могут перезаписываться, сохраняем настоящие как hidden
     graph!.mergeEdgeAttributes(source, target, {
       size: size,
       color: `rgba(${r}, ${g}, ${b})`,
+      hiddenColor: `rgba(${r}, ${g}, ${b})`,
       alpha: vis.edgeDefaultAlpha,
       zIndex: attrs.weight,
       type: 'curved'
@@ -189,7 +192,7 @@ async function initGraph(path: string, title: string) {
 
 
   // Hover с подсветкой узла
-  renderer.on('enterNode', ({ node }) => hoverNode(node, graph!, renderer!));
+  renderer.on('enterNode', ({ node }) => hoverNode(node, graph!, renderer!, metrics));
 
   // Unhover
   renderer.on('leaveNode', () => unhoverNode(graph!, renderer!));

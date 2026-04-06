@@ -16,6 +16,7 @@ export const edgeSaturation = 70;
 export const edgeValue = 55;
 export const edgeHiddenAlpha = 0.10;
 export const edgeDefaultAlpha = 1.0;
+export const edgeHoverColor = '#ffffff';
 
 export const borderColor = '#ffffff';
 export const borderSizeDefault = 0.075; // Дробь от размера всего узла, [0, 1]

@@ -12,7 +12,8 @@ let hoveredNodeId:  string | null = null;
 
 
 
-export function hoverNode(newHoveredNodeId: string, graph: Graph, renderer: Sigma) {
+export function hoverNode(newHoveredNodeId: string, graph: Graph, 
+  renderer: Sigma, metrics: graphMetrics) {
   if (hoveredNodeId === newHoveredNodeId) return;
 
   if (hoveredNodeId != null)
@@ -34,6 +35,13 @@ export function hoverNode(newHoveredNodeId: string, graph: Graph, renderer: Sigm
   //   graph.setNodeAttribute(neighbor, 'borderSize', vis.borderSizeNeighbor);
   // });
 
+  // Подсвечиваем ребра этого узла
+  const weightsRange = (metrics.maxEdgeWeight - metrics.minEdgeWeight) || 1;
+  graph.forEachEdge(hoveredNodeId, (edge, attrs, _source, _target) => {
+    graph.setEdgeAttribute(edge, 'color', vis.edgeHoverColor);
+    graph.setEdgeAttribute(edge, 'zIndex', attrs.weight + weightsRange);
+  });
+
   renderer.refresh();
 }
 
@@ -53,6 +61,12 @@ export function unhoverNode(graph: Graph, renderer: Sigma, refresh: boolean = tr
   // graph.forEachNeighbor(hoveredNodeId, (neighbor) => {
   //   graph.setNodeAttribute(neighbor, 'borderSize', vis.borderSizeDefault);
   // });
+
+  // Убираем подсветку у ребер этого узла
+  graph.forEachEdge(hoveredNodeId, (edge, attrs, _source, _target) => {
+    graph.setEdgeAttribute(edge, 'color', attrs.hiddenColor);
+    graph.setEdgeAttribute(edge, 'zIndex', attrs.weight);
+  });
 
   hoveredNodeId = null;
 
@@ -124,7 +138,6 @@ export function deselectNode(graph: Graph, renderer: Sigma) {
   graph.setNodeAttribute(selectedNodeId, 'label', '');
   graph.setNodeAttribute(selectedNodeId, 'size', vis.nodeSizeDefault);
   graph.setNodeAttribute(selectedNodeId, 'borderSize', vis.borderSizeDefault);
-  selectedNodeId = null;
 
   // Возвращаем непрозрачность всем узлам и ребрам и возвращаем их zIndex
   graph.forEachNode((node, attrs) => {
@@ -136,6 +149,8 @@ export function deselectNode(graph: Graph, renderer: Sigma) {
     graph.setEdgeAttribute(edge, 'alpha', vis.edgeDefaultAlpha);
     graph.setEdgeAttribute(edge, 'zIndex', attrs.weight);
   })
+
+  selectedNodeId = null;
 
   renderer.refresh();
 }
