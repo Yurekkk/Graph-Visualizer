@@ -99,7 +99,7 @@ export function selectNode(newSelectedNodeId: string, graph: Graph,
   graph.setNodeAttribute(selectedNodeId, 'size', vis.nodeSizeSelected);
   graph.setNodeAttribute(selectedNodeId, 'borderSize', vis.borderSizeHover);
 
-  const importantIds = findCloseImportantNeighbours(selectedNodeId, graph);
+  const importantIds = findCloseImportantNeighbours(selectedNodeId, graph, metrics);
 
   // Делаем важные узлы и ребра непрозрачными и возвращаем их zIndex
   // zIndex выбранного узла поднимаем

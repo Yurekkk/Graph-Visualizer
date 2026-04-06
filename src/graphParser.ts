@@ -1,11 +1,6 @@
 import Graph from 'graphology';
 import { parse as parseGEXFGraphology } from "graphology-gexf/browser";
-
-
-
-// Если все значения ребер больше этого порога, 
-// то, скорее всего, это не веса, а временные метки
-const TIMESTAMP_THRESHOLD = 500_000_000;
+import { timestamp_threshold } from './configs/algorithmicConfig';
 
 
 
@@ -160,7 +155,7 @@ function parseMTX(content: string): Graph {
 
   let valuesAreTimestamps = true;
   for (const edge of edges) {
-    if (edge.weight < TIMESTAMP_THRESHOLD) {
+    if (edge.weight < timestamp_threshold) {
       valuesAreTimestamps = false;
       break;
     }
@@ -217,7 +212,7 @@ function parseCSV(content: string): Graph {
 
   let valuesAreTimestamps = true;
   for (const edge of edges) {
-    if (edge.weight < TIMESTAMP_THRESHOLD) {
+    if (edge.weight < timestamp_threshold) {
       valuesAreTimestamps = false;
       break;
     }
