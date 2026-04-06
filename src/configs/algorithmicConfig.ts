@@ -2,7 +2,7 @@
 export const circularMinDensity = 0.25;
 export const circularMaxNumNodes = 50;
 export const radialMinDegreeGini = 0.75;
-export const radialMinHubDominance = 25;
+export const radialMinHubDominance = 100;
 export const samplingMinNumNodes = 500;
 
 export const forceAtlasIterations = 50;
@@ -19,6 +19,7 @@ export const maxWeightCost = 0.1; // Стоимость прохода по ре
 
 
 // ### Misc ###
+export const seed = '42';
 export const timestamp_threshold = 500_000_000;
 // Если все значения ребер больше этого порога, 
 // то, скорее всего, это не веса, а временные метки

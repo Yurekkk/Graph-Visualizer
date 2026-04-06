@@ -9,6 +9,8 @@ import parseGraphFile from './graphParser.ts';
 import smartLayout from './layoutEngine.ts';
 import { hoverNode, unhoverNode, selectNode, deselectNode } from './graphHoverClickHandler.ts';
 import * as vis from './configs/visualConfig.ts';
+import * as alg from './configs/algorithmicConfig.ts';
+import seedrandom from 'seedrandom';
 
 
 
@@ -82,6 +84,7 @@ async function initGraph(path: string, title: string) {
 
   // Расставляем атрибуты узлов
   const numNodesSqrt = Math.sqrt(numNodes);
+  const rng = seedrandom(alg.seed);
   graph.forEachNode((node, attrs) => {
     // Окрашиваем узлы в зависимости от номера сообщества
     const hue = (attrs.community / numCommunities) * 360;
@@ -95,8 +98,8 @@ async function initGraph(path: string, title: string) {
       color: `rgba(${r}, ${g}, ${b})`,
       labelColor: vis.labelColor,
       alpha: vis.nodeDefaultAlpha,
-      x: (Math.random() - 0.5) * numNodesSqrt,
-      y: (Math.random() - 0.5) * numNodesSqrt,
+      x: (rng() - 0.5) * numNodesSqrt,
+      y: (rng() - 0.5) * numNodesSqrt,
       borderColor: vis.borderColor,
       borderSize: vis.borderSizeDefault,
       zIndex: attrs.degree

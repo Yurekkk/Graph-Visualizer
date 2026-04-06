@@ -3,6 +3,8 @@ import Graph from 'graphology';
 import calculateModularity from 'graphology-metrics/graph/modularity';
 import louvain from 'graphology-communities-louvain';
 import type graphMetrics from './graphMetricsInterface';
+import * as alg from './configs/algorithmicConfig.ts';
+import seedrandom from 'seedrandom';
 
 // Все это пока не учитывает, что граф может быть ориентированным
 // Может потом добавлю
@@ -35,7 +37,7 @@ export default function calculateGraphMetrics(graph: Graph): graphMetrics {
 
   //*
   start = performance.now();
-  louvain.assign(graph);
+  louvain.assign(graph, {rng: seedrandom(alg.seed)});
   const numCommunities = findCommunitiesNum(graph);
   end = performance.now();
   console.log(`Время нахождения сообществ (louvain): ${end - start} мс`)

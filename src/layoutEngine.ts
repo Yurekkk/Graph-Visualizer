@@ -50,6 +50,8 @@ export default async function smartLayout(
   // noverlap.assign(graph);
 }
 
+
+
 async function circularLayout(graph: Graph) {
   await circular.assign(graph);
 }
@@ -62,6 +64,8 @@ async function forceAtlas2Layout(graph: Graph) {
     settings: sensibleSettings
   });
 }
+
+
 
 async function forceAtlas2SamplingLayout(graph: Graph) {
   // Сэмплируем, раскладываем подграф, интерполируем остальное
