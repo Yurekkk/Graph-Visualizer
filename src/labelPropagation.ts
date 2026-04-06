@@ -1,10 +1,11 @@
 import Graph from 'graphology';
+import * as alg from './configs/algorithmicConfig.ts';
+import seedrandom from 'seedrandom';
 
 // Возвращает кол-во найденных сообществ
 export default function labelPropagation(
   graph: Graph,
-  maxIterations: number = 100,
-  seed: number = Math.random()
+  maxIterations: number = 100
 ): number {
 
   const nodes = graph.nodes();
@@ -14,18 +15,14 @@ export default function labelPropagation(
   nodes.forEach(node => communities.set(node, node));
 
   // PRNG для воспроизводимости
-  let rand = seed;
-  const random = () => {
-    rand = (22695477 * rand + 1) % 2**31;
-    return rand / 2**31;
-  }
+  const rng = seedrandom(alg.seed);
 
   const counts = new Map<string, number>();
   
   // Основной цикл
   for (let iter = 0; iter < maxIterations; iter++) {
     let changed = false;
-    const shuffled = [...nodes].sort(() => random() - 0.5);
+    const shuffled = [...nodes].sort(() => rng() - 0.5);
     
     for (const currNode of shuffled) {
       counts.clear();

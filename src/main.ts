@@ -50,7 +50,10 @@ async function initGraph(path: string, title: string) {
 
 
   // Парсим граф
+  start = performance.now();
   graph = await parseGraphFile(path);
+  end = performance.now();
+  console.log(`Время парсинга графа: ${end - start} мс`)
 
 
 

@@ -30,7 +30,7 @@ export default function calculateGraphMetrics(graph: Graph): graphMetrics {
 
   /*
   start = performance.now();
-  const numCommunities = labelPropagation(graph, 100);
+  const _ = labelPropagation(graph, 100);
   end = performance.now();
   console.log(`Время нахождения сообществ (LPA): ${end - start} мс`)
   //*/
