@@ -5,6 +5,8 @@ import { MinPriorityQueue } from '@datastructures-js/priority-queue';
 
 export default function findCloseImportantNeighbours(
   selectedNodeId: string, graph: Graph, metrics: graphMetrics): string[] {
+  // С помощью алгоритма Дейкстры ищем максимум alg.maxHighlightedNeighborsNum узлов,
+  // цена у которых не больше alg.maxAccumulatedCost
     
   // Расстояние от выбранного узла до всех достижимых
   const dist = new Map<string, number>([[selectedNodeId, 0]]);
@@ -31,7 +33,7 @@ export default function findCloseImportantNeighbours(
       const neighbor = source !== node ? source : target;
 
       const weight = attrs?.weight ?? 1;
-      const edgeCost = costFunc(weight);
+      const edgeCost = costFunc(graph, neighbor, weight);
       const newCost = cost + edgeCost;
 
       if (!dist.has(neighbor) || newCost < dist.get(neighbor)!) {
@@ -48,14 +50,30 @@ export default function findCloseImportantNeighbours(
 }
 
 function buildCostFunction(metrics: graphMetrics) {
-  if (metrics.maxEdgeWeight == metrics.minEdgeWeight)
-    return (_w: number) => {return alg.minWeightCost};
+  const weightsAreDifferent = (metrics.maxEdgeWeight != metrics.minEdgeWeight);
 
-  // По сути отрицательная экспнента e^(-w), но чтобы она проходила через
-  // точки (minEdgeWeight,minWeightCost) и (maxEdgeWeight, maxWeightCost)
-  const growth = Math.log(alg.maxWeightCost / alg.minWeightCost) / 
-    (metrics.maxEdgeWeight - metrics.minEdgeWeight);
-  const amplitude = alg.minWeightCost / Math.exp(growth * metrics.minEdgeWeight);
+  // Функция учитывает вес ребра и степень узла, в который идет ребро
 
-  return (w: number) => {return amplitude * Math.exp(growth * w);}
+  // Для веса ребра:
+  // По сути отрицательная экспонента e^(-w), но чтобы она проходила через
+  // точки (minEdgeWeight, minWeightCost) и (maxEdgeWeight, maxWeightCost)
+  let growth: number, amplitude: number;
+  if (weightsAreDifferent) {
+    growth = Math.log(alg.maxWeightCost / alg.minWeightCost) / 
+      (metrics.maxEdgeWeight - metrics.minEdgeWeight);
+    amplitude = alg.minWeightCost / Math.exp(growth * metrics.minEdgeWeight);
+  }
+
+  return (graph: Graph, neighbor: string, w: number) => {
+    // Чем больше узел является хабом, тем большую выжность он представляет
+    const degCent = graph.getNodeAttribute(neighbor, 'degreeCentrality');
+    const degreeFactor = alg.degreeInfluence * (1 - degCent);
+
+    let weightFactor;
+    if (weightsAreDifferent)
+      weightFactor = amplitude * Math.exp(growth * w);
+    else weightFactor = alg.minWeightCost / 3;
+    
+    return weightFactor + degreeFactor;
+  }
 }

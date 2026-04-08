@@ -9,6 +9,8 @@ import seedrandom from 'seedrandom';
 // Все это пока не учитывает, что граф может быть ориентированным
 // Может потом добавлю
 
+// Также для каждого узла считает degree, degreeCentrality
+
 export default function calculateGraphMetrics(graph: Graph): graphMetrics {
   let start, end;
 
@@ -89,8 +91,10 @@ function findSimpleMetrics(graph: Graph) {
     degreeMap.set(target, (degreeMap.get(target) || 0) + (attributes.weight || 1));
   });
 
+  const N = graph.order;
   graph.forEachNode((node) => {
     graph.setNodeAttribute(node, 'degree', degreeMap.get(node)!);
+    graph.setNodeAttribute(node, 'degreeCentrality', degreeMap.get(node)! / (N - 1));
   });
   
   const maxDegree = Math.max(...Array.from(degreeMap.values()));

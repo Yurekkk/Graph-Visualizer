@@ -14,7 +14,9 @@ export const maxHighlightedNeighborsNum = 20;
 export const maxAccumulatedCost = 3;
 export const minWeightCost = 3;   // Стоимость прохода по ребру с минимальным весом, > 0
 export const maxWeightCost = 0.1; // Стоимость прохода по ребру с максимальным весом, > 0
-// В случае, если maxWeight = minWeight, цена всегда = minWeightCost
+// В случае, если maxWeight = minWeight, цена за вес ребра всегда = minWeightCost / 3
+export const degreeInfluence = 0.5; // Влияние степени на функцию цены
+// Больше значение => поиск больше тяготеет к хабам
 
 
 
