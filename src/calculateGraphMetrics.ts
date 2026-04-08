@@ -5,6 +5,7 @@ import louvain from 'graphology-communities-louvain';
 import type graphMetrics from './graphMetricsInterface';
 import * as alg from './configs/algorithmicConfig.ts';
 import seedrandom from 'seedrandom';
+// import betweennessCentrality from 'graphology-metrics/centrality/betweenness';
 
 // Все это пока не учитывает, что граф может быть ориентированным
 // Может потом добавлю
@@ -28,13 +29,21 @@ export default function calculateGraphMetrics(graph: Graph): graphMetrics {
   } = findSimpleMetrics(graph);
   const degreeGini = findDegreeGini(graph);
   end = performance.now();
-  console.log(`Время вычисления простых метрик: ${end - start} мс`)
+  console.log(`Время вычисления простых метрик: ${(end - start).toFixed(2)} мс`)
+
+  /*
+  // Очень долго считает
+  start = performance.now();
+  betweennessCentrality.assign(graph);
+  end = performance.now();
+  console.log(`Время вычисления центральности: ${(end - start).toFixed(2)} мс`)
+  //*/
 
   /*
   start = performance.now();
   const _ = labelPropagation(graph, 100);
   end = performance.now();
-  console.log(`Время нахождения сообществ (LPA): ${end - start} мс`)
+  console.log(`Время нахождения сообществ (LPA): ${(end - start).toFixed(2)} мс`)
   //*/
 
   //*
@@ -42,13 +51,13 @@ export default function calculateGraphMetrics(graph: Graph): graphMetrics {
   louvain.assign(graph, {rng: seedrandom(alg.seed)});
   const numCommunities = findCommunitiesNum(graph);
   end = performance.now();
-  console.log(`Время нахождения сообществ (louvain): ${end - start} мс`)
+  console.log(`Время нахождения сообществ (louvain): ${(end - start).toFixed(2)} мс`)
   //*/
 
   start = performance.now();
   const modularity = calculateModularity(graph);
   end = performance.now();
-  console.log(`Время нахождения модулярности: ${end - start} мс`)
+  console.log(`Время нахождения модулярности: ${(end - start).toFixed(2)} мс`)
 
   return {
     numNodes,

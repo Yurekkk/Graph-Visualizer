@@ -7,7 +7,7 @@ import { createNodeBorderProgram } from "@sigma/node-border";
 import EdgeCurveProgram from '@sigma/edge-curve';
 import parseGraphFile from './graphParser.ts';
 import smartLayout from './layoutEngine.ts';
-import { hoverNode, unhoverNode, selectNode, deselectNode } from './graphHoverClickHandler.ts';
+import { hoverNode, unhoverNode, selectNode, deselectNode, clearHoveredSelected } from './graphHoverClickHandler.ts';
 import * as vis from './configs/visualConfig.ts';
 import * as alg from './configs/algorithmicConfig.ts';
 import seedrandom from 'seedrandom';
@@ -50,6 +50,7 @@ async function initGraph(path: string, title: string) {
     renderer.kill(); 
     renderer = null;
   }
+  clearHoveredSelected();
   graph = null;
   let start, end;
 
@@ -59,7 +60,7 @@ async function initGraph(path: string, title: string) {
   start = performance.now();
   graph = await parseGraphFile(path);
   end = performance.now();
-  console.log(`Время парсинга графа: ${end - start} мс`)
+  console.log(`Время парсинга графа: ${(end - start).toFixed(2)} мс`)
 
 
 
@@ -95,7 +96,7 @@ async function initGraph(path: string, title: string) {
     });
   });
   end = performance.now();
-  console.log(`Время расставления атрибутов узлов: ${end - start} мс`)
+  console.log(`Время расставления атрибутов узлов: ${(end - start).toFixed(2)} мс`)
 
 
 
@@ -115,7 +116,7 @@ async function initGraph(path: string, title: string) {
     });
   });
   end = performance.now();
-  console.log(`Время расставления атрибутов рёбер: ${end - start} мс`)
+  console.log(`Время расставления атрибутов рёбер: ${(end - start).toFixed(2)} мс`)
 
 
 
@@ -123,7 +124,7 @@ async function initGraph(path: string, title: string) {
   start = performance.now();
   smartLayout(graph, metrics);
   end = performance.now();
-  console.log(`Время работы раскладки: ${end - start} мс`)
+  console.log(`Время работы раскладки: ${(end - start).toFixed(2)} мс`)
 
 
 
@@ -171,7 +172,7 @@ async function initGraph(path: string, title: string) {
   });
 
   end = performance.now();
-  console.log(`Время отрисовки: ${end - start} мс`)
+  console.log(`Время отрисовки: ${(end - start).toFixed(2)} мс`)
   await setStatus('Почти готово...');
 
 
@@ -215,7 +216,7 @@ function initSelector() {
 
 async function setStatus(text: string) {
   statusSpan.textContent = text;
-  await new Promise(r => setTimeout(r, 0)); // отдаём поток на repaint
+  await new Promise(r => setTimeout(r, 1)); // отдаём поток на repaint
 }
 
 
@@ -224,7 +225,7 @@ selector.addEventListener('change', async (e) => {
   loader.style.display = 'flex'; // показываем крутилку
   
   // Ждём 1 кадр, чтобы браузер успел отрисовать лоадер
-  await new Promise(r => setTimeout(r, 0));
+  await new Promise(r => setTimeout(r, 1));
   
   // Запускаем тяжёлую инициализацию
   const target = e.target as HTMLSelectElement;

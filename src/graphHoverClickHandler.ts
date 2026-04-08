@@ -17,6 +17,13 @@ let hoveredNodeId:  string | null = null;
 
 
 
+export function clearHoveredSelected() {
+  selectedNodeId = null;
+  hoveredNodeId = null;
+}
+
+
+
 export function hoverNode(newHoveredNodeId: string, graph: Graph, 
   renderer: Sigma, metrics: graphMetrics) {
   if (hoveredNodeId === newHoveredNodeId) return;
