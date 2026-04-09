@@ -6,6 +6,8 @@ import type graphMetrics from './graphMetricsInterface';
 import * as alg from './configs/algorithmicConfig.ts';
 import seedrandom from 'seedrandom';
 // import betweennessCentrality from 'graphology-metrics/centrality/betweenness';
+import coreNumber from 'graphology-cores';
+// import pagerank from 'graphology-metrics/centrality/pagerank';
 
 // Все это пока не учитывает, что граф может быть ориентированным
 // Может потом добавлю
@@ -29,35 +31,29 @@ export default function calculateGraphMetrics(graph: Graph): graphMetrics {
   } = findSimpleMetrics(graph);
   const degreeGini = findDegreeGini(graph);
   end = performance.now();
-  console.log(`Время вычисления простых метрик: ${(end - start).toFixed(2)} мс`)
-
-  /*
-  // Очень долго считает
-  start = performance.now();
-  betweennessCentrality.assign(graph);
-  end = performance.now();
-  console.log(`Время вычисления центральности: ${(end - start).toFixed(2)} мс`)
-  //*/
+  console.log(`Время вычисления простых метрик: ${(end - start).toFixed(3)} мс`)
 
   /*
   start = performance.now();
   const _ = labelPropagation(graph, 100);
   end = performance.now();
-  console.log(`Время нахождения сообществ (LPA): ${(end - start).toFixed(2)} мс`)
+  console.log(`Время нахождения сообществ (LPA): ${(end - start).toFixed(3)} мс`)
   //*/
+
+  calculateNodeMetrics(graph);
 
   //*
   start = performance.now();
   louvain.assign(graph, {rng: seedrandom(alg.seed)});
   const numCommunities = findCommunitiesNum(graph);
   end = performance.now();
-  console.log(`Время нахождения сообществ (louvain): ${(end - start).toFixed(2)} мс`)
+  console.log(`Время нахождения сообществ (louvain): ${(end - start).toFixed(3)} мс`)
   //*/
 
   start = performance.now();
   const modularity = calculateModularity(graph);
   end = performance.now();
-  console.log(`Время нахождения модулярности: ${(end - start).toFixed(2)} мс`)
+  console.log(`Время нахождения модулярности: ${(end - start).toFixed(3)} мс`)
 
   return {
     numNodes,
@@ -132,6 +128,123 @@ function findSimpleMetrics(graph: Graph) {
     minEdgeWeight,
     hubDominance
   }
+}
+
+function calculateNodeMetrics(graph: Graph) {
+  /*
+  // Очень долго считает
+  start = performance.now();
+  betweennessCentrality.assign(graph);
+  end = performance.now();
+  console.log(`Время вычисления центральности: ${(end - start).toFixed(3)} мс`);
+  //*/
+
+  const start = performance.now();
+  coreNumber.coreNumber.assign(graph); // k-core
+  // pagerank.assign(graph);
+  // graph.forEachNode(node => {
+  //   const cc = localClusteringCoefficient(graph, node);
+  //   graph.setNodeAttribute(node, 'clusteringCoef', cc);
+  // });
+  computeImportance(graph);
+  const end = performance.now();
+  console.log(`Время вычисления узловых метрик: ${(end - start).toFixed(3)} мс`);
+}
+
+function computeImportance(graph: Graph, weights = { deg: 0.5, k: 0.5 }) {
+  const stats = { 
+    deg: { min: Infinity, max: -Infinity },
+    k:  { min: Infinity, max: -Infinity }
+  };
+
+  // Собираем максимумы и минимумы
+  graph.forEachNode(node => {
+    const deg = graph.getNodeAttribute(node, 'degree') ?? 0;
+    const k  = graph.getNodeAttribute(node, 'kcore') ?? 0;
+
+    if (deg < stats.deg.min) stats.deg.min = deg;
+    if (deg > stats.deg.max) stats.deg.max = deg;
+    if (k   < stats.k.min)   stats.k.min   = k;
+    if (k   > stats.k.max)   stats.k.max   = k;
+  });
+
+  // Нормализация [0,1] + взвешивание
+  graph.forEachNode((node, attrs) => {
+    const norm = (val: number, s: { min: number; max: number }) =>
+      s.max === s.min ? 0.5 : (val - s.min) / (s.max - s.min);
+
+    const importance = weights.deg * norm(attrs.degree, stats.deg) +
+                       weights.k * norm(attrs.coreNumber, stats.k);
+
+    graph.setNodeAttribute(node, 'importance', importance);
+  });
+}
+
+/*
+function computeImportance(graph: Graph, weights = { pr: 0.4, k: 0.4, cc: 0.2 }) {
+  const metrics = new Map<string, { pr: number; k: number; cc: number }>();
+  const stats = { 
+    pr: { min: Infinity, max: -Infinity },
+    k:  { min: Infinity, max: -Infinity },
+    cc: { min: Infinity, max: -Infinity }
+  };
+
+  // Сбор + логарифмирование (сжимает power-law "хвосты")
+  graph.forEachNode(node => {
+    const pr = graph.getNodeAttribute(node, 'pagerank') ?? 0;
+    const k  = graph.getNodeAttribute(node, 'kcore') ?? 0;
+    const cc = graph.getNodeAttribute(node, 'clustering') ?? 0;
+
+    // log1p(x) = ln(1+x). Безопасен для 0, сжимает большие значения
+    const lPr = Math.log1p(pr);
+    const lK  = Math.log1p(k);
+    const lCc = cc; // Без log, так как cc уже [0,1]
+
+    metrics.set(node, { pr: lPr, k: lK, cc: lCc });
+
+    if (lPr < stats.pr.min) stats.pr.min = lPr;
+    if (lPr > stats.pr.max) stats.pr.max = lPr;
+    if (lK  < stats.k.min)  stats.k.min  = lK;
+    if (lK  > stats.k.max)  stats.k.max  = lK;
+    if (lCc < stats.cc.min) stats.cc.min = lCc;
+    if (lCc > stats.cc.max) stats.cc.max = lCc;
+  });
+
+  // Нормализация [0,1] + взвешивание
+  metrics.forEach(({ pr, k, cc }, node) => {
+    const norm = (val: number, s: { min: number; max: number }) =>
+      s.max === s.min ? 0.5 : (val - s.min) / (s.max - s.min);
+
+    const importance = weights.pr * norm(pr, stats.pr) +
+                       weights.k  * norm(k,  stats.k) +
+                       weights.cc * norm(cc, stats.cc);
+
+    graph.setNodeAttribute(node, 'importance', Math.max(0, Math.min(1, importance)));
+  });
+}
+//*/
+
+// Слишком медленный
+function localClusteringCoefficient(graph: Graph, node: string): number {
+  const neighbors = graph.neighbors(node);
+  const k = neighbors.length;
+  
+  if (k < 2) return 0; // не хватает соседей для треугольника
+  
+  // Считаем рёбра между соседями
+  const neighborSet = new Set(neighbors);
+  let edgesBetween = 0;
+
+  for (const nb of neighbors) {
+    for (const other of graph.neighbors(nb)) {
+      if (neighborSet.has(other) && nb < other) { // nb<other чтобы не посчитать дважды
+        edgesBetween++;
+      }
+    }
+  }
+  
+  const maxPossible = k * (k - 1) / 2;
+  return edgesBetween / maxPossible; // [0, 1]
 }
 
 // Нахождение компонент связности, диаметра, радиуса и длины среднего пути

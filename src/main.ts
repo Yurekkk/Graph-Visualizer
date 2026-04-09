@@ -11,6 +11,7 @@ import { hoverNode, unhoverNode, selectNode, deselectNode, clearHoveredSelected 
 import * as vis from './configs/visualConfig.ts';
 import * as alg from './configs/algorithmicConfig.ts';
 import seedrandom from 'seedrandom';
+import hideUnimportantNodes from './hideUnimportantNodes.ts';
 
 
 
@@ -60,7 +61,7 @@ async function initGraph(path: string, title: string) {
   start = performance.now();
   graph = await parseGraphFile(path);
   end = performance.now();
-  console.log(`Время парсинга графа: ${(end - start).toFixed(2)} мс`)
+  console.log(`Время парсинга графа: ${(end - start).toFixed(3)} мс`)
 
 
 
@@ -96,7 +97,7 @@ async function initGraph(path: string, title: string) {
     });
   });
   end = performance.now();
-  console.log(`Время расставления атрибутов узлов: ${(end - start).toFixed(2)} мс`)
+  console.log(`Время расставления атрибутов узлов: ${(end - start).toFixed(3)} мс`)
 
 
 
@@ -116,7 +117,7 @@ async function initGraph(path: string, title: string) {
     });
   });
   end = performance.now();
-  console.log(`Время расставления атрибутов рёбер: ${(end - start).toFixed(2)} мс`)
+  console.log(`Время расставления атрибутов рёбер: ${(end - start).toFixed(3)} мс`)
 
 
 
@@ -124,7 +125,15 @@ async function initGraph(path: string, title: string) {
   start = performance.now();
   smartLayout(graph, metrics);
   end = performance.now();
-  console.log(`Время работы раскладки: ${(end - start).toFixed(2)} мс`)
+  console.log(`Время работы раскладки: ${(end - start).toFixed(3)} мс`)
+
+
+
+  await setStatus('Скрываем менее полезные узлы...');
+  start = performance.now();
+  hideUnimportantNodes(graph);
+  end = performance.now();
+  console.log(`Время скрытия менее полезных узлов: ${(end - start).toFixed(3)} мс`)
 
 
 
@@ -172,7 +181,7 @@ async function initGraph(path: string, title: string) {
   });
 
   end = performance.now();
-  console.log(`Время отрисовки: ${(end - start).toFixed(2)} мс`)
+  console.log(`Время отрисовки: ${(end - start).toFixed(3)} мс`)
   await setStatus('Почти готово...');
 
 

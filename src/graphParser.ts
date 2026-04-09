@@ -20,14 +20,12 @@ interface Edge {
 
 export default async function parseGraphFile(
   filePath: string,
-  format:string = 'auto'
+  format: string = 'auto'
 ): Promise<Graph> {
   const response = await fetch(filePath);
   const content = await response.text();
 
-  if (format === 'auto') {
-    format = detectFormat(filePath);
-  }
+  if (format === 'auto') format = detectFormat(filePath);
 
   switch (format) {
     case 'json':
@@ -72,7 +70,7 @@ function detectFormat(filePath: string): string {
 
 
 function parseJSON(content: string): Graph {
-  const graph = new Graph();
+  const graph = new Graph({allowSelfLoops: false});
   const data = JSON.parse(content);
 
   if (data.nodes) {
@@ -88,10 +86,12 @@ function parseJSON(content: string): Graph {
 
   if (edges) {
     edges.forEach((edge: Edge) => {
-      graph.addEdge(edge.source, edge.target, {
-        ...edge,
-        weight: edge.weight ?? edge.size ?? edge.value ?? 1,
-      });
+      if (edge.source !== edge.target) {
+        graph.addEdge(edge.source, edge.target, {
+          ...edge,
+          weight: edge?.weight ?? edge?.size ?? edge?.value ?? 1,
+        });
+      }
     });
   }
 
@@ -109,7 +109,7 @@ function parseGEXF(content: string): Graph {
 
 
 function parseMTX(content: string): Graph {
-  const graph = new Graph();
+  const graph = new Graph({allowSelfLoops: false});
   const lines = content.trim().split('\n');
   const nodes = new Set<string>();
   const edges: Array<{ source: string; target: string; weight: number }> = [];
@@ -163,9 +163,11 @@ function parseMTX(content: string): Graph {
 
   edges.forEach((edge) => {
     if (!graph.hasEdge(edge.source, edge.target)) {
-      graph.addEdge(edge.source, edge.target, {
-        weight: valuesAreTimestamps ? 1 : edge.weight
-      });
+      if (edge.source !== edge.target) {
+        graph.addEdge(edge.source, edge.target, {
+          weight: valuesAreTimestamps ? 1 : edge.weight
+        });
+      }
     }
     else {
       const edgeID = graph.edge(edge.source, edge.target);
@@ -181,7 +183,7 @@ function parseMTX(content: string): Graph {
 
 
 function parseCSV(content: string): Graph {
-  const graph = new Graph();
+  const graph = new Graph({allowSelfLoops: false});
   const lines = content.trim().split('\n');
   const nodes = new Set<string>();
   const edges: Array<{ source: string; target: string; weight: number }> = [];
@@ -220,9 +222,11 @@ function parseCSV(content: string): Graph {
 
   edges.forEach((edge) => {
     if (!graph.hasEdge(edge.source, edge.target)) {
-      graph.addEdge(edge.source, edge.target, {
-        weight: valuesAreTimestamps ? 1 : edge.weight
-      });
+      if (edge.source !== edge.target) {
+        graph.addEdge(edge.source, edge.target, {
+          weight: valuesAreTimestamps ? 1 : edge.weight
+        });
+      }
     }
     else {
       const edgeID = graph.edge(edge.source, edge.target);
@@ -238,7 +242,7 @@ function parseCSV(content: string): Graph {
 
 
 function parseDOT(content: string): Graph {
-  const graph = new Graph();
+  const graph = new Graph({allowSelfLoops: false});
   
   // Удаляем комментарии // и /* */
   const clean = content.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
@@ -275,7 +279,7 @@ function parseDOT(content: string): Graph {
       });
     }
 
-    if (!graph.hasEdge(source, target)) {
+    if (!graph.hasEdge(source, target) && source !== target) {
       graph.addEdge(source, target, attributes);
     }
   }

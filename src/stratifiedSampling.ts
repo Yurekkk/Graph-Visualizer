@@ -1,5 +1,7 @@
 import Graph from 'graphology';
 
+// TODO?: Учитывать Importance вместо degree
+
 export default function stratifiedSampling(
   graph: Graph,
   options: {
