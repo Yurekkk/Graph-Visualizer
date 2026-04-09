@@ -3,6 +3,9 @@ import * as alg from './configs/algorithmicConfig.ts';
 import type graphMetrics from './graphMetricsInterface.ts';
 import { MinPriorityQueue } from '@datastructures-js/priority-queue';
 
+// TODO?: Учитывать importance вместо degree
+// TODO: В целом сделать работоспособным
+
 export default function findCloseImportantNeighbours(
   selectedNodeId: string, graph: Graph, metrics: graphMetrics): string[] {
   // С помощью алгоритма Дейкстры ищем максимум alg.maxHighlightedNeighborsNum узлов,

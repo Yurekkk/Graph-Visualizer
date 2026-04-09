@@ -151,7 +151,7 @@ function calculateNodeMetrics(graph: Graph) {
   console.log(`Время вычисления узловых метрик: ${(end - start).toFixed(3)} мс`);
 }
 
-function computeImportance(graph: Graph, weights = { deg: 0.5, k: 0.5 }) {
+function computeImportance(graph: Graph) {
   const stats = { 
     deg: { min: Infinity, max: -Infinity },
     k:  { min: Infinity, max: -Infinity }
@@ -160,7 +160,7 @@ function computeImportance(graph: Graph, weights = { deg: 0.5, k: 0.5 }) {
   // Собираем максимумы и минимумы
   graph.forEachNode(node => {
     const deg = graph.getNodeAttribute(node, 'degree') ?? 0;
-    const k  = graph.getNodeAttribute(node, 'kcore') ?? 0;
+    const k  = graph.getNodeAttribute(node, 'core') ?? 0;
 
     if (deg < stats.deg.min) stats.deg.min = deg;
     if (deg > stats.deg.max) stats.deg.max = deg;
@@ -171,10 +171,10 @@ function computeImportance(graph: Graph, weights = { deg: 0.5, k: 0.5 }) {
   // Нормализация [0,1] + взвешивание
   graph.forEachNode((node, attrs) => {
     const norm = (val: number, s: { min: number; max: number }) =>
-      s.max === s.min ? 0.5 : (val - s.min) / (s.max - s.min);
+      s.max === s.min ? 1 : (val - s.min) / (s.max - s.min);
 
-    const importance = weights.deg * norm(attrs.degree, stats.deg) +
-                       weights.k * norm(attrs.coreNumber, stats.k);
+    const importance = alg.degreeWeight * norm(attrs.degree, stats.deg) +
+                       alg.kCoreWeight * norm(attrs.core, stats.k);
 
     graph.setNodeAttribute(node, 'importance', importance);
   });

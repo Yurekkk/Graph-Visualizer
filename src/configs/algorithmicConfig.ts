@@ -21,7 +21,12 @@ export const degreeInfluence = 0.5; // Влияние степени на фун
 
 
 // ### Misc ###
+// Importance calculations
+export const degreeWeight = 0.5;
+export const kCoreWeight = 0.5;
+
 export const seed = '42';
+
 export const timestamp_threshold = 500_000_000;
 // Если все значения ребер больше этого порога, 
 // то, скорее всего, это не веса, а временные метки

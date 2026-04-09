@@ -9,7 +9,7 @@ interface RadialLayoutOptions {
 export default function radialLayout(graph: Graph, opts: RadialLayoutOptions = {}) {
   const {
     ringSpacing = 100,
-    sortByDegreeOnRing = true
+    sortByDegreeOnRing = false
   } = opts;
 
   if (graph.order === 0) return;
