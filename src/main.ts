@@ -145,6 +145,7 @@ async function initGraph(path: string, title: string) {
     defaultEdgeType: 'line',
     labelSize: vis.labelSize,
     zIndex: true,
+    autoRescale: false,
 
     nodeProgramClasses: {
       circle: createNodeBorderProgram({
