@@ -5,7 +5,14 @@ export const radialMinDegreeGini = 0.75;
 export const radialMinHubDominance = 100;
 export const samplingMinNumNodes = 500;
 
+export const radialRingSpacing = 100;
+export const radialSortByDegreeOnRing = false;
 export const forceAtlasIterations = 50;
+
+export const metaLayoutMinNodes = 500;
+export const metaLayoutMinEdges = 2000;
+export const metaLayoutMinModularity = 0.75;
+export const metaLayoutSpacing = 10.0;
 
 
 
@@ -25,6 +32,7 @@ export const degreeInfluence = 0.5; // Влияние степени на фун
 export const degreeWeight = 0.5;
 export const kCoreWeight = 0.5;
 
+export const louvainResolution = 1.0;
 export const seed = '42';
 
 export const timestamp_threshold = 500_000_000;

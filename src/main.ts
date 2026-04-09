@@ -2,7 +2,7 @@ import './style.css';
 import Sigma from 'sigma';
 import Graph from 'graphology';
 import { blendWithBackground, edgeColor, edgeSize, nodeColor, nodeSize } from './visualUtils.ts';
-import calculateGraphMetrics from './calculateGraphMetrics.ts';
+import { calculateGraphMetrics, calculateNodeMetrics } from './calculateGraphMetrics.ts';
 import { createNodeBorderProgram } from "@sigma/node-border";
 import EdgeCurveProgram from '@sigma/edge-curve';
 import parseGraphFile from './graphParser.ts';
@@ -67,6 +67,7 @@ async function initGraph(path: string, title: string) {
 
   await setStatus('Считаем метрики...');
   const metrics = calculateGraphMetrics(graph);
+  calculateNodeMetrics(graph);
   for (const [key, value] of Object.entries(metrics)) {
     console.log(`--- ${key}: ${value}`);
   }
@@ -129,11 +130,11 @@ async function initGraph(path: string, title: string) {
 
 
 
-  await setStatus('Скрываем менее полезные узлы...');
+  await setStatus('Скрываем наименее полезные узлы...');
   start = performance.now();
   hideUnimportantNodes(graph);
   end = performance.now();
-  console.log(`Время скрытия менее полезных узлов: ${(end - start).toFixed(3)} мс`)
+  console.log(`Время скрытия наименее полезных узлов: ${(end - start).toFixed(3)} мс`)
 
 
 
@@ -198,6 +199,8 @@ async function initGraph(path: string, title: string) {
 
   // Клик по пустому месту для сброса фокуса
   renderer.on('clickStage', () => deselectNode(graph!, renderer!));
+
+  await setStatus('');
 }
 
 

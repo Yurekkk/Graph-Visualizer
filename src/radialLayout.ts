@@ -1,16 +1,7 @@
 import Graph from 'graphology';
+import * as alg from './configs/algorithmicConfig.ts';
 
-interface RadialLayoutOptions {
-  ringSpacing?: number;         // Расстояние между кольцами (px)
-  angleOffset?: number;         // Смещение начального угла (радианы)
-  sortByDegreeOnRing?: boolean; // Сортировать узлы на кольце по степени
-}
-
-export default function radialLayout(graph: Graph, opts: RadialLayoutOptions = {}) {
-  const {
-    ringSpacing = 100,
-    sortByDegreeOnRing = false
-  } = opts;
+export default function radialLayout(graph: Graph) {
 
   if (graph.order === 0) return;
 
@@ -52,11 +43,11 @@ export default function radialLayout(graph: Graph, opts: RadialLayoutOptions = {
 
   // Расчёт координат
   rings.forEach((ringNodes, level) => {
-    const radius = level * ringSpacing;
+    const radius = level * alg.radialRingSpacing;
     const count = ringNodes.length;
 
     // Сортировка для уменьшения пересечений рёбер
-    if (sortByDegreeOnRing && count > 2) {
+    if (alg.radialSortByDegreeOnRing && count > 2) {
       ringNodes.sort((a, b) => graph.degree(b) - graph.degree(a));
     }
 
