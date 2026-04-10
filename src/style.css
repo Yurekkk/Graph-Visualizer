@@ -22,17 +22,20 @@ body, html {
   top: 20px;
   left: 20px;
   z-index: 100;
+  display: flex;
+  flex-direction: row;
 }
 
 select {
   padding: 8px 12px;
   font-size: 14px;
   color: #f0f0f0;
-  background-color: #363636;
+  background-color: #454545;
   cursor: pointer;
   min-width: 200px;
   border-color: #00000000;
   border-radius: 8px;
+  margin: 5px;
 }
 
 

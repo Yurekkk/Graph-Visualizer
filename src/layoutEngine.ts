@@ -21,8 +21,36 @@ import seedrandom from 'seedrandom';
 export default function smartLayout(
   graph: Graph, 
   metrics: graphMetrics,
+  algorithm: string = 'auto',
   _recursion_level: number = 0
 ) {
+
+  switch (algorithm) {
+    case 'auto':
+      break;
+    case 'meta':
+      console.log("metaLayout chosen at recursion level: ", _recursion_level);
+      metaLayout(graph, _recursion_level);
+      return;
+    case 'circular':
+      console.log("circularLayout chosen at recursion level: ", _recursion_level);
+      circularLayout(graph);
+      return;
+    case 'radial':
+      console.log("radialLayout chosen at recursion level: ", _recursion_level);
+      radialLayout(graph);
+      return;
+    case 'forceAtlas2':
+      console.log("forceAtlas2Layout chosen at recursion level: ", _recursion_level);
+      forceAtlas2Layout(graph); 
+      return;
+    case 'forceAtlas2wSampling':
+      console.log("forceAtlas2SamplingLayout chosen at recursion level: ", _recursion_level);
+      forceAtlas2SamplingLayout(graph);
+      return;
+    default: 
+      throw new Error("Unknown algorithm.");
+  }
 
   if ((metrics.numNodes > alg.metaLayoutMinNodes ||
       metrics.numEdges > alg.metaLayoutMinEdges ||
@@ -63,7 +91,7 @@ function metaLayout(graph: Graph, _recursion_level: number) {
   metaMetrics = {...metaMetrics, numCommunities, modularity};
 
   // Рекурсивно раскладываем мета-граф
-  smartLayout(metaGraph, metaMetrics, _recursion_level + 1);
+  smartLayout(metaGraph, metaMetrics, 'auto', _recursion_level + 1);
 
   // Для каждого сообщества - свой внутренний layout
 
@@ -80,7 +108,7 @@ function metaLayout(graph: Graph, _recursion_level: number) {
     metricsComm = {...metricsComm, numCommunities, modularity};
 
     // Раскладываем сообщество
-    smartLayout(commGraph, metricsComm, _recursion_level + 1);
+    smartLayout(commGraph, metricsComm, 'auto', _recursion_level + 1);
 
     // Считаем центры и радиусы
     const { centerX, centerY, radius } = getGraphCenterRadius(commGraph);
