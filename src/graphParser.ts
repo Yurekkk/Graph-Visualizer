@@ -75,7 +75,7 @@ function parseJSON(content: string): Graph {
 
   if (data.nodes) {
     data.nodes.forEach((node: Node) => {
-      graph.addNode(node.id, {
+      graph.addNode(node.id ?? node.key, {
         ...node,
         label: node.label ?? node.id,
       });

@@ -97,7 +97,10 @@ export function findCommunities(graph: Graph) {
   //*/
 
   // start = performance.now();
-  const modularity = calculateModularity(graph);
+  let modularity;
+  if (graph.size == 0 || graph.order == 0)
+    modularity = 0;
+  else modularity = calculateModularity(graph);
   // end = performance.now();
   // console.log(`Время нахождения модулярности: ${(end - start).toFixed(3)} мс`)
 

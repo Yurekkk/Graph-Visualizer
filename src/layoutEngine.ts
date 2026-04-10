@@ -58,7 +58,6 @@ export default function smartLayout(
 
 function metaLayout(graph: Graph, _recursion_level: number) {
   const metaGraph = buildMetaGraph(graph);
-  if (metaGraph.order == 0 || metaGraph.size == 0) return;
   let metaMetrics = calculateGraphMetrics(metaGraph);
   let {numCommunities, modularity} = findCommunities(metaGraph);
   metaMetrics = {...metaMetrics, numCommunities, modularity};
@@ -67,15 +66,15 @@ function metaLayout(graph: Graph, _recursion_level: number) {
   smartLayout(metaGraph, metaMetrics, _recursion_level + 1);
 
   // Для каждого сообщества - свой внутренний layout
-  metaGraph.forEachNode((commId, metaAttrs) => {
-    const metaPos = {
-      x: metaAttrs.x,
-      y: metaAttrs.y,
-      size: metaAttrs.size
-    };
 
+  // Первый проход: раскладываем сообщества, считаем радиусы
+  const communities = new Map<string, {commGraph: Graph, 
+    centerX: number, centerY: number, radius: number}>();
+  let meanRadius = 0;
+  let count = 0;
+  
+  metaGraph.forEachNode((commId, _metaAttrs) => {
     const commGraph = buildCommunityGraph(graph, commId);
-    if (commGraph.order == 0 || commGraph.size == 0) return;
     let metricsComm = calculateGraphMetrics(commGraph);
     ({numCommunities, modularity} = findCommunities(commGraph));
     metricsComm = {...metricsComm, numCommunities, modularity};
@@ -83,20 +82,62 @@ function metaLayout(graph: Graph, _recursion_level: number) {
     // Раскладываем сообщество
     smartLayout(commGraph, metricsComm, _recursion_level + 1);
 
-    // Композиция координат: мета-центр + локальные со смещением
-    commGraph.forEachNode((node, attrs) => {
-      const localX = attrs.x;
-      const localY = attrs.y;
+    // Считаем центры и радиусы
+    const { centerX, centerY, radius } = getGraphCenterRadius(commGraph);
+    meanRadius += (radius - meanRadius) / ++count;
 
-      graph.setNodeAttribute(node, 'x', metaPos.x * alg.metaLayoutSpacing + localX);
-      graph.setNodeAttribute(node, 'y', metaPos.y * alg.metaLayoutSpacing + localY);
+    communities.set(commId, {commGraph: commGraph, 
+      centerX: centerX, centerY: centerY, radius: radius})
+  });
+
+  // Второй проход: композиция координат
+  metaGraph.forEachNode((commId, metaAttrs) => {
+    const {commGraph, centerX: centerX, centerY: centerY, 
+      radius: _radius} = communities.get(commId)!;
+    commGraph.forEachNode((node, localAttrs) => {
+      const metaX = metaAttrs.x * alg.metaLayoutSpacing * meanRadius;
+      const metaY = metaAttrs.y * alg.metaLayoutSpacing * meanRadius;
+      const localX = (localAttrs.x - centerX);
+      const localY = (localAttrs.y - centerY);
+      graph.setNodeAttribute(node, 'x', metaX + localX);
+      graph.setNodeAttribute(node, 'y', metaY + localY);
     });
   });
 }
 
 
 
-function buildCommunityGraph(graph: Graph, commId: any) {
+export function getGraphCenterRadius(graph: Graph): 
+  {centerX: number, centerY: number, radius: number} {
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  let sumX = 0, sumY = 0, count = 0;
+
+  graph.forEachNode((_, attrs) => {
+    const x = attrs.x ?? 0, y = attrs.y ?? 0;
+    minX = Math.min(minX, x); maxX = Math.max(maxX, x);
+    minY = Math.min(minY, y); maxY = Math.max(maxY, y);
+    sumX += x; sumY += y; count++;
+  });
+
+  if (count === 0) return {centerX: 0, centerY: 0, radius: 0};
+
+  const centerX = sumX / count;
+  const centerY = sumY / count;
+  
+  // Радиус: максимальное расстояние от центра до узла
+  let radius = 0;
+  graph.forEachNode((_, attrs) => {
+    const dx = (attrs.x ?? 0) - centerX;
+    const dy = (attrs.y ?? 0) - centerY;
+    radius = Math.max(radius, Math.sqrt(dx*dx + dy*dy));
+  });
+
+  return { centerX: centerX, centerY: centerY, radius: radius };
+}
+
+
+
+function buildCommunityGraph(graph: Graph, commId: any): Graph {
   // Строим граф сообщества
   const currCommNodes = new Set<string>();
   graph.forEachNode((node, attrs) => {

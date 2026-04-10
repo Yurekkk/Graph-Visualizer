@@ -130,11 +130,11 @@ async function initGraph(path: string, title: string) {
 
 
 
-  await setStatus('Скрываем наименее полезные узлы...');
-  start = performance.now();
-  hideUnimportantNodes(graph);
-  end = performance.now();
-  console.log(`Время скрытия наименее полезных узлов: ${(end - start).toFixed(3)} мс`)
+  // await setStatus('Скрываем наименее полезные узлы...');
+  // start = performance.now();
+  // hideUnimportantNodes(graph);
+  // end = performance.now();
+  // console.log(`Время скрытия наименее полезных узлов: ${(end - start).toFixed(3)} мс`)
 
 
 
