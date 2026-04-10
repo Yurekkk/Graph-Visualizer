@@ -5,7 +5,7 @@ export const radialMinDegreeGini = 0.75;
 export const radialMinHubDominance = 100;
 export const samplingMinNumNodes = 500;
 
-export const radialRingSpacing = 1;
+export const radialRingSpacing = 100;
 export const radialSortByDegreeOnRing = false;
 export const forceAtlasIterations = 50;
 

@@ -51,7 +51,6 @@ graphSelector.addEventListener('change', async () => {
   // Ждём 1 кадр, чтобы браузер успел отрисовать лоадер
   await new Promise(r => setTimeout(r, 1));
   
-  // Запускаем тяжёлую инициализацию
   await initGraph(graphSelector.value, 
     graphSelector.textContent, algorithmSelector.value);
 
@@ -66,7 +65,6 @@ algorithmSelector.addEventListener('change', async () => {
   // Ждём 1 кадр, чтобы браузер успел отрисовать лоадер
   await new Promise(r => setTimeout(r, 1));
   
-  // Запускаем тяжёлую инициализацию
   await initGraph(graphSelector.value, 
     graphSelector.textContent, algorithmSelector.value);
 

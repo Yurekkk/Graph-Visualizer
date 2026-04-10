@@ -30,12 +30,16 @@ select {
   padding: 8px 12px;
   font-size: 14px;
   color: #f0f0f0;
-  background-color: #454545;
   cursor: pointer;
   min-width: 200px;
   border-color: #00000000;
-  border-radius: 8px;
+  background-color: #454545;
+  border-radius: 10px;
   margin: 5px;
+}
+
+select:open {
+  border-radius: 10px 10px 0px 0px;
 }
 
 
