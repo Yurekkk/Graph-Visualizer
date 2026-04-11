@@ -1,20 +1,18 @@
 import Graph from 'graphology';
 
-// TODO?: Учитывать Importance вместо degree
-
 export default function stratifiedSampling(
   graph: Graph,
   options: {
     sampleSize: number;
     method?: 'proportional' | 'equal';
-    prioritizeHighDegree?: boolean;
+    prioritizeImportantNodes?: boolean;
   }
 ): string[] {
 
   const {
     sampleSize,
     method = 'proportional',
-    prioritizeHighDegree = true
+    prioritizeImportantNodes: prioritizeHighDegree = true
   } = options;
 
   const totalNodes = graph.order;
@@ -44,8 +42,8 @@ export default function stratifiedSampling(
         shuffled = nodes.sort(() => Math.random() - 0.5);
       else 
         shuffled = nodes.sort((a, b) => {
-          return graph.getNodeAttribute(b, "degree") - 
-            graph.getNodeAttribute(a, "degree");  // По убыванию
+          return graph.getNodeAttribute(b, "importance") - 
+            graph.getNodeAttribute(a, "importance");  // По убыванию
         });
       sampled.push(...shuffled.slice(0, count));
     }
@@ -59,8 +57,8 @@ export default function stratifiedSampling(
         shuffled = nodes.sort(() => Math.random() - 0.5);
       else 
         shuffled = nodes.sort((a, b) => {
-          return graph.getNodeAttribute(b, "degree") - 
-            graph.getNodeAttribute(a, "degree");  // По убыванию
+          return graph.getNodeAttribute(b, "importance") - 
+            graph.getNodeAttribute(a, "importance");  // По убыванию
         });
       sampled.push(...shuffled.slice(0, perStratum));
     }

@@ -207,7 +207,7 @@ function forceAtlas2SamplingLayout(graph: Graph) {
   const sampledNodes = stratifiedSampling(graph, {
     sampleSize: alg.samplingMinNumNodes, 
     method: "proportional", 
-    prioritizeHighDegree: true
+    prioritizeImportantNodes: true
   });
 
   const sub = subgraph(graph, (node) => sampledNodes.includes(node));
