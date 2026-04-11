@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@types/dagre": "^0.7.54",
     "@types/node": "^25.3.1",
     "@types/seedrandom": "^3.0.8",
     "typescript": "~5.9.3",
@@ -20,6 +21,7 @@
     "@sigma/node-border": "^3.0.0",
     "@sigma/utils": "^3.0.0",
     "@ts-graphviz/parser": "^0.6.1",
+    "dagre": "^0.8.5",
     "graphology": "^0.26.0",
     "graphology-communities-louvain": "^2.0.2",
     "graphology-cores": "^0.0.1",
