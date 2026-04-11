@@ -9,6 +9,8 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@types/culori": "^4.0.1",
+    "@types/d3-scale-chromatic": "^3.1.0",
     "@types/dagre": "^0.7.54",
     "@types/node": "^25.3.1",
     "@types/seedrandom": "^3.0.8",
@@ -21,9 +23,12 @@
     "@sigma/node-border": "^3.0.0",
     "@sigma/utils": "^3.0.0",
     "@ts-graphviz/parser": "^0.6.1",
+    "culori": "^4.0.2",
+    "d3-scale-chromatic": "^3.1.0",
     "dagre": "^0.8.5",
     "graphology": "^0.26.0",
     "graphology-communities-louvain": "^2.0.2",
+    "graphology-components": "^1.5.4",
     "graphology-cores": "^0.0.1",
     "graphology-gexf": "^0.13.2",
     "graphology-layout": "^0.6.1",
