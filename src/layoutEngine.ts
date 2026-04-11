@@ -2,7 +2,7 @@ import Graph from 'graphology';
 import forceAtlas2 from 'graphology-layout-forceatlas2';
 import { circular } from 'graphology-layout';
 import radialLayout from './radialLayout';
-import noverlap from 'graphology-layout-noverlap';
+// import noverlap from 'graphology-layout-noverlap';
 import type graphMetrics from './graphMetricsInterface';
 import { subgraph } from 'graphology-operators';
 import interpolatePositions from './interpolatePositions';
@@ -11,7 +11,7 @@ import * as vis from './configs/visualConfig.ts';
 import * as alg from './configs/algorithmicConfig.ts';
 import { calculateGraphMetrics, findCommunities } from './calculateGraphMetrics.ts';
 import { buildCommunityGraph, buildMetaGraph, getGraphCenterRadius } from './algorithmicUtils.ts';
-
+import dagre from 'dagre';
 
 
 
@@ -42,6 +42,10 @@ export default function smartLayout(
       logAlgoChoice(algorithm, _recursion_level, _meta_or_comm_prefix);
       radialLayout(graph);
       return;
+    // case 'hierarchical':
+    //   logAlgoChoice(algorithm, _recursion_level, _meta_or_comm_prefix);
+    //   hierarchicalLayout(graph);
+    //   return;
     case 'forceAtlas2':
       logAlgoChoice(algorithm, _recursion_level, _meta_or_comm_prefix);
       forceAtlas2Layout(graph); 
@@ -157,6 +161,30 @@ function circularLayout(graph: Graph) {
     attrs.y *= r;
   })
 }
+
+
+
+/*
+function hierarchicalLayout(graph: Graph) {
+  const dagreGraph = new dagre.graphlib.Graph();
+  dagreGraph.setGraph({ rankdir: 'TB', nodesep: 50, ranksep: 60 });
+
+  graph.forEachNode(n => dagreGraph.setNode(String(n), { width: 50, height: 30 }));
+  graph.forEachEdge((id, _attrs, source, target) => {
+    if (source !== target && dagreGraph.hasNode(String(source)) && dagreGraph.hasNode(String(target))) {
+      dagreGraph.setEdge(String(source), String(target), { id });
+    }
+  });
+
+  dagre.layout(dagreGraph);
+
+  dagreGraph.nodes().forEach(node => {
+    const pos = dagreGraph.node(node);
+    graph.setNodeAttribute(node, 'x', pos.x);
+    graph.setNodeAttribute(node, 'y', pos.y);
+  });
+}
+//*/
 
 
 

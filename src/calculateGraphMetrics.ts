@@ -12,7 +12,7 @@ import coreNumber from 'graphology-cores';
 // Все это пока не учитывает, что граф может быть ориентированным
 // Может потом добавлю
 
-// Также для каждого узла считает degree, degreeCentrality
+// Также для каждого узла считает degree, degreeCentrality и core
 
 export function calculateGraphMetrics(graph: Graph): graphMetrics {
   // const start = performance.now();

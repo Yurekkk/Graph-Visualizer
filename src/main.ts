@@ -15,7 +15,13 @@ if (!loader) throw new Error('Загрузчик не найден!');
 function initSelectors() {
   algorithmSelector!.innerHTML = '';
   const algorithms = [
-    'auto', 'meta', 'circular', 'radial', 'forceAtlas2', 'forceAtlas2wSampling'
+    'auto', 
+    'meta', 
+    'circular', 
+    'radial', 
+    // 'hierarchical', 
+    'forceAtlas2', 
+    'forceAtlas2wSampling'
   ];
   algorithms.forEach((algorithm) => {
     const option = document.createElement('option');

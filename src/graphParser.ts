@@ -77,7 +77,8 @@ function parseJSON(content: string): Graph {
     data.nodes.forEach((node: Node) => {
       graph.addNode(node.id ?? node.key, {
         ...node,
-        label: node.label ?? node.id,
+        ...node.attributes,
+        label: node.label ?? node.attributes?.label ?? node.id ?? node.key,
       });
     });
   }
@@ -89,7 +90,9 @@ function parseJSON(content: string): Graph {
       if (edge.source !== edge.target) {
         graph.addEdge(edge.source, edge.target, {
           ...edge,
-          weight: edge?.weight ?? edge?.size ?? edge?.value ?? 1,
+          ...edge.attributes,
+          weight: edge.weight ?? edge.size ?? edge.value ?? edge.attributes?.weight ??
+            edge.attributes?.size ?? edge.attributes?.value ?? 1,
         });
       }
     });
