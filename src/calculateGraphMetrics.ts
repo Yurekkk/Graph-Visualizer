@@ -8,11 +8,12 @@ import seedrandom from 'seedrandom';
 // import betweennessCentrality from 'graphology-metrics/centrality/betweenness';
 import coreNumber from 'graphology-cores';
 // import pagerank from 'graphology-metrics/centrality/pagerank';
+import { connectedComponents } from 'graphology-components';
 
 // Все это пока не учитывает, что граф может быть ориентированным
 // Может потом добавлю
 
-// Также для каждого узла считает degree, degreeCentrality и core
+// Также для каждого узла считает degree, degreeCentrality, community и core
 
 export function calculateGraphMetrics(graph: Graph): graphMetrics {
   // const start = performance.now();
@@ -96,10 +97,12 @@ export function findCommunities(graph: Graph) {
   // console.log(`Время нахождения сообществ (louvain): ${(end - start).toFixed(3)} мс`)
   //*/
 
+  // Разделяем сообщества с несколькими компонентами связности на разные сообщества
+  remapCommunitiesPerComponent(graph);
+
   // start = performance.now();
   let modularity;
-  if (graph.size == 0 || graph.order == 0)
-    modularity = 0;
+  if (graph.size == 0 || graph.order == 0) modularity = 0;
   else modularity = calculateModularity(graph);
   // end = performance.now();
   // console.log(`Время нахождения модулярности: ${(end - start).toFixed(3)} мс`)
@@ -116,6 +119,33 @@ function findCommunitiesNum(graph: Graph): number {
     uniqueCommunities.add(attributes.community);
   })
   return uniqueCommunities.size;
+}
+
+
+
+export function remapCommunitiesPerComponent(graph: Graph) {
+  // Louvain может узлы из разных компонент связности запихивать в одно сообщество
+  // Разделяем сообщества с несколькими компонентами связности на разные сообщества
+
+  const components = connectedComponents(graph); // string[][]
+
+  let nextId = 0;
+  for (const component of components) {
+    // Уникальные старые ID сообществ в этой компоненте
+    const oldIds = new Set<number>();
+    for (const node of component)
+      oldIds.add(graph.getNodeAttribute(node, 'community'));
+
+    // Маппинг: старый в новый уникальный ID
+    const map = new Map<number, number>();
+    for (const id of oldIds) map.set(id, nextId++);
+
+    // Применяем
+    for (const node of component) {
+      const c = graph.getNodeAttribute(node, 'community');
+      graph.setNodeAttribute(node, 'community', map.get(c));
+    }
+  }
 }
 
 
