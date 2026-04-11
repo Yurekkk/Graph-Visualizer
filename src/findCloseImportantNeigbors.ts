@@ -3,8 +3,7 @@ import * as alg from './configs/algorithmicConfig.ts';
 import type graphMetrics from './graphMetricsInterface.ts';
 import { MinPriorityQueue } from '@datastructures-js/priority-queue';
 
-// TODO?: Учитывать importance вместо degree
-// TODO: В целом сделать работоспособным
+
 
 export default function findCloseImportantNeighbours(
   selectedNodeId: string, graph: Graph, metrics: graphMetrics): string[] {
@@ -36,7 +35,8 @@ export default function findCloseImportantNeighbours(
       const neighbor = source !== node ? source : target;
 
       const weight = attrs?.weight ?? 1;
-      const edgeCost = costFunc(graph, neighbor, weight);
+      const neighborImportance = graph.getNodeAttribute(neighbor, 'importance');
+      const edgeCost = costFunc(neighborImportance, weight);
       const newCost = cost + edgeCost;
 
       if (!dist.has(neighbor) || newCost < dist.get(neighbor)!) {
@@ -52,10 +52,12 @@ export default function findCloseImportantNeighbours(
   return result;
 }
 
+
+
 function buildCostFunction(metrics: graphMetrics) {
   const weightsAreDifferent = (metrics.maxEdgeWeight != metrics.minEdgeWeight);
 
-  // Функция учитывает вес ребра и степень узла, в который идет ребро
+  // Функция учитывает вес ребра и важность узла, в который идет ребро
 
   // Для веса ребра:
   // По сути отрицательная экспонента e^(-w), но чтобы она проходила через
@@ -67,16 +69,14 @@ function buildCostFunction(metrics: graphMetrics) {
     amplitude = alg.minWeightCost / Math.exp(growth * metrics.minEdgeWeight);
   }
 
-  return (graph: Graph, neighbor: string, w: number) => {
-    // Чем больше узел является хабом, тем большую выжность он представляет
-    const degCent = graph.getNodeAttribute(neighbor, 'degreeCentrality');
-    const degreeFactor = alg.degreeInfluence * (1 - degCent);
+  return (neighborImportance: number, w: number) => {
+    const importanceFactor = neighborImportance * alg.nodeImportanceInfluence;
 
     let weightFactor;
     if (weightsAreDifferent)
       weightFactor = amplitude * Math.exp(growth * w);
     else weightFactor = alg.minWeightCost / 3;
     
-    return weightFactor + degreeFactor;
+    return weightFactor + importanceFactor;
   }
 }

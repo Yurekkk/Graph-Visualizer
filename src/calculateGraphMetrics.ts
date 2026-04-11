@@ -67,7 +67,7 @@ export function calculateNodeMetrics(graph: Graph) {
   //   const cc = localClusteringCoefficient(graph, node);
   //   graph.setNodeAttribute(node, 'clusteringCoef', cc);
   // });
-  computeImportance(graph);
+  calculateImportance(graph);
   const end = performance.now();
   console.log(`Время вычисления узловых метрик: ${(end - start).toFixed(3)} мс`);
 }
@@ -171,7 +171,7 @@ function findSimpleMetrics(graph: Graph) {
 
 
 
-function computeImportance(graph: Graph) {
+function calculateImportance(graph: Graph) {
   const stats = { 
     deg: { min: Infinity, max: -Infinity },
     k:  { min: Infinity, max: -Infinity }
