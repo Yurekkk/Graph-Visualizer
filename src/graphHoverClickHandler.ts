@@ -65,7 +65,8 @@ export function unhoverNode(graph: Graph, renderer: Sigma, refresh: boolean = tr
   // Скрываем лейбл и уменьшаем узел
   if (hoveredNodeId !== selectedNodeId) {
     graph.setNodeAttribute(hoveredNodeId, 'label', '');
-    graph.setNodeAttribute(hoveredNodeId, 'size', vis.nodeSizeDefault);
+    const hiddenSize = graph.getNodeAttribute(hoveredNodeId, 'hiddenSize');
+    graph.setNodeAttribute(hoveredNodeId, 'size', hiddenSize);
   }
   graph.setNodeAttribute(hoveredNodeId, 'borderSize', vis.borderSizeDefault);
 
@@ -96,7 +97,8 @@ export function selectNode(newSelectedNodeId: string, graph: Graph,
 
   if (selectedNodeId != null) {
     graph.setNodeAttribute(selectedNodeId, 'label', '');
-    graph.setNodeAttribute(selectedNodeId, 'size', vis.nodeSizeDefault);
+    const hiddenSize = graph.getNodeAttribute(selectedNodeId, 'hiddenSize');
+    graph.setNodeAttribute(selectedNodeId, 'size', hiddenSize);
     graph.setNodeAttribute(selectedNodeId, 'borderSize', vis.borderSizeDefault);
   }
   selectedNodeId = newSelectedNodeId;
@@ -149,7 +151,8 @@ export function selectNode(newSelectedNodeId: string, graph: Graph,
 export function deselectNode(graph: Graph, renderer: Sigma) {
   if (selectedNodeId == null) return;
   graph.setNodeAttribute(selectedNodeId, 'label', '');
-  graph.setNodeAttribute(selectedNodeId, 'size', vis.nodeSizeDefault);
+  const hiddenSize = graph.getNodeAttribute(selectedNodeId, 'hiddenSize');
+  graph.setNodeAttribute(selectedNodeId, 'size', hiddenSize);
   graph.setNodeAttribute(selectedNodeId, 'borderSize', vis.borderSizeDefault);
 
   // Возвращаем непрозрачность всем узлам и ребрам и возвращаем их zIndex

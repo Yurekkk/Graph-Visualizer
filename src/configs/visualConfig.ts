@@ -1,6 +1,8 @@
-export const nodeSizeDefault = 10;
-export const nodeSizeHover = 20;
-export const nodeSizeSelected = 25;
+export const nodeMinSize = 6;   // При минимальной степени
+export const nodeMaxSize = 20;  // При максимальной степени
+export const nodeSizeDefault = 13;
+export const nodeSizeHover = 25;
+export const nodeSizeSelected = 30;
 export const nodeSaturation = 90;
 export const nodeValue = 75;
 export const nodeHiddenAlpha = 0.05;
@@ -19,7 +21,7 @@ export const edgeDefaultAlpha = 1.0;
 export const edgeHoverColor = '#ffffff';
 
 export const borderColor = '#ffffff';
-export const borderSizeDefault = 0.075; // Дробь от размера всего узла, [0, 1]
+export const borderSizeDefault = 0.125; // Дробь от размера всего узла, [0, 1]
 export const borderSizeNeighbor = 0.35; // [0, 1]
 export const borderSizeHover = 0.2;     // [0, 1]
 export const borderSizeSelect = 0.15;

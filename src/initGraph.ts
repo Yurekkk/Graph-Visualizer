@@ -11,6 +11,7 @@ import * as vis from './configs/visualConfig.ts';
 import * as alg from './configs/algorithmicConfig.ts';
 import seedrandom from 'seedrandom';
 import hideUnimportantNodes from './hideUnimportantNodes.ts';
+import { fitViewportToNodes } from '@sigma/utils';
 
 
 
@@ -81,14 +82,16 @@ export default async function initGraph(path: string, title: string, algorithm: 
   const numNodesSqrt = Math.sqrt(metrics.numNodes);
   const rng = seedrandom(alg.seed);
   graph.forEachNode((node, attrs) => {
+    // Ставим размер узлов в зависимости от степени
     // Окрашиваем узлы в зависимости от номера сообщества
-    const size = nodeSize();
+    const size = nodeSize(attrs.degree, metrics);
     const color = nodeColor(attrs.community, metrics);
     // Некоторые атрибуты могут перезаписываться, сохраняем настоящие как hidden
     graph!.mergeNodeAttributes(node, {
       label: '',
       hiddenLabel: attrs.label,
       size: size,
+      hiddenSize: size,
       color: color,
       labelColor: vis.labelColor,
       alpha: vis.nodeDefaultAlpha,
@@ -201,6 +204,8 @@ export default async function initGraph(path: string, title: string, algorithm: 
 
   // Клик по пустому месту для сброса фокуса
   renderer.on('clickStage', () => deselectNode(graph!, renderer!));
+
+  fitViewportToNodes(renderer, graph.nodes());
 
   await setStatus('');
 }

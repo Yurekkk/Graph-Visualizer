@@ -27,9 +27,9 @@ export default function hideUnimportantNodes(graph: Graph) {
       const dy = nodes[i].y - nodes[j].y;
       const minDist = nodes[i].size + nodes[j].size;
 
-      // Пересечение окружностей?
+      // Если пересечение окружностей, то скрываем менее важный
       if (dx*dx + dy*dy < minDist * minDist) {
-        toHide.add(nodes[j].id); // j менее важен → скрываем
+        toHide.add(nodes[j].id);
       }
     }
   }

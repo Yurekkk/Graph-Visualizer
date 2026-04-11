@@ -84,8 +84,14 @@ export function nodeColor(community: number, metrics: graphMetrics): string {
 
 
 
-export function nodeSize(): number {
-  return vis.nodeSizeDefault;
+export function nodeSize(degree: number, metrics: graphMetrics): number {
+  // Ставим размер узлов в зависимости от их степени
+  if (metrics.maxDegree !== metrics.minDegree) {
+    const ratio = (degree - metrics.minDegree) / 
+                  (metrics.maxDegree - metrics.minDegree); // 0.0 - 1.0
+    return (vis.nodeMaxSize - vis.nodeMinSize) * ratio + vis.nodeMinSize;
+  }
+  else return vis.edgeDefaultSize;
 }
 
 
