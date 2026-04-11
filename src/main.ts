@@ -19,7 +19,8 @@ function initSelectors() {
   ];
   algorithms.forEach((algorithm) => {
     const option = document.createElement('option');
-    option.textContent = option.value = algorithm;
+    option.textContent = algorithm;
+    option.value = algorithm;
     algorithmSelector!.append(option);
   })
 
@@ -52,7 +53,8 @@ graphSelector.addEventListener('change', async () => {
   await new Promise(r => setTimeout(r, 1));
   
   await initGraph(graphSelector.value, 
-    graphSelector.textContent, algorithmSelector.value);
+    graphSelector.options[graphSelector.selectedIndex].text, 
+    algorithmSelector.value);
 
   loader.style.display = 'none'; // скрываем по завершении
 });
@@ -66,7 +68,8 @@ algorithmSelector.addEventListener('change', async () => {
   await new Promise(r => setTimeout(r, 1));
   
   await initGraph(graphSelector.value, 
-    graphSelector.textContent, algorithmSelector.value);
+    graphSelector.options[graphSelector.selectedIndex].text, 
+    algorithmSelector.value);
 
   loader.style.display = 'none'; // скрываем по завершении
 });

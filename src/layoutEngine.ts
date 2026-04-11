@@ -7,6 +7,7 @@ import type graphMetrics from './graphMetricsInterface';
 import { subgraph } from 'graphology-operators';
 import interpolatePositions from './interpolatePositions';
 import stratifiedSampling from './stratifiedSampling';
+import * as vis from './configs/visualConfig.ts';
 import * as alg from './configs/algorithmicConfig.ts';
 import { calculateGraphMetrics, findCommunities } from './calculateGraphMetrics.ts';
 import { toUndirected } from 'graphology-operators';
@@ -22,30 +23,31 @@ export default function smartLayout(
   graph: Graph, 
   metrics: graphMetrics,
   algorithm: string = 'auto',
-  _recursion_level: number = 0
+  _recursion_level: number = 0,
+  _meta_or_comm_prefix = ''
 ) {
 
   switch (algorithm) {
     case 'auto':
       break;
     case 'meta':
-      console.log("metaLayout chosen at recursion level: ", _recursion_level);
+      logAlgoChoice(algorithm, _recursion_level, _meta_or_comm_prefix);
       metaLayout(graph, _recursion_level);
       return;
     case 'circular':
-      console.log("circularLayout chosen at recursion level: ", _recursion_level);
+      logAlgoChoice(algorithm, _recursion_level, _meta_or_comm_prefix);
       circularLayout(graph);
       return;
     case 'radial':
-      console.log("radialLayout chosen at recursion level: ", _recursion_level);
+      logAlgoChoice(algorithm, _recursion_level, _meta_or_comm_prefix);
       radialLayout(graph);
       return;
     case 'forceAtlas2':
-      console.log("forceAtlas2Layout chosen at recursion level: ", _recursion_level);
+      logAlgoChoice(algorithm, _recursion_level, _meta_or_comm_prefix);
       forceAtlas2Layout(graph); 
       return;
     case 'forceAtlas2wSampling':
-      console.log("forceAtlas2SamplingLayout chosen at recursion level: ", _recursion_level);
+      logAlgoChoice(algorithm, _recursion_level, _meta_or_comm_prefix);
       forceAtlas2SamplingLayout(graph);
       return;
     default: 
@@ -55,31 +57,43 @@ export default function smartLayout(
   if ((metrics.numNodes > alg.metaLayoutMinNodes ||
       metrics.numEdges > alg.metaLayoutMinEdges ||
       metrics.modularity > alg.metaLayoutMinModularity) &&
-      _recursion_level < 2 && metrics.numCommunities > 1) {
-    console.log("metaLayout chosen at recursion level: ", _recursion_level);
+      _recursion_level < alg.metaLayoutRecursionLevelCap && 
+      metrics.numCommunities > 1) {
+    logAlgoChoice('meta', _recursion_level, _meta_or_comm_prefix);
     metaLayout(graph, _recursion_level);
   }
   else if (metrics.density >= alg.circularMinDensity && 
     metrics.numNodes <= alg.circularMaxNumNodes) {
-    console.log("circularLayout chosen at recursion level: ", _recursion_level);
+    logAlgoChoice('circular', _recursion_level, _meta_or_comm_prefix);
     circularLayout(graph);
   }
   else if (metrics.degreeGini >= alg.radialMinDegreeGini || 
     metrics.hubDominance >= alg.radialMinHubDominance) {
-    console.log("radialLayout chosen at recursion level: ", _recursion_level);
+    logAlgoChoice('radial', _recursion_level, _meta_or_comm_prefix);
     radialLayout(graph);
   }
   else if (metrics.numNodes <= alg.samplingMinNumNodes) {
-    console.log("forceAtlas2Layout chosen at recursion level: ", _recursion_level);
+    logAlgoChoice('forceAtlas2', _recursion_level, _meta_or_comm_prefix);
     forceAtlas2Layout(graph);
   } 
   else {
-    console.log("forceAtlas2SamplingLayout chosen at recursion level: ", _recursion_level);
+    logAlgoChoice('forceAtlas2Sampling', _recursion_level, _meta_or_comm_prefix);
     forceAtlas2SamplingLayout(graph);
   }
 
   // Убираем наложения узлов
   // noverlap.assign(graph);
+}
+
+
+
+function logAlgoChoice(
+  algorithm: string,
+  _recursion_level: number = 0,
+  _meta_or_comm_prefix = '') {
+  if (_recursion_level > 0)
+    console.log(`- ${_meta_or_comm_prefix} - Выбран ${algorithm}Layout на уровне рекурсии: ${_recursion_level}`);
+  else console.log(`Выбран ${algorithm}Layout`);
 }
 
 
@@ -91,14 +105,14 @@ function metaLayout(graph: Graph, _recursion_level: number) {
   metaMetrics = {...metaMetrics, numCommunities, modularity};
 
   // Рекурсивно раскладываем мета-граф
-  smartLayout(metaGraph, metaMetrics, 'auto', _recursion_level + 1);
+  smartLayout(metaGraph, metaMetrics, 'auto', _recursion_level + 1, 'metaGraph');
 
   // Для каждого сообщества - свой внутренний layout
 
   // Первый проход: раскладываем сообщества, считаем радиусы
   const communities = new Map<string, {commGraph: Graph, 
     centerX: number, centerY: number, radius: number}>();
-  let meanRadius = 0;
+  let meanCommRadius = 0;
   let count = 0;
   
   metaGraph.forEachNode((commId, _metaAttrs) => {
@@ -108,11 +122,11 @@ function metaLayout(graph: Graph, _recursion_level: number) {
     metricsComm = {...metricsComm, numCommunities, modularity};
 
     // Раскладываем сообщество
-    smartLayout(commGraph, metricsComm, 'auto', _recursion_level + 1);
+    smartLayout(commGraph, metricsComm, 'auto', _recursion_level + 1, 'commGraph');
 
     // Считаем центры и радиусы
     const { centerX, centerY, radius } = getGraphCenterRadius(commGraph);
-    meanRadius += (radius - meanRadius) / ++count;
+    meanCommRadius += (radius - meanCommRadius) / ++count;
 
     communities.set(commId, {commGraph: commGraph, 
       centerX: centerX, centerY: centerY, radius: radius})
@@ -123,8 +137,9 @@ function metaLayout(graph: Graph, _recursion_level: number) {
     const {commGraph, centerX: centerX, centerY: centerY, 
       radius: _radius} = communities.get(commId)!;
     commGraph.forEachNode((node, localAttrs) => {
-      const metaX = metaAttrs.x * alg.metaLayoutSpacing * meanRadius;
-      const metaY = metaAttrs.y * alg.metaLayoutSpacing * meanRadius;
+      const metaX = metaAttrs.x * meanCommRadius * alg.metaLayoutSpacing;
+      const metaY = metaAttrs.y * meanCommRadius * alg.metaLayoutSpacing;
+      // console.log(metaAttrs.x, metaAttrs.y, meanRadius)
       const localX = (localAttrs.x - centerX);
       const localY = (localAttrs.y - centerY);
       graph.setNodeAttribute(node, 'x', metaX + localX);
@@ -221,6 +236,12 @@ function buildMetaGraph(graph: Graph): Graph {
 
 function circularLayout(graph: Graph) {
   circular.assign(graph);
+  graph.forEachNode((_node, attrs) => {
+    const r = vis.nodeSizeDefault * graph.order / 6.28 * alg.circularSpacing;
+    attrs.x *= r;
+    attrs.y *= r;
+    // console.log(attrs.x, attrs.y)
+  })
 }
 
 

@@ -1,18 +1,36 @@
-// ### Layout Engine ###
-export const circularMinDensity = 0.25;
-export const circularMaxNumNodes = 50;
-export const radialMinDegreeGini = 0.75;
-export const radialMinHubDominance = 100;
-export const samplingMinNumNodes = 500;
+// ### Metrics ###
+// Importance calculations
+export const degreeWeight = 0.5;
+export const kCoreWeight = 0.5;
 
+// higher values (>1) produce more, smaller clusters, 
+// while lower values (<1) produce fewer, larger clusters
+export const louvainResolution = 1.0;
+
+
+
+// ### Layouts Settings ###
+export const circularSpacing = 2.0;
 export const radialRingSpacing = 100;
 export const radialSortByDegreeOnRing = false;
 export const forceAtlasIterations = 50;
+export const metaLayoutSpacing = 0.2;
 
-export const metaLayoutMinNodes = 500;
-export const metaLayoutMinEdges = 2000;
+
+
+// ### Layout Engine Decision Tree ###
+export const metaLayoutRecursionLevelCap = 2; 
+export const metaLayoutMinNodes = 500;    // ||
+export const metaLayoutMinEdges = 2000;   // ||
 export const metaLayoutMinModularity = 0.75;
-export const metaLayoutSpacing = 2.0;
+
+export const circularMinDensity = 0.25;   // &&
+export const circularMaxNumNodes = 50;
+
+export const radialMinDegreeGini = 0.75;  // ||
+export const radialMinHubDominance = 100;
+
+export const samplingMinNumNodes = 500;
 
 
 
@@ -28,16 +46,7 @@ export const degreeInfluence = 0.5; // Влияние степени на фун
 
 
 // ### Misc ###
-// Importance calculations
-export const degreeWeight = 0.5;
-export const kCoreWeight = 0.5;
-
-// higher values (>1) produce more, smaller clusters, 
-// while lower values (<1) produce fewer, larger clusters
-export const louvainResolution = 1.0;
-
 export const seed = '42';
-
 export const timestamp_threshold = 500_000_000;
 // Если все значения ребер больше этого порога, 
 // то, скорее всего, это не веса, а временные метки
