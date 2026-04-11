@@ -14,7 +14,6 @@ export const circularSpacing = 2.0;
 export const radialRingSpacing = 100;
 export const radialSortByDegreeOnRing = false;
 export const forceAtlasIterations = 50;
-export const metaLayoutSpacing = 0.2;
 
 
 
@@ -27,8 +26,8 @@ export const metaLayoutMinModularity = 0.75;
 export const circularMinDensity = 0.25;   // &&
 export const circularMaxNumNodes = 50;
 
-export const radialMinDegreeGini = 0.75;  // ||
-export const radialMinHubDominance = 100;
+export const radialMinDegreeGini = 0.5;
+// export const radialMinHubDominance = 100;
 
 export const samplingMinNumNodes = 500;
 
