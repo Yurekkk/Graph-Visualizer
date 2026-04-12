@@ -1,7 +1,7 @@
 import Sigma from 'sigma';
 import Graph from 'graphology';
 import { blendWithBackground, edgeColor, edgeSize, nodeColor, nodeSize } from './visualUtils.ts';
-import { calculateGraphMetrics, calculateNodeMetrics } from './calculateGraphMetrics.ts';
+import { calculateEdgeMetrics, calculateGraphMetrics, calculateNodeMetrics } from './calculateGraphMetrics.ts';
 import { createNodeBorderProgram } from "@sigma/node-border";
 import EdgeCurveProgram from '@sigma/edge-curve';
 import parseGraphFile from './graphParser.ts';
@@ -71,8 +71,10 @@ export default async function initGraph(path: string, title: string, algorithm: 
 
 
   await setStatus('Считаем метрики...');
-  const metrics = calculateGraphMetrics(graph);
+  let metrics = calculateGraphMetrics(graph);
   calculateNodeMetrics(graph);
+  const {minEdgeImportance, maxEdgeImportance} = calculateEdgeMetrics(graph);
+  metrics = {...metrics, minEdgeImportance, maxEdgeImportance}
   for (const [key, value] of Object.entries(metrics)) {
     console.log(`--- ${key}: ${value}`);
   }
@@ -112,8 +114,8 @@ export default async function initGraph(path: string, title: string, algorithm: 
   await setStatus('Расставляем атрибуты рёбер...');
   start = performance.now();
   graph.forEachEdge((_edge, attrs, source, target) => {
-    const size = edgeSize(attrs.weight, metrics);
-    const color = edgeColor(attrs.weight, metrics);
+    const size = edgeSize(attrs.weight, attrs.importance, metrics);
+    const color = edgeColor(attrs.weight, attrs.importance, metrics);
     // Некоторые атрибуты могут перезаписываться, сохраняем настоящие как hidden
     graph!.mergeEdgeAttributes(source, target, {
       size: size,

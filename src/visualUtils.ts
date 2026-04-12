@@ -83,12 +83,15 @@ export function nodeSize(degree: number, metrics: graphMetrics): number {
 
 
 
-export function edgeColor(weight: number, metrics: graphMetrics): string {
-  // Окрашиваем ребра в зависимости от их веса
+export function edgeColor(weight: number, importance: number, metrics: graphMetrics): string {
+  // Окрашиваем ребра в зависимости от их веса или важности
   let t;
   if (metrics.maxEdgeWeight !== metrics.minEdgeWeight)
     t = (weight - metrics.minEdgeWeight) / 
       (metrics.maxEdgeWeight - metrics.minEdgeWeight); // 0.0 - 1.0
+  // else 
+  //   t = (importance - metrics.minEdgeImportance!) / 
+  //     (metrics.maxEdgeImportance! - metrics.minEdgeImportance!); // 0.0 - 1.0
   else t = 0;
   t += vis.edgeMinTurboT * (1 - t); // vis.edgeMinTurboT - 1.0
   return interpolateTurbo(t);
@@ -125,12 +128,15 @@ export function edgeColor(weight: number, metrics: graphMetrics): string {
 
 
 
-export function edgeSize(weight: number, metrics: graphMetrics): number {
-  // Ставим ширину ребер в зависимости от их веса
-  if (metrics.maxEdgeWeight !== metrics.minEdgeWeight) {
-    const ratio = (weight - metrics.minEdgeWeight) / 
-                  (metrics.maxEdgeWeight - metrics.minEdgeWeight); // 0.0 - 1.0
-    return (vis.edgeMaxSize - vis.edgeMinSize) * ratio + vis.edgeMinSize;
-  }
+export function edgeSize(weight: number, importance: number, metrics: graphMetrics): number {
+  // Ставим ширину ребер в зависимости от их веса или важности
+  let ratio;
+  if (metrics.maxEdgeWeight !== metrics.minEdgeWeight)
+    ratio = (weight - metrics.minEdgeWeight) / 
+      (metrics.maxEdgeWeight - metrics.minEdgeWeight); // 0.0 - 1.0
+  // else 
+  //   ratio = (importance - metrics.minEdgeImportance!) / 
+  //     (metrics.maxEdgeImportance! - metrics.minEdgeImportance!); // 0.0 - 1.0
   else return vis.edgeDefaultSize;
+  return (vis.edgeMaxSize - vis.edgeMinSize) * ratio + vis.edgeMinSize;
 }

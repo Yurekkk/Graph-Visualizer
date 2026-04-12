@@ -10,5 +10,7 @@ export default interface graphMetrics {
     numCommunities: number,
     modularity: number,
     hubDominance: number,
-    degreeGini: number
+    degreeGini: number,
+    minEdgeImportance?: number, 
+    maxEdgeImportance?: number
 }

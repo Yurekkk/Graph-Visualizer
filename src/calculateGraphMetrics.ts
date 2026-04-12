@@ -10,10 +10,14 @@ import coreNumber from 'graphology-cores';
 // import pagerank from 'graphology-metrics/centrality/pagerank';
 import { connectedComponents } from 'graphology-components';
 
+
+
 // Все это пока не учитывает, что граф может быть ориентированным
 // Может потом добавлю
 
 // Также для каждого узла считает degree, degreeCentrality, community и core
+
+
 
 export function calculateGraphMetrics(graph: Graph): graphMetrics {
   // const start = performance.now();
@@ -68,9 +72,16 @@ export function calculateNodeMetrics(graph: Graph) {
   //   const cc = localClusteringCoefficient(graph, node);
   //   graph.setNodeAttribute(node, 'clusteringCoef', cc);
   // });
-  calculateImportance(graph);
+  calculateNodesImportance(graph);
   const end = performance.now();
   console.log(`Время вычисления узловых метрик: ${(end - start).toFixed(3)} мс`);
+}
+
+
+
+export function calculateEdgeMetrics(graph: Graph) {
+  const {minEdgeImportance, maxEdgeImportance} = calculateEdgesImportance(graph);
+  return {minEdgeImportance, maxEdgeImportance};
 }
 
 
@@ -203,7 +214,7 @@ function findSimpleMetrics(graph: Graph) {
 
 
 
-function calculateImportance(graph: Graph) {
+function calculateNodesImportance(graph: Graph) {
   const stats = { 
     deg: { min: Infinity, max: -Infinity },
     k:  { min: Infinity, max: -Infinity }
@@ -230,6 +241,23 @@ function calculateImportance(graph: Graph) {
 
     graph.setNodeAttribute(node, 'importance', importance);
   });
+}
+
+
+
+function calculateEdgesImportance(graph: Graph) {
+  let maxEdgeImportance = -Infinity;
+  let minEdgeImportance = Infinity;
+  graph.forEachEdge((_edge, attrs, source, target) => {
+    const sourceImportance = graph.getNodeAttribute(source, 'importance');
+    const targetImportance = graph.getNodeAttribute(target, 'importance');
+    const edgeImportance = (2 * sourceImportance * targetImportance) / 
+      (sourceImportance + targetImportance);
+    attrs.importance = edgeImportance;
+    maxEdgeImportance = Math.max(edgeImportance, maxEdgeImportance);
+    minEdgeImportance = Math.min(edgeImportance, minEdgeImportance);
+  })
+  return {minEdgeImportance, maxEdgeImportance};
 }
 
 
