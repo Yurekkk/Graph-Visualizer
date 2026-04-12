@@ -12,6 +12,7 @@ import * as alg from './configs/algorithmicConfig.ts';
 import seedrandom from 'seedrandom';
 import hideUnimportantNodes from './hideUnimportantNodes.ts';
 import { fitViewportToNodes } from '@sigma/utils';
+import hideUnimportantEdges from './hideUnimportantEdges.ts';
 
 
 
@@ -73,8 +74,11 @@ export default async function initGraph(path: string, title: string, algorithm: 
   await setStatus('Считаем метрики...');
   let metrics = calculateGraphMetrics(graph);
   calculateNodeMetrics(graph);
-  const {minEdgeImportance, maxEdgeImportance} = calculateEdgeMetrics(graph);
-  metrics = {...metrics, minEdgeImportance, maxEdgeImportance}
+  const {
+    minEdgeImportance, 
+    maxEdgeImportance, 
+    avgEdgeImportance} = calculateEdgeMetrics(graph);
+  metrics = {...metrics, minEdgeImportance, maxEdgeImportance, avgEdgeImportance}
   for (const [key, value] of Object.entries(metrics)) {
     console.log(`--- ${key}: ${value}`);
   }
@@ -144,6 +148,14 @@ export default async function initGraph(path: string, title: string, algorithm: 
   // hideUnimportantNodes(graph);
   // end = performance.now();
   // console.log(`Время скрытия наименее полезных узлов: ${(end - start).toFixed(3)} мс`)
+
+
+
+  // await setStatus('Скрываем наименее полезные рёбра...');
+  // start = performance.now();
+  // hideUnimportantEdges(graph, metrics);
+  // end = performance.now();
+  // console.log(`Время скрытия наименее полезных рёбер: ${(end - start).toFixed(3)} мс`)
 
 
 

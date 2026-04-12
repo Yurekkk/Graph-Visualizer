@@ -12,6 +12,8 @@ import { connectedComponents } from 'graphology-components';
 
 
 
+// TODO?: Тут немного срач, надо бы почистить
+
 // Все это пока не учитывает, что граф может быть ориентированным
 // Может потом добавлю
 
@@ -58,7 +60,8 @@ export function calculateGraphMetrics(graph: Graph): graphMetrics {
 
 export function calculateNodeMetrics(graph: Graph) {
   /*
-  // Очень долго считает
+  // Оно было бы даже лучше для узлов и ребер в качестве importance,
+  // но очень долго считает, сложность O(V*E)
   start = performance.now();
   betweennessCentrality.assign(graph);
   end = performance.now();
@@ -80,8 +83,8 @@ export function calculateNodeMetrics(graph: Graph) {
 
 
 export function calculateEdgeMetrics(graph: Graph) {
-  const {minEdgeImportance, maxEdgeImportance} = calculateEdgesImportance(graph);
-  return {minEdgeImportance, maxEdgeImportance};
+  const {minEdgeImportance, maxEdgeImportance, avgEdgeImportance} = calculateEdgesImportance(graph);
+  return {minEdgeImportance, maxEdgeImportance, avgEdgeImportance};
 }
 
 
@@ -248,16 +251,23 @@ function calculateNodesImportance(graph: Graph) {
 function calculateEdgesImportance(graph: Graph) {
   let maxEdgeImportance = -Infinity;
   let minEdgeImportance = Infinity;
+  let avgEdgeImportance = 0;
+  let count = 0;
+
   graph.forEachEdge((_edge, attrs, source, target) => {
     const sourceImportance = graph.getNodeAttribute(source, 'importance');
     const targetImportance = graph.getNodeAttribute(target, 'importance');
+
     const edgeImportance = (2 * sourceImportance * targetImportance) / 
       (sourceImportance + targetImportance);
     attrs.importance = edgeImportance;
+
     maxEdgeImportance = Math.max(edgeImportance, maxEdgeImportance);
     minEdgeImportance = Math.min(edgeImportance, minEdgeImportance);
+
+    avgEdgeImportance += (edgeImportance - avgEdgeImportance) / ++count;
   })
-  return {minEdgeImportance, maxEdgeImportance};
+  return {minEdgeImportance, maxEdgeImportance, avgEdgeImportance};
 }
 
 

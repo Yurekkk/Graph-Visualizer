@@ -12,5 +12,6 @@ export default interface graphMetrics {
     hubDominance: number,
     degreeGini: number,
     minEdgeImportance?: number, 
-    maxEdgeImportance?: number
+    maxEdgeImportance?: number,
+    avgEdgeImportance?: number
 }
