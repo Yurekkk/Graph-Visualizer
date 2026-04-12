@@ -3,8 +3,6 @@ import { parse as parseGEXFGraphology } from "graphology-gexf/browser";
 import { timestamp_threshold } from './configs/algorithmicConfig';
 
 
-// TODO: Пофикси двунаправленность связей
-
 
 interface Node {
   id: string;

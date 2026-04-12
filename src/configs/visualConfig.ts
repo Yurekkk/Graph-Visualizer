@@ -18,12 +18,6 @@ export const edgeHiddenAlpha = 0.10;
 export const edgeDefaultAlpha = 1.0;
 export const edgeHoverColor = '#ffffff';
 
-// export const edgeMinHue = 30;   // При максимальном весе ребра
-// export const edgeMaxHue = 300; // При минимальном весе ребра
-// export const edgeDefaultHue = 240;
-// export const edgeChroma = 0.2;
-// export const edgeLightness = 0.5;
-
 export const borderColor = '#ffffff';
 export const borderSizeDefault = 0.125; // Дробь от размера всего узла, [0, 1]
 export const borderSizeNeighbor = 0.35; // [0, 1]

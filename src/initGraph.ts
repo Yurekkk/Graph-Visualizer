@@ -48,6 +48,8 @@ async function setStatus(text: string) {
 export default async function initGraph(path: string, title: string, algorithm: string = 'auto') {
   console.log(`=============== Отрисовка графа ${title} ===============`)
 
+  const overallStartTime = performance.now();
+
   if (renderer) {
     await setStatus('Чистим предыдущий граф...');
     renderer.removeAllListeners();
@@ -208,4 +210,7 @@ export default async function initGraph(path: string, title: string, algorithm: 
   fitViewportToNodes(renderer, graph.nodes());
 
   await setStatus('');
+
+  const overallEndTime = performance.now();
+  console.log(`Всего прошло времени: ${(overallEndTime - overallStartTime).toFixed(3)} мс`)
 }

@@ -52,7 +52,7 @@ export function blendWithBackground(
 
 
 export function nodeColor(community: number, metrics: graphMetrics): string {
-  // Окрашиваем узлы в зависимости от их номера сообщества
+  // Окрашиваем узлы в зависимости от номера их сообщества
 
   const N = metrics.numCommunities;
 
@@ -91,35 +91,36 @@ export function edgeColor(weight: number, metrics: graphMetrics): string {
       (metrics.maxEdgeWeight - metrics.minEdgeWeight); // 0.0 - 1.0
   else t = 0;
   t += vis.edgeMinTurboT * (1 - t); // vis.edgeMinTurboT - 1.0
-  // TODO?: Make mid less bright so that it doesn't blend with white hover
   return interpolateTurbo(t);
 
-  // let hue;
-  // if (metrics.maxEdgeWeight !== metrics.minEdgeWeight) {
-  //   const ratio = (weight - metrics.minEdgeWeight) / 
-  //                 (metrics.maxEdgeWeight - metrics.minEdgeWeight); // 0.0 - 1.0
-  //   hue = (vis.edgeMaxHue - vis.edgeMinHue) * 
-  //         (1 - ratio) + vis.edgeMinHue; // синий - красный
-  // }
-  // else hue = vis.edgeDefaultHue;
+  /*
+  let hue;
+  if (metrics.maxEdgeWeight !== metrics.minEdgeWeight) {
+    const ratio = (weight - metrics.minEdgeWeight) / 
+                  (metrics.maxEdgeWeight - metrics.minEdgeWeight); // 0.0 - 1.0
+    hue = (vis.edgeMaxHue - vis.edgeMinHue) * 
+          (1 - ratio) + vis.edgeMinHue; // синий - красный
+  }
+  else hue = vis.edgeDefaultHue;
 
-  // const color: Color = { 
-  //   mode: 'oklch', 
-  //   l: vis.edgeLightness,
-  //   c: vis.edgeChroma,
-  //   h: hue
-  // };
+  const color: Color = { 
+    mode: 'oklch', 
+    l: vis.edgeLightness,
+    c: vis.edgeChroma,
+    h: hue
+  };
 
-  // let {r: r, g: g, b: b} = converter('rgb')(color);
-  // r = Math.max(0.0, (Math.min(1.0, r)));
-  // g = Math.max(0.0, (Math.min(1.0, g)));
-  // b = Math.max(0.0, (Math.min(1.0, b)));
+  let {r: r, g: g, b: b} = converter('rgb')(color);
+  r = Math.max(0.0, (Math.min(1.0, r)));
+  g = Math.max(0.0, (Math.min(1.0, g)));
+  b = Math.max(0.0, (Math.min(1.0, b)));
 
-  // r = Math.round(255 * r);
-  // g = Math.round(255 * g);
-  // b = Math.round(255 * b);
+  r = Math.round(255 * r);
+  g = Math.round(255 * g);
+  b = Math.round(255 * b);
 
-  // return `rgb(${r}, ${g}, ${b})`;
+  return `rgb(${r}, ${g}, ${b})`;
+  */
 }
 
 
