@@ -72,7 +72,7 @@ function detectFormat(filePath: string): string {
 
 
 function parseJSON(content: string): Graph {
-  const graph = new Graph({allowSelfLoops: false});
+  const graph = new Graph({type: 'undirected', allowSelfLoops: false});
   const data = JSON.parse(content);
 
   if (data.nodes) {
@@ -114,7 +114,7 @@ function parseGEXF(content: string): Graph {
 
 
 function parseMTX(content: string): Graph {
-  const graph = new Graph({allowSelfLoops: false});
+  const graph = new Graph({type: 'undirected', allowSelfLoops: false});
   const lines = content.trim().split('\n');
   const nodes = new Set<string>();
   const edges: Array<{ source: string; target: string; weight: number }> = [];
@@ -167,18 +167,11 @@ function parseMTX(content: string): Graph {
   }
 
   edges.forEach((edge) => {
-    if (!graph.hasEdge(edge.source, edge.target)) {
-      if (edge.source !== edge.target) {
-        graph.addEdge(edge.source, edge.target, {
-          weight: valuesAreTimestamps ? 1 : edge.weight
-        });
-      }
-    }
-    else {
-      const edgeID = graph.edge(edge.source, edge.target);
-      const oldWeight = graph.getEdgeAttribute(edgeID, 'weight');
-      graph.setEdgeAttribute(edge.source, edge.target, 'weight', 
-        oldWeight + (valuesAreTimestamps ? 1 : edge.weight));
+    if (edge.source !== edge.target && 
+    !graph.hasEdge(edge.source, edge.target)) {
+      graph.addEdge(edge.source, edge.target, {
+        weight: valuesAreTimestamps ? 1 : edge.weight
+      });
     }
   });
 
@@ -188,7 +181,7 @@ function parseMTX(content: string): Graph {
 
 
 function parseCSV(content: string): Graph {
-  const graph = new Graph({allowSelfLoops: false});
+  const graph = new Graph({type: 'undirected', allowSelfLoops: false});
   const lines = content.trim().split('\n');
   const nodes = new Set<string>();
   const edges: Array<{ source: string; target: string; weight: number }> = [];
@@ -226,18 +219,11 @@ function parseCSV(content: string): Graph {
   }
 
   edges.forEach((edge) => {
-    if (!graph.hasEdge(edge.source, edge.target)) {
-      if (edge.source !== edge.target) {
-        graph.addEdge(edge.source, edge.target, {
-          weight: valuesAreTimestamps ? 1 : edge.weight
-        });
-      }
-    }
-    else {
-      const edgeID = graph.edge(edge.source, edge.target);
-      const oldWeight = graph.getEdgeAttribute(edgeID, 'weight');
-      graph.setEdgeAttribute(edge.source, edge.target, 'weight', 
-        oldWeight + (valuesAreTimestamps ? 1 : edge.weight));
+    if (edge.source !== edge.target && 
+      !graph.hasEdge(edge.source, edge.target)) {
+      graph.addEdge(edge.source, edge.target, {
+        weight: valuesAreTimestamps ? 1 : edge.weight
+      });
     }
   });
 
@@ -247,7 +233,7 @@ function parseCSV(content: string): Graph {
 
 
 function parseDOT(content: string): Graph {
-  const graph = new Graph({allowSelfLoops: false});
+  const graph = new Graph({type: 'undirected', allowSelfLoops: false});
   
   // Удаляем комментарии // и /* */
   const clean = content.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
