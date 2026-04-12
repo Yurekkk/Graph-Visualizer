@@ -62,6 +62,8 @@ export function calculateNodeMetrics(graph: Graph) {
   /*
   // Оно было бы даже лучше для узлов и ребер в качестве importance,
   // но очень долго считает, сложность O(V*E)
+  // V = 3600, E = 3800 => 6 секунд
+  // V = 8000, E = 8100 => 31.5 секунд
   start = performance.now();
   betweennessCentrality.assign(graph);
   end = performance.now();

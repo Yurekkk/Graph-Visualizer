@@ -221,6 +221,11 @@ export default async function initGraph(path: string, title: string, algorithm: 
   // Клик по пустому месту для сброса фокуса
   renderer.on('clickStage', () => deselectNode(graph!, renderer!));
 
+  // const camera = renderer.getCamera();
+  // camera.on("updated", () => {
+  //   const zoomLevel = camera.ratio;
+  // });
+
   fitViewportToNodes(renderer, graph.nodes());
 
   await setStatus('');

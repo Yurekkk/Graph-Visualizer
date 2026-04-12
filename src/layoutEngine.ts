@@ -16,6 +16,8 @@ import { buildCommunityGraph, buildMetaGraph, getGraphCenterRadius } from './alg
 
 // TODO: A lot of tweaking is still needed
 
+// Просто meta layout'ом и force-алгоритмами как будто бы приятнее раскладывается всегда
+
 
 
 export default function smartLayout(
@@ -84,7 +86,7 @@ export default function smartLayout(
     forceAtlas2SamplingLayout(graph);
   }
 
-  // Убираем наложения узлов
+  // Убираем наложения узлов // Долго
   // noverlap.assign(graph);
 }
 
@@ -94,6 +96,7 @@ function logAlgoChoice(
   algorithm: string,
   _recursion_level: number = 0,
   _meta_or_comm_prefix = '') {
+  if (!alg.logAlgorithmChoices) return;
   if (_recursion_level > 0)
     console.log(`- ${_meta_or_comm_prefix} - Выбран ${algorithm}Layout на уровне рекурсии: ${_recursion_level}`);
   else console.log(`- Выбран ${algorithm}Layout`);
@@ -122,7 +125,7 @@ function metaLayout(graph: Graph, _recursion_level: number) {
 
     // Раскладываем сообщество
     smartLayout(commGraph, metricsComm, 'auto', _recursion_level + 1, 'commGraph');
-    // noverlap.assign(commGraph);
+    // noverlap.assign(commGraph); // Долго
 
     // Считаем центры и радиусы
     const { centerX, centerY, radius } = getGraphCenterRadius(commGraph);
