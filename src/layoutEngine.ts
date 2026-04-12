@@ -65,15 +65,16 @@ export default function smartLayout(
     logAlgoChoice('meta', _recursion_level, _meta_or_comm_prefix);
     metaLayout(graph, _recursion_level);
   }
-  else if (metrics.density >= alg.circularMinDensity && 
-    metrics.numNodes <= alg.circularMaxNumNodes) {
-    logAlgoChoice('circular', _recursion_level, _meta_or_comm_prefix);
-    circularLayout(graph);
-  }
-  else if (metrics.degreeGini >= alg.radialMinDegreeGini) {
-    logAlgoChoice('radial', _recursion_level, _meta_or_comm_prefix);
-    radialLayout(graph);
-  }
+  // else if (metrics.density >= alg.circularMinDensity && 
+  //   metrics.numNodes <= alg.circularMaxNumNodes) {
+  //   logAlgoChoice('circular', _recursion_level, _meta_or_comm_prefix);
+  //   circularLayout(graph);
+  // }
+  // else if (metrics.degreeGini >= alg.radialMinDegreeGini ||
+  //          metrics.hubDominance >= alg.radialMinHubDominance) {
+  //   logAlgoChoice('radial', _recursion_level, _meta_or_comm_prefix);
+  //   radialLayout(graph);
+  // }
   else if (metrics.numNodes <= alg.samplingMinNumNodes) {
     logAlgoChoice('forceAtlas2', _recursion_level, _meta_or_comm_prefix);
     forceAtlas2Layout(graph);
@@ -95,7 +96,7 @@ function logAlgoChoice(
   _meta_or_comm_prefix = '') {
   if (_recursion_level > 0)
     console.log(`- ${_meta_or_comm_prefix} - Выбран ${algorithm}Layout на уровне рекурсии: ${_recursion_level}`);
-  else console.log(`Выбран ${algorithm}Layout`);
+  else console.log(`- Выбран ${algorithm}Layout`);
 }
 
 

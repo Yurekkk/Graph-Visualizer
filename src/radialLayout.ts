@@ -1,5 +1,6 @@
 import Graph from 'graphology';
 import * as alg from './configs/algorithmicConfig.ts';
+// import noverlap from 'graphology-layout-noverlap';
 
 export default function radialLayout(graph: Graph) {
 
@@ -57,4 +58,6 @@ export default function radialLayout(graph: Graph) {
       graph.setNodeAttribute(node, 'y', Math.sin(angle) * radius);
     });
   });
+
+  // noverlap.assign(graph);
 }
