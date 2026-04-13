@@ -110,13 +110,13 @@ function metaLayout(graph: Graph, _recursion_level: number) {
   let {numCommunities, modularity} = findCommunities(metaGraph);
   metaMetrics = {...metaMetrics, numCommunities, modularity};
 
-  // Рекурсивно раскладываем каждое сообщество по отдельности
-  // Первый проход: раскладываем сообщества, считаем радиусы
   const communities = new Map<string, {commGraph: Graph, 
     centerX: number, centerY: number, radius: number}>();
   let meanCommRadius = 0;
   let count = 0;
   
+  // Рекурсивно раскладываем каждое сообщество по отдельности
+  // Первый проход: раскладываем сообщества, считаем радиусы
   metaGraph.forEachNode((commId, metaAttrs) => {
     const commGraph = buildCommunityGraph(graph, commId);
     let metricsComm = calculateGraphMetrics(commGraph);

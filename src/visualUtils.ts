@@ -140,3 +140,15 @@ export function edgeSize(weight: number, importance: number, metrics: graphMetri
   else return vis.edgeDefaultSize;
   return (vis.edgeMaxSize - vis.edgeMinSize) * ratio + vis.edgeMinSize;
 }
+
+
+
+/*
+export function applyAlpha(color: string, alpha: number): string {
+  if (alpha >= 1 || !color) return color;
+  // rgb() -> rgba()
+  const m = color.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+  if (m) return `rgba(${m[1]}, ${m[2]}, ${m[3]}, ${alpha})`;
+  return color;
+}
+*/

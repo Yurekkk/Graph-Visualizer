@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@types/chroma-js": "^3.1.2",
     "@types/culori": "^4.0.1",
     "@types/d3-scale-chromatic": "^3.1.0",
     "@types/dagre": "^0.7.54",
@@ -23,6 +24,7 @@
     "@sigma/node-border": "^3.0.0",
     "@sigma/utils": "^3.0.0",
     "@ts-graphviz/parser": "^0.6.1",
+    "chroma-js": "^3.2.0",
     "culori": "^4.0.2",
     "d3-scale-chromatic": "^3.1.0",
     "dagre": "^0.8.5",
