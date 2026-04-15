@@ -31,9 +31,7 @@ export default function interpolatePositions(
         }
       });
     }
-    catch(NotFoundGraphError) {
-      console.log(node);
-    }
+    catch(NotFoundGraphError) {}
 
     if (totalWeight > 0) {
       // Позиция = взвешенное среднее позиций соседей

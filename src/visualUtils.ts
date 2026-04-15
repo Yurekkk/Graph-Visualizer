@@ -98,7 +98,10 @@ export function edgeColorInterpolate(value: number, maxValue: number, minValue: 
 
 
 export function edgeSizeInterpolate(value: number, maxValue: number, minValue: number) {
-  const ratio = (value - minValue) / (maxValue - minValue); // 0.0 - 1.0
+  let ratio;
+  if (maxValue !== minValue)
+    ratio = (value - minValue) / (maxValue - minValue); // 0.0 - 1.0
+  else ratio = 0.5;
   return (vis.edgeMaxSize - vis.edgeMinSize) * ratio + vis.edgeMinSize;
 }
 

@@ -30,7 +30,7 @@ export const circularMaxNumNodes = 50;
 export const radialMinDegreeGini = 0.5;   // ||
 export const radialMinHubDominance = 0.5;
 
-export const samplingMinNumNodes = 500;
+export const samplingMinNumNodes = 200;
 
 
 

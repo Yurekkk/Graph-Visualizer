@@ -1,7 +1,7 @@
 import type Graph from 'graphology';
 import * as vis from './configs/visualConfig';
 import type graphMetrics from './graphMetricsInterface';
-import { blendWithBackground, edgeColor, edgeColorInterpolate, nodeColor } from './visualUtils';
+import { blendWithBackground, edgeColor, edgeColorInterpolate, edgeSize, edgeSizeInterpolate, nodeColor, nodeSize } from './visualUtils';
 import type Sigma from 'sigma';
 import findCloseImportantNeighbours from './findCloseImportantNeigbors';
 import { fitViewportToNodes } from '@sigma/utils';
@@ -73,7 +73,7 @@ function computeNodeVisuals(node: string, data: any, metrics: any) {
       return {
         ...data,
         label: '',
-        size: data.hiddenSize,
+        size: nodeSize(data.degree, metrics),
         borderSize: vis.borderSizeDefault,
         alpha: vis.nodeDefaultAlpha,
         zIndex: data.degree,
@@ -85,7 +85,7 @@ function computeNodeVisuals(node: string, data: any, metrics: any) {
       return {
         ...data,
         label: '',
-        size: data.hiddenSize,
+        size: nodeSize(data.degree, metrics),
         borderSize: 0,
         alpha: vis.nodeTransparentAlpha,
         zIndex: data.degree - vis.zLayerMargin,
@@ -110,7 +110,9 @@ export function nodeReducer(node: string, data: any, metrics: any) {
 function getEdgeLevel(edge: string, graph: Graph) {
   const source = graph.extremities(edge)[0];
   const target = graph.extremities(edge)[1];
-  if (source === hoveredNodeId || target === hoveredNodeId) return 'highlighted'; // При ховере
+  if ((source === hoveredNodeId || target === hoveredNodeId) && importantEdgesCache.has(edge))
+    return 'highlightedAndImportant'; // При ховере важного
+  else if (source === hoveredNodeId || target === hoveredNodeId) return 'highlighted'; // При ховере
   else if (importantEdgesCache.has(edge)) return 'important'; // Важные при селекте
   else if (selectedNodeId == null) return 'usual';
   else return 'transparent';
@@ -120,9 +122,20 @@ function computeEdgeVisuals(edge: string, data: any, graph: Graph, metrics: grap
   const level = getEdgeLevel(edge, graph);
   
   switch (level) {
+    case 'highlightedAndImportant':
+      return {
+        ...data,
+        size: edgeSizeInterpolate(importantEdgesCache.get(edge)!, maxEdgeImportance!, minEdgeImportance!),
+        color: vis.edgeHoverColor,
+        alpha: vis.edgeHoverAlpha,
+        zIndex: data.weight + 2 * vis.zLayerMargin,
+        hidden: false,
+      };
+
     case 'highlighted':
       return {
         ...data,
+        size: edgeSize(data.weight, data.importance, metrics),
         color: vis.edgeHoverColor,
         alpha: vis.edgeHoverAlpha,
         zIndex: data.weight + 2 * vis.zLayerMargin,
@@ -133,6 +146,7 @@ function computeEdgeVisuals(edge: string, data: any, graph: Graph, metrics: grap
       const importance = importantEdgesCache.get(edge);
       return {
         ...data,
+        size: edgeSizeInterpolate(importance!, maxEdgeImportance!, minEdgeImportance!),
         color: edgeColorInterpolate(importance!, maxEdgeImportance!, minEdgeImportance!),
         alpha: vis.edgeClickAlpha,
         zIndex: data.weight + vis.zLayerMargin,
@@ -142,6 +156,7 @@ function computeEdgeVisuals(edge: string, data: any, graph: Graph, metrics: grap
     case 'usual':
       return {
         ...data,
+        size: edgeSize(data.weight, data.importance, metrics),
         color: edgeColor(data.weight, data.importance, metrics),
         alpha: vis.edgeDefaultAlpha,
         zIndex: data.weight,
@@ -151,6 +166,7 @@ function computeEdgeVisuals(edge: string, data: any, graph: Graph, metrics: grap
     case 'transparent':
       return {
         ...data,
+        size: edgeSize(data.weight, data.importance, metrics),
         color: edgeColor(data.weight, data.importance, metrics),
         alpha: vis.edgeTransparentAlpha,
         zIndex: data.weight - vis.zLayerMargin,

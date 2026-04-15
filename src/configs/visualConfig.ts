@@ -1,6 +1,3 @@
-// TODO: Сделать, чтобы nodeSizeHover и nodeSizeSelected
-// умножали оригинальные значения, а не заменяли их
-
 export const nodeMinSize = 6;   // При минимальной степени
 export const nodeMaxSize = 20;  // При максимальной степени
 export const nodeSizeDefault = 13;

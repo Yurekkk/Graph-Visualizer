@@ -16,7 +16,15 @@ import { buildCommunityGraph, buildMetaGraph, getGraphCenterRadius } from './alg
 
 // TODO: A lot of tweaking is still needed
 
-// Просто meta layout'ом и force-алгоритмами как будто бы приятнее раскладывается всегда
+/* 
+Просто meta layout'ом и force-алгоритмами как будто бы приятнее раскладывается всегда.
+Radial, circular и подобное не особо и нужно, если есть forceAtlas.
+ForceAtlas, ко всему прочему, еще и аномалии типа выбивающихся из паттерна узлов учтет.
+
+ForceAtlas с сэмплированием всегда тянет узлы ближе к центру сообщества, 
+хз че с этим делать. Но зато быстрее
+*/
+
 
 
 
@@ -25,7 +33,7 @@ export default function smartLayout(
   metrics: graphMetrics,
   algorithm: string = 'auto',
   _recursion_level: number = 0,
-  _meta_or_comm_prefix = ''
+  _meta_or_comm_prefix = '' // чисто для отладки
 ) {
 
   switch (algorithm) {
@@ -77,13 +85,13 @@ export default function smartLayout(
   //   logAlgoChoice('radial', _recursion_level, _meta_or_comm_prefix);
   //   radialLayout(graph);
   // }
-  else if (metrics.numNodes <= alg.samplingMinNumNodes) {
-    logAlgoChoice('forceAtlas2', _recursion_level, _meta_or_comm_prefix);
-    forceAtlas2Layout(graph);
-  } 
-  else {
+  else if (metrics.numNodes > alg.samplingMinNumNodes) {
     logAlgoChoice('forceAtlas2Sampling', _recursion_level, _meta_or_comm_prefix);
     forceAtlas2SamplingLayout(graph);
+  } 
+  else {
+    logAlgoChoice('forceAtlas2', _recursion_level, _meta_or_comm_prefix);
+    forceAtlas2Layout(graph);
   }
 
   // Убираем наложения узлов // Долго
@@ -112,8 +120,6 @@ function metaLayout(graph: Graph, _recursion_level: number) {
 
   const communities = new Map<string, {commGraph: Graph, 
     centerX: number, centerY: number, radius: number}>();
-  let meanCommRadius = 0;
-  let count = 0;
   
   // Рекурсивно раскладываем каждое сообщество по отдельности
   // Первый проход: раскладываем сообщества, считаем радиусы
@@ -129,7 +135,6 @@ function metaLayout(graph: Graph, _recursion_level: number) {
 
     // Считаем центры и радиусы
     const { centerX, centerY, radius } = getGraphCenterRadius(commGraph);
-    meanCommRadius += (radius - meanCommRadius) / ++count;
 
     communities.set(commId, {commGraph: commGraph, 
       centerX: centerX, centerY: centerY, radius: radius})
@@ -140,7 +145,7 @@ function metaLayout(graph: Graph, _recursion_level: number) {
 
   // Рекурсивно раскладываем мета-граф
   smartLayout(metaGraph, metaMetrics, 'auto', _recursion_level + 1, 'metaGraph');
-  noverlap.assign(metaGraph);
+  noverlap.assign(metaGraph); // Тут быстро достаточно
 
   // Второй проход: композиция координат
   metaGraph.forEachNode((commId, metaAttrs) => {
@@ -199,7 +204,10 @@ function forceAtlas2Layout(graph: Graph) {
   const sensibleSettings = forceAtlas2.inferSettings(graph);
   forceAtlas2.assign(graph, {
     iterations: alg.forceAtlasIterations,
-    settings: sensibleSettings
+    settings: {
+      ...sensibleSettings,
+      barnesHutOptimize: true
+    }
   });
 }
 
@@ -219,7 +227,10 @@ function forceAtlas2SamplingLayout(graph: Graph) {
   const sensibleSettings = forceAtlas2.inferSettings(sub);
   forceAtlas2.assign(sub, {
     iterations: alg.forceAtlasIterations,
-    settings: sensibleSettings
+    settings: {
+      ...sensibleSettings,
+      barnesHutOptimize: true,
+    }
   });
 
   interpolatePositions(graph, sub);

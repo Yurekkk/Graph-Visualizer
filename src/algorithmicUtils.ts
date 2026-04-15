@@ -28,8 +28,9 @@ export function getGraphCenterRadius(graph: Graph):
   graph.forEachNode((_, attrs) => {
     const dx = (attrs.x ?? 0) - centerX;
     const dy = (attrs.y ?? 0) - centerY;
-    radius = Math.max(radius, Math.sqrt(dx*dx + dy*dy));
+    radius = Math.max(radius, dx*dx + dy*dy);
   });
+  radius = Math.sqrt(radius);
 
   return { centerX: centerX, centerY: centerY, radius: radius };
 }
@@ -43,7 +44,8 @@ export function buildCommunityGraph(graph: Graph, commId: any): Graph {
     if (attrs.community == commId)
       currCommNodes.add(node);
   });
-  const commGraph = subgraph(graph, (node) => currCommNodes.has(node));
+  let commGraph = subgraph(graph, (node) => currCommNodes.has(node));
+  commGraph = toUndirected(commGraph);
 
   // Расставляем
   const rng = seedrandom(alg.seed);
@@ -52,14 +54,14 @@ export function buildCommunityGraph(graph: Graph, commId: any): Graph {
     commGraph.updateNodeAttribute(node, 'y', _ => rng() - 0.5);
   })
 
-  return toUndirected(commGraph);
+  return commGraph;
 }
 
 
 
 export function buildMetaGraph(graph: Graph): Graph {
   // Строим мета-граф (сообщества как узлы)
-  const metaGraph = new Graph({});
+  let metaGraph = new Graph({});
   graph.forEachNode((_node, attrs) => {
     const commId = attrs.community;
     if (!metaGraph.hasNode(commId)) metaGraph.addNode(commId, {size: 1});
@@ -78,6 +80,8 @@ export function buildMetaGraph(graph: Graph): Graph {
     }
   });
 
+  metaGraph = toUndirected(metaGraph);
+
   // Расставляем
   const rng = seedrandom(alg.seed);
   metaGraph.forEachNode((node) => {
@@ -85,5 +89,5 @@ export function buildMetaGraph(graph: Graph): Graph {
     metaGraph.updateNodeAttribute(node, 'y', _ => rng() - 0.5);
   })
 
-  return toUndirected(metaGraph);
+  return metaGraph;
 }

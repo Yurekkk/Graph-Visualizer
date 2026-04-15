@@ -74,53 +74,30 @@ export default async function initGraph(path: string, title: string, algorithm: 
   
 
 
-  await setStatus('Расставляем атрибуты узлов...');
+  await setStatus('Расставляем атрибуты...');
   start = performance.now();
+
   const numNodesSqrt = Math.sqrt(metrics.numNodes);
   const rng = seedrandom(alg.seed);
   graph.forEachNode((node, attrs) => {
-    // Ставим размер узлов в зависимости от степени
-    // Окрашиваем узлы в зависимости от номера сообщества
-    const size = nodeSize(attrs.degree, metrics);
-    const color = nodeColor(attrs.community, metrics);
-    // Некоторые атрибуты могут перезаписываться, сохраняем настоящие как hidden
     graph!.mergeNodeAttributes(node, {
-      label: '',
-      hiddenLabel: attrs.label,
-      size: size,
-      hiddenSize: size,
-      color: color,
+      label: '', // Пустой изначально
+      hiddenLabel: attrs.label, // Сохраняем настоящий
       labelColor: vis.labelColor,
-      alpha: vis.nodeDefaultAlpha,
       x: (rng() - 0.5) * numNodesSqrt,
       y: (rng() - 0.5) * numNodesSqrt,
-      borderColor: vis.borderColor,
-      borderSize: vis.borderSizeDefault,
-      zIndex: attrs.degree
+      borderColor: vis.borderColor
     });
   });
-  end = performance.now();
-  console.log(`Время расставления атрибутов узлов: ${(end - start).toFixed(3)} мс`)
 
-
-
-  await setStatus('Расставляем атрибуты рёбер...');
-  start = performance.now();
-  graph.forEachEdge((_edge, attrs, source, target) => {
-    const size = edgeSize(attrs.weight, attrs.importance, metrics);
-    const color = edgeColor(attrs.weight, attrs.importance, metrics);
-    // Некоторые атрибуты могут перезаписываться, сохраняем настоящие как hidden
+  graph.forEachEdge((_edge, _attrs, source, target) => {
     graph!.mergeEdgeAttributes(source, target, {
-      size: size,
-      color: color,
-      hiddenColor: color,
-      alpha: vis.edgeDefaultAlpha,
-      zIndex: attrs.weight,
       type: 'curved'
     });
   });
+
   end = performance.now();
-  console.log(`Время расставления атрибутов рёбер: ${(end - start).toFixed(3)} мс`)
+  console.log(`Время расставления атрибутов: ${(end - start).toFixed(3)} мс`)
 
 
 

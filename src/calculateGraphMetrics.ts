@@ -264,7 +264,7 @@ function calculateEdgesImportance(graph: Graph) {
     const targetImportance = graph.getNodeAttribute(target, 'importance');
 
     const edgeImportance = (2 * sourceImportance * targetImportance) / 
-      (sourceImportance + targetImportance);
+      ((sourceImportance + targetImportance) || 1e+12);
     attrs.importance = edgeImportance;
 
     maxEdgeImportance = Math.max(edgeImportance, maxEdgeImportance);
