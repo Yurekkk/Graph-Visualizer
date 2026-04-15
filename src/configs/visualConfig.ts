@@ -6,7 +6,7 @@ export const nodeMaxSize = 20;  // При максимальной степен�
 export const nodeSizeDefault = 13;
 export const nodeSizeHover = 25;
 export const nodeSizeSelected = 30;
-export const nodeHiddenAlpha = 0.05;
+export const nodeTransparentAlpha = 0.05;
 export const nodeDefaultAlpha = 1.0;
 
 export const edgeMinSize = 2;  // При минимальном весе ребра
@@ -14,9 +14,9 @@ export const edgeMaxSize = 4;  // При максимальном весе ре�
 export const edgeDefaultSize = 3;
 export const edgeMinTurboT = 0.025; // Минимальный параметр для interpolateTurbo
 // Темно-фиолетовый цвет в начале палитры выглядит уродливо, поэтому так ^
-export const edgeHiddenAlpha = 0.05;
+export const edgeTransparentAlpha = 0.05;
 export const edgeDefaultAlpha = 0.1;
-export const edgeHoverAlpha = 0.5;
+export const edgeHoverAlpha = 1.0;
 export const edgeClickAlpha = 1.0;
 export const edgeHoverColor = '#ffffff';
 
@@ -30,3 +30,6 @@ export const labelColor = '#000000';
 export const labelSize = 20;
 
 export const cameraFitPadding = 50; // в пикселях
+
+export const zLayerMargin = 1e+12; // Запас на один z-слой для одного типа узлов
+// [0, zLayerMargin] для usual узлов, [zLayerMargin, 2 * zLayerMargin] для selected узлов и т. д.

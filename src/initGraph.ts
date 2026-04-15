@@ -1,18 +1,18 @@
 import Sigma from 'sigma';
 import Graph from 'graphology';
-import { blendWithBackground, edgeColor, edgeSize, nodeColor, nodeSize } from './visualUtils.ts';
+import { edgeColor, edgeSize, nodeColor, nodeSize } from './visualUtils.ts';
 import { calculateEdgeMetrics, calculateGraphMetrics, calculateNodeMetrics } from './calculateGraphMetrics.ts';
 import { createNodeBorderProgram } from "@sigma/node-border";
 import EdgeCurveProgram from '@sigma/edge-curve';
 import parseGraphFile from './graphParser.ts';
 import smartLayout from './layoutEngine.ts';
-import { hoverNode, unhoverNode, selectNode, deselectNode, clearHoveredSelected } from './graphHoverClickHandler.ts';
 import * as vis from './configs/visualConfig.ts';
 import * as alg from './configs/algorithmicConfig.ts';
 import seedrandom from 'seedrandom';
 import hideUnimportantNodes from './hideUnimportantNodes.ts';
 import { fitViewportToNodes } from '@sigma/utils';
 import hideUnimportantEdges from './hideUnimportantEdges.ts';
+import { clearHighlightState, deselectNode, edgeReducer, hoverNode, nodeReducer, selectNode, unhoverNode } from './graphHoverClickHandler.ts';
 
 
 
@@ -27,17 +27,6 @@ let renderer: Sigma | null = null;
 let graph: Graph | null = null;
 
 
-
-// Кэшируем цвет фона, чтобы не парсить его на каждый кадр
-let cachedBgColor: string | null = null;
-function getBackgroundColor(): string {
-  if (!cachedBgColor) {
-    cachedBgColor = getComputedStyle(document.documentElement)
-    .getPropertyValue('--bg-color')
-    .trim();
-  }
-  return cachedBgColor;
-}
 
 async function setStatus(text: string) {
   statusSpan.textContent = text;
@@ -57,7 +46,7 @@ export default async function initGraph(path: string, title: string, algorithm: 
     renderer.kill(); 
     renderer = null;
   }
-  clearHoveredSelected();
+  clearHighlightState();
   graph = null;
   let start, end;
 
@@ -181,23 +170,9 @@ export default async function initGraph(path: string, title: string, algorithm: 
         ]
       }),
     },
-
-    // Смешиваем цвет узлов и ребер с цветом фона в зависимости от альфы
-    // WebGL через жопу поддерживает альфа-канал, поэтому так
-    nodeReducer: (node, data) => {
-      const alpha = graph!.getNodeAttribute(node, 'alpha') ?? 1;
-      const bgColor = getBackgroundColor();
-      const blended = blendWithBackground(data.color, bgColor, alpha);
-      const borderColorBlended = blendWithBackground(data.borderColor, bgColor, alpha);
-      return { ...data, color: blended, borderColor: borderColorBlended };
-    },
-
-    edgeReducer: (edge, data) => {
-      const alpha = graph!.getEdgeAttribute(edge, 'alpha') ?? 1;
-      const bgColor = getBackgroundColor();
-      const colorBlended = blendWithBackground(data.color, bgColor, alpha);
-      return { ...data, color: colorBlended };
-    }
+    
+    nodeReducer: (node, data) => nodeReducer(node, data, metrics),
+    edgeReducer: (edge, data) => edgeReducer(edge, data, graph!, metrics)
   });
 
   end = performance.now();
@@ -207,7 +182,7 @@ export default async function initGraph(path: string, title: string, algorithm: 
 
 
   // Hover с подсветкой узла
-  renderer.on('enterNode', ({ node }) => hoverNode(node, graph!, renderer!, metrics));
+  renderer.on('enterNode', ({ node }) => hoverNode(node, graph!, renderer!));
 
   // Unhover
   renderer.on('leaveNode', () => unhoverNode(graph!, renderer!));
@@ -216,7 +191,7 @@ export default async function initGraph(path: string, title: string, algorithm: 
   renderer.on('clickNode', ({ node }) => selectNode(node, graph!, renderer!, metrics));
 
   // Клик по пустому месту для сброса фокуса
-  renderer.on('clickStage', () => deselectNode(graph!, renderer!, metrics));
+  renderer.on('clickStage', () => deselectNode(graph!, renderer!));
 
   // const camera = renderer.getCamera();
   // camera.on("updated", () => {

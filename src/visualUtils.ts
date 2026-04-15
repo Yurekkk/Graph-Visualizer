@@ -38,6 +38,9 @@ export function blendWithBackground(
   bgColor: string, // hex
   alpha: number
 ): string {
+  // Смешиваем цвет узлов и ребер с цветом фона в зависимости от альфы
+  // WebGL через жопу поддерживает альфа-канал, поэтому так
+
   const fg = hexToRgb(fgColor);
   const bg = hexToRgb(bgColor);
   
@@ -84,7 +87,10 @@ export function nodeSize(degree: number, metrics: graphMetrics): number {
 
 
 export function edgeColorInterpolate(value: number, maxValue: number, minValue: number) {
-  let t = (value - minValue) / (maxValue - minValue); // 0.0 - 1.0
+  let t;
+  if (maxValue !== minValue)
+    t = (value - minValue) / (maxValue - minValue); // 0.0 - 1.0
+  else t = 0.5;
   t += vis.edgeMinTurboT * (1 - t); // vis.edgeMinTurboT - 1.0
   return interpolateTurbo(t);
 }
