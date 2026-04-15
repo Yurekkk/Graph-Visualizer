@@ -6,23 +6,27 @@ import { MinPriorityQueue } from '@datastructures-js/priority-queue';
 
 
 export default function findCloseImportantNeighbours(
-  selectedNodeId: string, graph: Graph, metrics: graphMetrics): string[] {
+  selectedNodeId: string, graph: Graph, metrics: graphMetrics): 
+  { importantNodes: Map<string, number>, importantEdges: Map<string, number> } {
   // С помощью алгоритма Дейкстры ищем максимум alg.maxHighlightedNeighborsNum узлов,
   // цена у которых не больше alg.maxAccumulatedCost
     
   // Расстояние от выбранного узла до всех достижимых
   const dist = new Map<string, number>([[selectedNodeId, 0]]);
-  // Очередь для Дейкстры: [узел, накопленная_стоимость]
-  const queue = new MinPriorityQueue<{ node: string; cost: number }>(x => x.cost);
-  queue.enqueue({ node: selectedNodeId, cost: 0 });
-  // Найденные важные соседи
-  const result: string[] = [];
+  // Очередь для Дейкстры: [узел, накопленная стоимость, ребро по которому пришли]
+  const queue = new MinPriorityQueue<{ node: string; cost: number, edge: string }>(x => x.cost);
+  queue.enqueue({ node: selectedNodeId, cost: 0, edge: '' });
+
+  // Найденные важные соседи и их важности
+  const resultNodes = new Map<string, number>(); 
+  // Встреченные ребра на пути и их важности
+  const resultEdges = new Map<string, number>(); 
 
   const costFunc = buildCostFunction(metrics);
 
-  while (!queue.isEmpty() && result.length < alg.maxHighlightedNeighborsNum) {
+  while (!queue.isEmpty() && resultNodes.size < alg.maxHighlightedNeighborsNum) {
     // Извлекаем узел
-    const { node, cost } = queue.dequeue()!;
+    const { node, cost, edge } = queue.dequeue()!;
 
     // Пропускаем устаревшие записи (стандартная "ленивая" проверка Дейкстры)
     if (dist.has(node) && cost > dist.get(node)!) continue;
@@ -31,7 +35,7 @@ export default function findCloseImportantNeighbours(
     if (cost > alg.maxAccumulatedCost) continue;
 
     // Релаксация соседей
-    graph.forEachEdge(node, (_edge, attrs, source, target) => {
+    graph.forEachEdge(node, (newEdge, attrs, source, target) => {
       const neighbor = source !== node ? source : target;
 
       const weight = attrs?.weight ?? 1;
@@ -41,15 +45,17 @@ export default function findCloseImportantNeighbours(
 
       if (!dist.has(neighbor) || newCost < dist.get(neighbor)!) {
         dist.set(neighbor, newCost);
-        queue.push({ node: neighbor, cost: newCost });
+        queue.push({ node: neighbor, cost: newCost, edge: newEdge });
       }
     });
 
-    if (node !== selectedNodeId)
-      result.push(node);
+    if (node !== selectedNodeId) {
+      resultNodes.set(node, 1 / (cost || 1e-15));
+      resultEdges.set(edge, 1 / (cost || 1e-15));
+    }
   }
 
-  return result;
+  return { importantNodes: resultNodes, importantEdges: resultEdges };
 }
 
 

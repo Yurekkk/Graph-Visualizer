@@ -251,6 +251,9 @@ function calculateNodesImportance(graph: Graph) {
 
 
 function calculateEdgesImportance(graph: Graph) {
+  // Вычисляет важность каждого ребра и возвращает 
+  // максимальную, минимальную и среднюю их важность
+  
   let maxEdgeImportance = -Infinity;
   let minEdgeImportance = Infinity;
   let avgEdgeImportance = 0;

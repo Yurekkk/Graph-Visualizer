@@ -4,11 +4,14 @@ import findCloseImportantNeighbours from './findCloseImportantNeigbors.ts';
 import { fitViewportToNodes } from '@sigma/utils';
 import * as vis from './configs/visualConfig.ts';
 import type graphMetrics from './graphMetricsInterface.ts';
+import { edgeColor, edgeColorInterpolate } from './visualUtils.ts';
 
 
 
 let selectedNodeId: string | null = null;
 let hoveredNodeId:  string | null = null;
+let importantNodes: Map<string, number>;
+let importantEdges: Map<string, number>;
 
 
 
@@ -52,6 +55,7 @@ export function hoverNode(newHoveredNodeId: string, graph: Graph,
   graph.forEachEdge(hoveredNodeId, (edge, attrs, _source, _target) => {
     graph.setEdgeAttribute(edge, 'color', vis.edgeHoverColor);
     graph.setEdgeAttribute(edge, 'zIndex', attrs.weight + weightsRange);
+    graph.setEdgeAttribute(edge, 'alpha', vis.edgeHoverAlpha);
   });
 
   renderer.refresh();
@@ -79,6 +83,9 @@ export function unhoverNode(graph: Graph, renderer: Sigma, refresh: boolean = tr
   graph.forEachEdge(hoveredNodeId, (edge, attrs, _source, _target) => {
     graph.setEdgeAttribute(edge, 'color', attrs.hiddenColor);
     graph.setEdgeAttribute(edge, 'zIndex', attrs.weight);
+    if (hoveredNodeId === selectedNodeId)
+      graph.setEdgeAttribute(edge, 'alpha', vis.edgeClickAlpha);
+    else graph.setEdgeAttribute(edge, 'alpha', vis.edgeDefaultAlpha);
   });
 
   hoveredNodeId = null;
@@ -95,6 +102,7 @@ export function selectNode(newSelectedNodeId: string, graph: Graph,
   const degreeRange = (metrics.maxDegree - metrics.minDegree) || 1;
   const weightsRange = (metrics.maxEdgeWeight - metrics.minEdgeWeight) || 1;
 
+  // Чистим предыдущий клик
   if (selectedNodeId != null) {
     graph.setNodeAttribute(selectedNodeId, 'label', '');
     const hiddenSize = graph.getNodeAttribute(selectedNodeId, 'hiddenSize');
@@ -108,13 +116,15 @@ export function selectNode(newSelectedNodeId: string, graph: Graph,
   graph.setNodeAttribute(selectedNodeId, 'size', vis.nodeSizeSelected);
   graph.setNodeAttribute(selectedNodeId, 'borderSize', vis.borderSizeHover);
 
-  const importantIds = findCloseImportantNeighbours(selectedNodeId, graph, metrics);
+  // Ищем важные узлы
+  const { importantNodes: importantNodes, importantEdges: importantEdges } = 
+    findCloseImportantNeighbours(selectedNodeId, graph, metrics);
 
   // Делаем важные узлы и ребра непрозрачными и возвращаем их zIndex
   // zIndex выбранного узла поднимаем
   // Делаем все остальные узлы и ребра полупрозрачными и опускаем их zIndex
   graph.forEachNode((node, attrs) => {
-    if (importantIds.includes(node) || node === selectedNodeId) {
+    if (importantNodes.has(node) || node === selectedNodeId) {
       graph.setNodeAttribute(node, 'alpha', vis.nodeDefaultAlpha);
       if (node === selectedNodeId)
         graph.setNodeAttribute(node, 'zIndex', attrs.degree + degreeRange);
@@ -127,28 +137,34 @@ export function selectNode(newSelectedNodeId: string, graph: Graph,
     }
   })
 
+  const maxEdgeImportance = Math.max(...importantEdges.values());
+  const minEdgeImportance = Math.min(...importantEdges.values());
+
   graph.forEachEdge((edge, attrs, source, target) => {
-    if ((importantIds.includes(source) || source === selectedNodeId) &&
-        (importantIds.includes(target) || target === selectedNodeId)) {
-      graph.setEdgeAttribute(edge, 'alpha', vis.edgeDefaultAlpha);
+    if (importantEdges.has(edge)) {
+      graph.setEdgeAttribute(edge, 'alpha', vis.edgeClickAlpha);
+      const color = edgeColorInterpolate(importantEdges.get(edge)!, maxEdgeImportance, minEdgeImportance);
+      graph.setEdgeAttribute(edge, 'hiddenColor', color);
       if (source !== hoveredNodeId && target !== hoveredNodeId)
         graph.setEdgeAttribute(edge, 'zIndex', attrs.weight);
     }
-    else {
+    else if (source !== hoveredNodeId && target !== hoveredNodeId) {
       graph.setEdgeAttribute(edge, 'alpha', vis.edgeHiddenAlpha);
+      const color = edgeColor(attrs.weight, attrs.importance, metrics);
+      graph.setEdgeAttribute(edge, 'hiddenColor', color);
       graph.setEdgeAttribute(edge, 'zIndex', attrs.weight - weightsRange);
     }
   })
 
   // Подстраиваем вид под нужные узлы
-  fitViewportToNodes(renderer, [...importantIds, selectedNodeId], { animate: true });
+  fitViewportToNodes(renderer, [...importantNodes.keys(), selectedNodeId], { animate: true });
   
   renderer.refresh();
 }
 
 
 
-export function deselectNode(graph: Graph, renderer: Sigma) {
+export function deselectNode(graph: Graph, renderer: Sigma, metrics: graphMetrics) {
   if (selectedNodeId == null) return;
   graph.setNodeAttribute(selectedNodeId, 'label', '');
   const hiddenSize = graph.getNodeAttribute(selectedNodeId, 'hiddenSize');
@@ -163,6 +179,8 @@ export function deselectNode(graph: Graph, renderer: Sigma) {
 
   graph.forEachEdge((edge, attrs, _source, _target) => {
     graph.setEdgeAttribute(edge, 'alpha', vis.edgeDefaultAlpha);
+    const color = edgeColor(attrs.weight, attrs.importance, metrics);
+    graph.setEdgeAttribute(edge, 'color', color);
     graph.setEdgeAttribute(edge, 'zIndex', attrs.weight);
   })
 

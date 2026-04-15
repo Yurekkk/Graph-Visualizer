@@ -18,9 +18,10 @@ export const forceAtlasIterations = 50;
 
 
 // ### Layout Engine Decision Tree ###
-export const metaLayoutRecursionLevelCap = 2; 
+export const metaLayoutRecursionLevelCap = 3; 
+
 export const metaLayoutMinNodes = 500;    // ||
-export const metaLayoutMinEdges = 2000;   // ||
+export const metaLayoutMinEdges = 1000;   // ||
 export const metaLayoutMinModularity = 0.75;
 
 export const circularMinDensity = 0.25;   // &&

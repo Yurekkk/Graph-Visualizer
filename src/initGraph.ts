@@ -216,7 +216,7 @@ export default async function initGraph(path: string, title: string, algorithm: 
   renderer.on('clickNode', ({ node }) => selectNode(node, graph!, renderer!, metrics));
 
   // Клик по пустому месту для сброса фокуса
-  renderer.on('clickStage', () => deselectNode(graph!, renderer!));
+  renderer.on('clickStage', () => deselectNode(graph!, renderer!, metrics));
 
   // const camera = renderer.getCamera();
   // camera.on("updated", () => {
