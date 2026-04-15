@@ -14,6 +14,7 @@ import { calculateGraphMetrics, findCommunities } from './calculateGraphMetrics.
 import { buildCommunityGraph, buildMetaGraph, getGraphCenterRadius } from './algorithmicUtils.ts';
 
 
+
 // TODO: A lot of tweaking is still needed
 
 /* 
@@ -24,7 +25,6 @@ ForceAtlas, ко всему прочему, еще и аномалии типа 
 ForceAtlas с сэмплированием всегда тянет узлы ближе к центру сообщества, 
 хз че с этим делать. Но зато быстрее
 */
-
 
 
 
@@ -85,10 +85,10 @@ export default function smartLayout(
   //   logAlgoChoice('radial', _recursion_level, _meta_or_comm_prefix);
   //   radialLayout(graph);
   // }
-  else if (metrics.numNodes > alg.samplingMinNumNodes) {
-    logAlgoChoice('forceAtlas2Sampling', _recursion_level, _meta_or_comm_prefix);
-    forceAtlas2SamplingLayout(graph);
-  } 
+  // else if (metrics.numNodes > alg.samplingMinNumNodes) {
+  //   logAlgoChoice('forceAtlas2Sampling', _recursion_level, _meta_or_comm_prefix);
+  //   forceAtlas2SamplingLayout(graph);
+  // } 
   else {
     logAlgoChoice('forceAtlas2', _recursion_level, _meta_or_comm_prefix);
     forceAtlas2Layout(graph);

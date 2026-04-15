@@ -1,6 +1,5 @@
 import Sigma from 'sigma';
 import Graph from 'graphology';
-import { edgeColor, edgeSize, nodeColor, nodeSize } from './visualUtils.ts';
 import { calculateEdgeMetrics, calculateGraphMetrics, calculateNodeMetrics } from './calculateGraphMetrics.ts';
 import { createNodeBorderProgram } from "@sigma/node-border";
 import EdgeCurveProgram from '@sigma/edge-curve';

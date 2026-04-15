@@ -2,16 +2,19 @@ import Graph from 'graphology';
 import * as alg from './configs/algorithmicConfig.ts';
 // import noverlap from 'graphology-layout-noverlap';
 
+// TODO?: сделать нормальную сортировку
+// Но надо ли оно теперь уже?
+
 export default function radialLayout(graph: Graph) {
 
   if (graph.order === 0) return;
 
   // Выбор корня
   let rootNode;
-  let maxDeg = -1;
-  graph.forEachNode((node) => {
-    const deg = graph.degree(node);
-    if (deg > maxDeg) { maxDeg = deg; rootNode = node; }
+  let maxKCore = -1;
+  graph.forEachNode((node, attrs) => {
+    const kCore = attrs.core;
+    if (kCore > maxKCore) { maxKCore = kCore; rootNode = node; }
   });
 
   // BFS по уровням
