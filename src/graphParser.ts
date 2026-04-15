@@ -125,13 +125,11 @@ function parseMTX(content: string): Graph {
   }
 
   // Первая строка: rows cols entries
-  const [rows, cols, _entries] = lines[lineIndex]
+  const [_rows, _cols, _entries] = lines[lineIndex]
     .trim()
     .split(/\s+/)
     .map(Number);
   lineIndex++;
-
-  const isSymmetric = rows === cols;
 
   for (let i = lineIndex; i < lines.length; i++) {
     const parts = lines[i].trim().split(/\s+/);
@@ -145,11 +143,6 @@ function parseMTX(content: string): Graph {
     nodes.add(col);
 
     edges.push({ source: row, target: col, weight });
-
-    // Для симметричных матриц добавляем обратное ребро
-    if (isSymmetric && row !== col) {
-      edges.push({ source: col, target: row, weight });
-    }
   }
 
   nodes.forEach((id) => {
@@ -184,15 +177,22 @@ function parseCSV(content: string): Graph {
   const nodes = new Set<string>();
   const edges: Array<{ source: string; target: string; weight: number }> = [];
 
+  let lineIndex = 0;
+
+  // Пропускаем комментарии
+  while (lines[lineIndex]?.startsWith('%'))
+    lineIndex++;
+
   // Определяем разделитель
-  const delimiter = lines[0].includes('\t') ? '\t' : ',';
+  const delimiter = lines[0].includes('\t') ? '\t' : 
+                    lines[0].includes(',')  ? ','  : ' ';
 
   // Проверяем, есть ли заголовок
-  const hasHeader = !/^\d/.test(lines[0]);
-  const startIndex = hasHeader ? 1 : 0;
+  const hasHeader = !/^\d/.test(lines[lineIndex]);
+  if (hasHeader) lineIndex++;
 
-  for (let i = startIndex; i < lines.length; i++) {
-    const parts = lines[i].trim().split(delimiter);
+  for (; lineIndex < lines.length; lineIndex++) {
+    const parts = lines[lineIndex].trim().split(delimiter);
     if (parts.length < 2) continue;
 
     const source = parts[0].trim();

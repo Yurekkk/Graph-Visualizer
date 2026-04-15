@@ -168,6 +168,7 @@ export default async function initGraph(path: string, title: string, algorithm: 
     labelSize: vis.labelSize,
     zIndex: true,
     autoRescale: false,
+    edgeProgramClasses: {curved: EdgeCurveProgram},
 
     nodeProgramClasses: {
       circle: createNodeBorderProgram({
@@ -181,12 +182,8 @@ export default async function initGraph(path: string, title: string, algorithm: 
       }),
     },
 
-    edgeProgramClasses: {
-      curved: EdgeCurveProgram,
-    },
-
     // Смешиваем цвет узлов и ребер с цветом фона в зависимости от альфы
-    // WebGL, по-видимому, не поддерживает альфа-канал, поэтому так
+    // WebGL через жопу поддерживает альфа-канал, поэтому так
     nodeReducer: (node, data) => {
       const alpha = graph!.getNodeAttribute(node, 'alpha') ?? 1;
       const bgColor = getBackgroundColor();
