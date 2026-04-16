@@ -11,7 +11,7 @@ import * as vis from './configs/visualConfig.ts';
 import * as alg from './configs/algorithmicConfig.ts';
 // import dagre from 'dagre';
 import { calculateGraphMetrics, findCommunities } from './calculateGraphMetrics.ts';
-import { buildCommunityGraph, buildMetaGraph, getGraphCenterRadius } from './algorithmicUtils.ts';
+import { buildCommunityGraph, buildMetaGraph, getGraphCenterRadius } from './utilsAlgorithmic.ts';
 
 
 

@@ -1,7 +1,7 @@
 import type Graph from 'graphology';
 import * as vis from './configs/visualConfig';
 import type graphMetrics from './graphMetricsInterface';
-import { blendWithBackground, edgeColor, edgeColorInterpolate, edgeSize, edgeSizeInterpolate, nodeColor, nodeSize } from './visualUtils';
+import { blendWithBackground, edgeColor, edgeColorInterpolate, edgeSize, edgeSizeInterpolate, nodeColor, nodeSize } from './utilsVisual';
 import type Sigma from 'sigma';
 import findCloseImportantNeighbours from './findCloseImportantNeigbors';
 import { fitViewportToNodes } from '@sigma/utils';

@@ -12,6 +12,7 @@ import { connectedComponents } from 'graphology-components';
 
 
 
+// TODO: Все таки считать betweeness centrality, если граф маленький
 // TODO?: Тут немного срач, надо бы почистить
 
 // Все это пока не учитывает, что граф может быть ориентированным
