@@ -109,13 +109,14 @@ export function findCommunities(graph: Graph) {
     resolution: alg.louvainResolution,
     nodeCommunityAttribute: 'community'
   });
-  const numCommunities = findCommunitiesNum(graph);
   // end = performance.now();
   // console.log(`Время нахождения сообществ (louvain): ${(end - start).toFixed(3)} мс`)
   //*/
 
   // Разделяем сообщества с несколькими компонентами связности на разные сообщества
   remapCommunitiesPerComponent(graph);
+
+  const numCommunities = findCommunitiesNum(graph);
 
   // start = performance.now();
   let modularity;
