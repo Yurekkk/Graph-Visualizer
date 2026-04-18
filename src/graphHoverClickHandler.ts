@@ -120,6 +120,7 @@ function getEdgeLevel(edge: string, graph: Graph) {
 
 function computeEdgeVisuals(edge: string, data: any, graph: Graph, metrics: graphMetrics) {
   const level = getEdgeLevel(edge, graph);
+  const allWeightsEqual = metrics.maxEdgeWeight == metrics.minEdgeWeight;
   
   switch (level) {
     case 'highlightedAndImportant':
@@ -128,7 +129,7 @@ function computeEdgeVisuals(edge: string, data: any, graph: Graph, metrics: grap
         size: edgeSizeInterpolate(importantEdgesCache.get(edge)!, maxEdgeImportance!, minEdgeImportance!),
         color: vis.edgeHoverColor,
         alpha: vis.edgeHoverAlpha,
-        zIndex: data.weight + 2 * vis.zLayerMargin,
+        zIndex: (allWeightsEqual ? data.importance : data.weight) + 2 * vis.zLayerMargin,
         hidden: false,
       };
 
@@ -138,7 +139,7 @@ function computeEdgeVisuals(edge: string, data: any, graph: Graph, metrics: grap
         size: edgeSize(data.weight, data.importance, metrics),
         color: vis.edgeHoverColor,
         alpha: vis.edgeHoverAlpha,
-        zIndex: data.weight + 2 * vis.zLayerMargin,
+        zIndex: (allWeightsEqual ? data.importance : data.weight) + 2 * vis.zLayerMargin,
         hidden: false,
       };
       
@@ -149,7 +150,7 @@ function computeEdgeVisuals(edge: string, data: any, graph: Graph, metrics: grap
         size: edgeSizeInterpolate(importance!, maxEdgeImportance!, minEdgeImportance!),
         color: edgeColorInterpolate(importance!, maxEdgeImportance!, minEdgeImportance!),
         alpha: vis.edgeClickAlpha,
-        zIndex: data.weight + vis.zLayerMargin,
+        zIndex: (allWeightsEqual ? data.importance : data.weight) + vis.zLayerMargin,
         hidden: false,
       };
       
@@ -159,7 +160,7 @@ function computeEdgeVisuals(edge: string, data: any, graph: Graph, metrics: grap
         size: edgeSize(data.weight, data.importance, metrics),
         color: edgeColor(data.weight, data.importance, metrics),
         alpha: vis.edgeDefaultAlpha,
-        zIndex: data.weight,
+        zIndex: (allWeightsEqual ? data.importance : data.weight),
         hidden: false,
       };
       
@@ -169,7 +170,7 @@ function computeEdgeVisuals(edge: string, data: any, graph: Graph, metrics: grap
         size: edgeSize(data.weight, data.importance, metrics),
         color: edgeColor(data.weight, data.importance, metrics),
         alpha: vis.edgeTransparentAlpha,
-        zIndex: data.weight - vis.zLayerMargin,
+        zIndex: (allWeightsEqual ? data.importance : data.weight) - vis.zLayerMargin,
         hidden: false,
       };
   }
