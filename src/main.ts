@@ -52,8 +52,13 @@ function initSelectors() {
 
 
 
-graphSelector.addEventListener('change', async () => {
-  loader.style.display = 'flex'; // показываем крутилку
+graphSelector.addEventListener('change', () => start());
+algorithmSelector.addEventListener('change', () => start());
+
+
+
+async function start() {
+  loader!.style.display = 'flex'; // показываем крутилку
   
   // Ждём 1 кадр, чтобы браузер успел отрисовать лоадер
   await new Promise(r => setTimeout(r, 1));
@@ -62,23 +67,8 @@ graphSelector.addEventListener('change', async () => {
     graphSelector.options[graphSelector.selectedIndex].text, 
     algorithmSelector.value);
 
-  loader.style.display = 'none'; // скрываем по завершении
-});
-
-
-
-algorithmSelector.addEventListener('change', async () => {
-  loader.style.display = 'flex'; // показываем крутилку
-  
-  // Ждём 1 кадр, чтобы браузер успел отрисовать лоадер
-  await new Promise(r => setTimeout(r, 1));
-  
-  await initGraph(graphSelector.value, 
-    graphSelector.options[graphSelector.selectedIndex].text, 
-    algorithmSelector.value);
-
-  loader.style.display = 'none'; // скрываем по завершении
-});
+  loader!.style.display = 'none'; // скрываем по завершении
+}
 
 
 
