@@ -8,9 +8,7 @@ import smartLayout from './layoutEngine.ts';
 import * as vis from './configs/visualConfig.ts';
 import * as alg from './configs/algorithmicConfig.ts';
 import seedrandom from 'seedrandom';
-import hideUnimportantNodes from './hideUnimportantNodes.ts';
 import { fitViewportToNodes } from '@sigma/utils';
-import hideUnimportantEdges from './hideUnimportantEdges.ts';
 import { clearHighlightState, deselectNode, edgeReducer, hoverNode, nodeReducer, selectNode, unhoverNode } from './graphHoverClickHandler.ts';
 
 
@@ -105,22 +103,6 @@ export default async function initGraph(path: string, title: string, algorithm: 
   smartLayout(graph, metrics, algorithm);
   end = performance.now();
   console.log(`Время работы раскладки: ${(end - start).toFixed(3)} мс`)
-
-
-
-  // await setStatus('Скрываем наименее полезные узлы...');
-  // start = performance.now();
-  // hideUnimportantNodes(graph);
-  // end = performance.now();
-  // console.log(`Время скрытия наименее полезных узлов: ${(end - start).toFixed(3)} мс`)
-
-
-
-  // await setStatus('Скрываем наименее полезные рёбра...');
-  // start = performance.now();
-  // hideUnimportantEdges(graph, metrics);
-  // end = performance.now();
-  // console.log(`Время скрытия наименее полезных рёбер: ${(end - start).toFixed(3)} мс`)
 
 
 
