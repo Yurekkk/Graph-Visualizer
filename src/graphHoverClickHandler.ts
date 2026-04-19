@@ -49,7 +49,7 @@ function computeNodeVisuals(node: string, data: any, metrics: any) {
       return {
         ...data,
         label: data.hiddenLabel,
-        size: vis.nodeSizeSelected,
+        size: vis.nodeSizeSelected ?? nodeSize(data.degree, metrics),
         borderSize: vis.borderSizeSelect,
         alpha: vis.nodeDefaultAlpha,
         zIndex: data.degree + 2 * vis.zLayerMargin,
@@ -61,7 +61,7 @@ function computeNodeVisuals(node: string, data: any, metrics: any) {
       return {
         ...data,
         label: data.hiddenLabel,
-        size: vis.nodeSizeHover,
+        size: vis.nodeSizeHover ?? nodeSize(data.degree, metrics),
         borderSize: vis.borderSizeHover,
         alpha: vis.nodeDefaultAlpha,
         zIndex: data.degree + vis.zLayerMargin,
