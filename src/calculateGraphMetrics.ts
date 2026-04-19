@@ -39,8 +39,6 @@ export function calculateGraphMetrics(graph: Graph): graphMetrics {
   // const end = performance.now();
   // console.log(`Время вычисления простых метрик: ${(end - start).toFixed(3)} мс`)
 
-  const {numCommunities, modularity} = findCommunities(graph);
-
   return {
     numNodes,
     numEdges,
@@ -50,8 +48,6 @@ export function calculateGraphMetrics(graph: Graph): graphMetrics {
     minDegree,
     maxEdgeWeight,
     minEdgeWeight,
-    numCommunities,
-    modularity,
     hubDominance,
     degreeGini
   };
@@ -61,8 +57,8 @@ export function calculateGraphMetrics(graph: Graph): graphMetrics {
 
 export function calculateNodeMetrics(graph: Graph) {
   /*
-  // Оно было бы даже лучше для узлов и ребер в качестве importance,
-  // но очень долго считает, сложность O(V*E)
+  // betweennessCentrality было бы даже лучше для узлов и ребер 
+  // в качестве importance, но очень долго считает, сложность O(V*E)
   // V = 3600, E = 3800 => 6 секунд
   // V = 8000, E = 8100 => 31.5 секунд
   start = performance.now();
@@ -71,7 +67,6 @@ export function calculateNodeMetrics(graph: Graph) {
   console.log(`Время вычисления центральности: ${(end - start).toFixed(3)} мс`);
   //*/
 
-  const start = performance.now();
   coreNumber.coreNumber.assign(graph); // k-core // оно горит красным, но все правильно
   // pagerank.assign(graph);
   // graph.forEachNode(node => {
@@ -79,8 +74,6 @@ export function calculateNodeMetrics(graph: Graph) {
   //   graph.setNodeAttribute(node, 'clusteringCoef', cc);
   // });
   calculateNodesImportance(graph);
-  const end = performance.now();
-  console.log(`Время вычисления узловых метрик: ${(end - start).toFixed(3)} мс`);
 }
 
 
@@ -92,7 +85,7 @@ export function calculateEdgeMetrics(graph: Graph) {
 
 
 
-export function findCommunities(graph: Graph) {
+export function findCommunities(graph: Graph, resolution: number = alg.louvainResolution) {
   // let start, end;
 
   /*
@@ -106,7 +99,7 @@ export function findCommunities(graph: Graph) {
   // start = performance.now();
   louvain.assign(graph, {
     rng: seedrandom(alg.seed), 
-    resolution: alg.louvainResolution,
+    resolution: resolution,
     nodeCommunityAttribute: 'community'
   });
   // end = performance.now();

@@ -190,12 +190,12 @@ export function edgeReducer(edge: string, data: any, graph: Graph, metrics: grap
 export function hoverNode(nodeId: string, _graph: Graph, renderer: Sigma) {
   if (hoveredNodeId === nodeId) return;
   hoveredNodeId = nodeId;
-  renderer.refresh();
+  renderer.refresh({skipIndexation: true});
 }
 
 export function unhoverNode(_graph: Graph, renderer: Sigma) {
   hoveredNodeId = null;
-  renderer.refresh();
+  renderer.refresh({skipIndexation: true});
 }
 
 export function selectNode(nodeId: string, graph: Graph, renderer: Sigma, metrics: graphMetrics) {
@@ -210,13 +210,13 @@ export function selectNode(nodeId: string, graph: Graph, renderer: Sigma, metric
   setImportantCache(importantNodes, importantEdges);
   
   fitViewportToNodes(renderer, [...importantNodes.keys(), nodeId], { animate: true });
-  renderer.refresh();
+  renderer.refresh({skipIndexation: true});
 }
 
 export function deselectNode(_graph: Graph, renderer: Sigma) {
   selectedNodeId = null;
   clearHighlightState();
-  renderer.refresh();
+  renderer.refresh({skipIndexation: true});
 }
 
 

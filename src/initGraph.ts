@@ -1,6 +1,6 @@
 import Sigma from 'sigma';
 import Graph from 'graphology';
-import { calculateEdgeMetrics, calculateGraphMetrics, calculateNodeMetrics } from './calculateGraphMetrics.ts';
+import { calculateEdgeMetrics, calculateGraphMetrics, calculateNodeMetrics, findCommunities } from './calculateGraphMetrics.ts';
 import { createNodeBorderProgram } from "@sigma/node-border";
 import EdgeCurveProgram from '@sigma/edge-curve';
 import parseGraphFile from './graphParser.ts';
@@ -9,7 +9,8 @@ import * as vis from './configs/visualConfig.ts';
 import * as alg from './configs/algorithmicConfig.ts';
 import seedrandom from 'seedrandom';
 import { fitViewportToNodes } from '@sigma/utils';
-import { clearHighlightState, deselectNode, edgeReducer, hoverNode, nodeReducer, selectNode, unhoverNode } from './graphHoverClickHandler.ts';
+import { clearHighlightState, deselectNode, edgeReducer, hoverNode, 
+  nodeReducer, selectNode, unhoverNode } from './hoverClickHandler.ts';
 
 
 
@@ -58,16 +59,24 @@ export default async function initGraph(path: string, title: string, algorithm: 
 
 
   await setStatus('Считаем метрики...');
+  start = performance.now();
+
   let metrics = calculateGraphMetrics(graph);
   calculateNodeMetrics(graph);
   const {
     minEdgeImportance, 
     maxEdgeImportance, 
     avgEdgeImportance} = calculateEdgeMetrics(graph);
-  metrics = {...metrics, minEdgeImportance, maxEdgeImportance, avgEdgeImportance}
+  let {numCommunities, modularity} = findCommunities(graph);
+  metrics = {...metrics, minEdgeImportance, maxEdgeImportance, 
+    avgEdgeImportance, numCommunities, modularity}
+
   for (const [key, value] of Object.entries(metrics)) {
     console.log(`--- ${key}: ${value}`);
   }
+
+  end = performance.now();
+  console.log(`Время расчета метрик: ${(end - start).toFixed(3)} мс`)
   
 
 

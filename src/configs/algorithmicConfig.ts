@@ -18,11 +18,14 @@ export const forceAtlasIterations = 50;
 
 
 // ### Layout Engine Decision Tree ###
-export const metaLayoutRecursionLevelCap = 3; 
+export const metaLayoutRecursionLevelCap = 5; 
+export const metaLayoutResolutionDecreaseStep = 0.2;
+// На каждом шаге рекурсии разрешение Louvain уменьшается (начиная с louvainResolution), 
+// чтобы алгоритм не зацикливался на слишком маленьких сообществах
 
-export const metaLayoutMinNodes = 500;    // ||
-export const metaLayoutMinEdges = 1000;   // ||
-export const metaLayoutMinModularity = 0.75;
+export const metaLayoutMinNodes = 1000; 
+// export const metaLayoutMinEdges = 1000;
+// export const metaLayoutMinModularity = 0.75;
 
 export const circularMinDensity = 0.25;   // &&
 export const circularMaxNumNodes = 50;
@@ -46,7 +49,7 @@ export const nodeImportanceInfluence = 0.5; // Влияние важности �
 
 
 // ### Misc ###
-export const logAlgorithmChoices = false;
+export const logAlgorithmChoices = true;
 export const seed = '42';
 export const timestamp_threshold = 500_000_000;
 // Если все значения ребер больше этого порога, 

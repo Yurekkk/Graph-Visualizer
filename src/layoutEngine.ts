@@ -67,11 +67,14 @@ export default function smartLayout(
       throw new Error("Unknown algorithm.");
   }
 
-  if ((metrics.numNodes > alg.metaLayoutMinNodes ||
-      metrics.numEdges > alg.metaLayoutMinEdges ||
-      metrics.modularity > alg.metaLayoutMinModularity) &&
+  // if ((metrics.numNodes > alg.metaLayoutMinNodes ||
+  //     metrics.numEdges > alg.metaLayoutMinEdges ||
+  //     metrics.modularity > alg.metaLayoutMinModularity) &&
+  //     _recursion_level < alg.metaLayoutRecursionLevelCap && 
+  //     metrics.numCommunities > 1) {
+  if (metrics.numNodes > alg.metaLayoutMinNodes &&
       _recursion_level < alg.metaLayoutRecursionLevelCap && 
-      metrics.numCommunities > 1) {
+      (metrics.numCommunities ?? 0) > 1) {
     logAlgoChoice('meta', _recursion_level, _meta_or_comm_prefix);
     metaLayout(graph, _recursion_level);
   }
@@ -115,7 +118,8 @@ function logAlgoChoice(
 function metaLayout(graph: Graph, _recursion_level: number) {
   const metaGraph = buildMetaGraph(graph);
   let metaMetrics = calculateGraphMetrics(metaGraph);
-  let {numCommunities, modularity} = findCommunities(metaGraph);
+  const resolution = alg.louvainResolution - alg.metaLayoutResolutionDecreaseStep * _recursion_level;
+  let {numCommunities, modularity} = findCommunities(metaGraph, resolution);
   metaMetrics = {...metaMetrics, numCommunities, modularity};
 
   const communities = new Map<string, {commGraph: Graph, 
