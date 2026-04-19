@@ -3,6 +3,7 @@ import { toUndirected } from 'graphology-operators';
 import seedrandom from 'seedrandom';
 import { subgraph } from 'graphology-operators';
 import * as alg from './configs/algorithmicConfig.ts';
+import * as vis from './configs/visualConfig.ts';
 
 
 
@@ -90,4 +91,19 @@ export function buildMetaGraph(graph: Graph): Graph {
   })
 
   return metaGraph;
+}
+
+
+
+export function setRandomCoords(graph: Graph, replaceNansOnly: boolean = false) {
+  const spacing = Math.sqrt(graph.order) * (vis.nodeMaxSize + vis.nodeMinSize) * 2;
+  const rng = seedrandom(alg.seed);
+  graph.forEachNode((node, attrs) => {
+    if (!replaceNansOnly || !attrs.x || !attrs.y) {
+      graph.mergeNodeAttributes(node, {
+        x: (rng() - 0.5) * spacing,
+        y: (rng() - 0.5) * spacing
+      });
+    }
+  });
 }

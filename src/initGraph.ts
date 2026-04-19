@@ -6,8 +6,6 @@ import EdgeCurveProgram from '@sigma/edge-curve';
 import parseGraphFile from './graphParser.ts';
 import smartLayout from './layoutEngine.ts';
 import * as vis from './configs/visualConfig.ts';
-import * as alg from './configs/algorithmicConfig.ts';
-import seedrandom from 'seedrandom';
 import { fitViewportToNodes } from '@sigma/utils';
 import { clearHighlightState, deselectNode, edgeReducer, hoverNode, 
   nodeReducer, selectNode, unhoverNode } from './hoverClickHandler.ts';
@@ -83,15 +81,11 @@ export default async function initGraph(path: string, title: string, algorithm: 
   await setStatus('Расставляем атрибуты...');
   start = performance.now();
 
-  const numNodesSqrt = Math.sqrt(metrics.numNodes);
-  const rng = seedrandom(alg.seed);
   graph.forEachNode((node, attrs) => {
     graph!.mergeNodeAttributes(node, {
       label: '', // Пустой изначально
       hiddenLabel: attrs.label, // Сохраняем настоящий
       labelColor: vis.labelColor,
-      x: (rng() - 0.5) * numNodesSqrt,
-      y: (rng() - 0.5) * numNodesSqrt,
       borderColor: vis.borderColor
     });
   });

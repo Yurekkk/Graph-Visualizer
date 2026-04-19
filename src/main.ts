@@ -19,7 +19,8 @@ function initSelectors() {
     'meta', 
     'circular', 
     'radial', 
-    // 'hierarchical', 
+    'random',
+    'hierarchical', 
     'forceAtlas2', 
     'forceAtlas2wSampling'
   ];

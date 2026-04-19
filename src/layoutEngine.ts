@@ -9,9 +9,10 @@ import interpolatePositions from './interpolatePositions';
 import stratifiedSampling from './stratifiedSampling';
 import * as vis from './configs/visualConfig.ts';
 import * as alg from './configs/algorithmicConfig.ts';
-// import dagre from 'dagre';
+import dagre from 'dagre';
 import { calculateGraphMetrics, findCommunities } from './calculateGraphMetrics.ts';
-import { buildCommunityGraph, buildMetaGraph, getGraphCenterRadius } from './utilsAlgorithmic.ts';
+import { buildCommunityGraph, buildMetaGraph, getGraphCenterRadius, 
+  setRandomCoords } from './utilsAlgorithmic.ts';
 
 
 
@@ -51,10 +52,14 @@ export default function smartLayout(
       logAlgoChoice(algorithm, _recursion_level, _meta_or_comm_prefix);
       radialLayout(graph);
       return;
-    // case 'hierarchical':
-    //   logAlgoChoice(algorithm, _recursion_level, _meta_or_comm_prefix);
-    //   hierarchicalLayout(graph);
-    //   return;
+    case 'random':
+      logAlgoChoice(algorithm, _recursion_level, _meta_or_comm_prefix);
+      setRandomCoords(graph);
+      return;
+    case 'hierarchical':
+      logAlgoChoice(algorithm, _recursion_level, _meta_or_comm_prefix);
+      hierarchicalLayout(graph);
+      return;
     case 'forceAtlas2':
       logAlgoChoice(algorithm, _recursion_level, _meta_or_comm_prefix);
       forceAtlas2Layout(graph); 
@@ -67,12 +72,8 @@ export default function smartLayout(
       throw new Error("Unknown algorithm.");
   }
 
-  // if ((metrics.numNodes > alg.metaLayoutMinNodes ||
-  //     metrics.numEdges > alg.metaLayoutMinEdges ||
-  //     metrics.modularity > alg.metaLayoutMinModularity) &&
-  //     _recursion_level < alg.metaLayoutRecursionLevelCap && 
-  //     metrics.numCommunities > 1) {
   if (metrics.numNodes > alg.metaLayoutMinNodes &&
+      (metrics.modularity ?? -1) > alg.metaLayoutMinModularity &&
       _recursion_level < alg.metaLayoutRecursionLevelCap && 
       (metrics.numCommunities ?? 0) > 1) {
     logAlgoChoice('meta', _recursion_level, _meta_or_comm_prefix);
@@ -180,7 +181,6 @@ function circularLayout(graph: Graph) {
 
 
 
-/*
 function hierarchicalLayout(graph: Graph) {
   const dagreGraph = new dagre.graphlib.Graph();
   dagreGraph.setGraph({ rankdir: 'TB', nodesep: 50, ranksep: 60 });
@@ -196,15 +196,15 @@ function hierarchicalLayout(graph: Graph) {
 
   dagreGraph.nodes().forEach(node => {
     const pos = dagreGraph.node(node);
-    graph.setNodeAttribute(node, 'x', pos.x);
-    graph.setNodeAttribute(node, 'y', pos.y);
+    graph.setNodeAttribute(node, 'x', pos.x * alg.hierarchicalSpacing);
+    graph.setNodeAttribute(node, 'y', pos.y * alg.hierarchicalSpacing);
   });
 }
-//*/
 
 
 
 function forceAtlas2Layout(graph: Graph) {
+  setRandomCoords(graph);
   // Прямая раскладка
   const sensibleSettings = forceAtlas2.inferSettings(graph);
   forceAtlas2.assign(graph, {
@@ -228,6 +228,7 @@ function forceAtlas2SamplingLayout(graph: Graph) {
   });
 
   const sub = subgraph(graph, (node) => sampledNodes.includes(node));
+  setRandomCoords(sub);
 
   const sensibleSettings = forceAtlas2.inferSettings(sub);
   forceAtlas2.assign(sub, {
@@ -238,5 +239,6 @@ function forceAtlas2SamplingLayout(graph: Graph) {
     }
   });
 
+  setRandomCoords(sub, true);
   interpolatePositions(graph, sub);
 }

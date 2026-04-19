@@ -1,13 +1,14 @@
 import Graph from 'graphology';
 import * as alg from './configs/algorithmicConfig.ts';
 import seedrandom from 'seedrandom';
+import * as vis from './configs/visualConfig.ts';
 
 export default function interpolatePositions(
   fullGraph: Graph,
   laidOutSubgraph: Graph
 ): void {
 
-  const numNodesSqrt = Math.sqrt(fullGraph.order);
+  const spacing = Math.sqrt(fullGraph.order) * (vis.nodeMaxSize + vis.nodeMinSize) * 2;
   const rng = seedrandom(alg.seed);
 
   fullGraph.forEachNode((node) => {
@@ -44,8 +45,8 @@ export default function interpolatePositions(
       fullGraph.setNodeAttribute(node, 'y', sumY / totalWeight);
     } else {
       // Изолированный узел - случайная позиция
-      fullGraph.setNodeAttribute(node, 'x', (rng() - 0.5) * numNodesSqrt);
-      fullGraph.setNodeAttribute(node, 'y', (rng() - 0.5) * numNodesSqrt);
+      fullGraph.setNodeAttribute(node, 'x', (rng() - 0.5) * spacing);
+      fullGraph.setNodeAttribute(node, 'y', (rng() - 0.5) * spacing);
     }
   });
 }
