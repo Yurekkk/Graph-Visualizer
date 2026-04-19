@@ -1,8 +1,7 @@
 export const nodeMinSize = 6;   // При минимальной степени
 export const nodeMaxSize = 20;  // При максимальной степени
-export const nodeSizeDefault = 13;
-export const nodeSizeHover = 25;
-export const nodeSizeSelected = 30;
+export const nodeSizeHover = null;    // Если null, то размер не меняется при ховере
+export const nodeSizeSelected = null; // Если null, то размер не меняется при клике
 export const nodeTransparentAlpha = 0.05;
 export const nodeDefaultAlpha = 1.0;
 
