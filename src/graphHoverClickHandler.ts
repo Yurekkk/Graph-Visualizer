@@ -161,7 +161,7 @@ function computeEdgeVisuals(edge: string, data: any, graph: Graph, metrics: grap
         color: edgeColor(data.weight, data.importance, metrics),
         alpha: vis.edgeDefaultAlpha,
         zIndex: (allWeightsEqual ? data.importance : data.weight),
-        hidden: false,
+        hidden: metrics.numEdges > vis.edgesMaxDrawnLimit,
       };
       
     case 'transparent':
@@ -171,7 +171,7 @@ function computeEdgeVisuals(edge: string, data: any, graph: Graph, metrics: grap
         color: edgeColor(data.weight, data.importance, metrics),
         alpha: vis.edgeTransparentAlpha,
         zIndex: (allWeightsEqual ? data.importance : data.weight) - vis.zLayerMargin,
-        hidden: false,
+        hidden: metrics.numEdges > vis.edgesMaxDrawnLimit,
       };
   }
 }
