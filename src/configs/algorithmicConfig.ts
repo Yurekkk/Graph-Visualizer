@@ -13,6 +13,7 @@ export const louvainResolution = 1.0;
 export const circularSpacing = 2.0;
 export const radialRingSpacing = 100;
 export const hierarchicalSpacing = 0.2;
+export const spectralSpacing = 10.0;
 export const radialSortByDegreeOnRing = false;
 export const forceAtlasIterations = 50;
 
