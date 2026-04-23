@@ -1,5 +1,5 @@
 import * as vis from './configs/visualConfig.ts';
-import type graphMetrics from './graphMetricsInterface.ts';
+import type graphMetrics from './metric-module/graphMetricsInterface.ts';
 import { interpolateTurbo, interpolateSinebow } from 'd3-scale-chromatic';
 // import { converter, type Color } from 'culori';
 

@@ -13,13 +13,18 @@ export const louvainResolution = 1.0;
 export const circularSpacing = 2.0;
 export const radialRingSpacing = 100;
 export const hierarchicalSpacing = 0.2;
-export const spectralSpacing = 100.0;
 export const radialSortByDegreeOnRing = false;
 export const forceAtlasIterations = 50;
 
 export const metaLayoutResolutionDecreaseStep = 0.2;
 // На каждом шаге рекурсии разрешение Louvain уменьшается (начиная с louvainResolution), 
 // чтобы алгоритм не зацикливался на слишком маленьких сообществах
+
+export const spectralSpacing = 1000.0;
+export const spectralMaxIterations = 20;    // макс. итераций степенного метода
+export const spectralCgMaxIterations = 50;  // макс. итераций CG на одном шаге
+export const spectralDenseThreshold = 200;  // размер компоненты, до которого используем плотный метод
+export const spectralCgTolerance = 1e-6;
 
 
 

@@ -1,19 +1,15 @@
 import Graph from 'graphology';
-import forceAtlas2 from 'graphology-layout-forceatlas2';
-import { circular } from 'graphology-layout';
-import radialLayout from './radialLayout';
+import radialLayout from './layoutRadial.ts';
 import noverlap from 'graphology-layout-noverlap';
-import type graphMetrics from './graphMetricsInterface';
-import { subgraph } from 'graphology-operators';
-import interpolatePositions from './interpolatePositions';
-import stratifiedSampling from './stratifiedSampling';
-import * as vis from './configs/visualConfig.ts';
-import * as alg from './configs/algorithmicConfig.ts';
-import dagre from 'dagre';
-import { calculateGraphMetrics, findCommunities } from './calculateGraphMetrics.ts';
+import type graphMetrics from '../metric-module/graphMetricsInterface.ts';
+import * as alg from '../configs/algorithmicConfig.ts';
+import { calculateGraphMetrics, findCommunities } from '../metric-module/calculateGraphMetrics.ts';
 import { buildCommunityGraph, buildMetaGraph, getGraphCenterRadius, 
-  setRandomCoords } from './utilsAlgorithmic.ts';
+  setRandomCoords } from '../utilsAlgorithmic.ts';
 import layoutSpectral from './layoutSpectral.ts';
+import circularLayout from './layoutCircular.ts';
+import { forceAtlas2Layout, forceAtlas2SamplingLayout } from './layoutsForce.ts';
+import hierarchicalLayout from './layoutHierarchical.ts';
 
 
 
@@ -170,80 +166,4 @@ function metaLayout(graph: Graph, _recursion_level: number) {
       graph.setNodeAttribute(node, 'y', metaY + localY);
     });
   });
-}
-
-
-
-function circularLayout(graph: Graph) {
-  circular.assign(graph);
-  const meanSize = (vis.nodeMaxSize + vis.nodeMinSize) / 2;
-  const r = meanSize * graph.order / 6.28 * alg.circularSpacing;
-  graph.forEachNode((_node, attrs) => {
-    attrs.x *= r;
-    attrs.y *= r;
-  })
-}
-
-
-
-function hierarchicalLayout(graph: Graph) {
-  const dagreGraph = new dagre.graphlib.Graph();
-  dagreGraph.setGraph({ rankdir: 'TB', nodesep: 50, ranksep: 60 });
-
-  graph.forEachNode(n => dagreGraph.setNode(String(n), { width: 50, height: 30 }));
-  graph.forEachEdge((id, _attrs, source, target) => {
-    if (source !== target && dagreGraph.hasNode(String(source)) && dagreGraph.hasNode(String(target))) {
-      dagreGraph.setEdge(String(source), String(target), { id });
-    }
-  });
-
-  dagre.layout(dagreGraph);
-
-  dagreGraph.nodes().forEach(node => {
-    const pos = dagreGraph.node(node);
-    graph.setNodeAttribute(node, 'x', pos.x * alg.hierarchicalSpacing);
-    graph.setNodeAttribute(node, 'y', pos.y * alg.hierarchicalSpacing);
-  });
-}
-
-
-
-function forceAtlas2Layout(graph: Graph) {
-  setRandomCoords(graph);
-  // Прямая раскладка
-  const sensibleSettings = forceAtlas2.inferSettings(graph);
-  forceAtlas2.assign(graph, {
-    iterations: alg.forceAtlasIterations,
-    settings: {
-      ...sensibleSettings,
-      barnesHutOptimize: true
-    }
-  });
-}
-
-
-
-function forceAtlas2SamplingLayout(graph: Graph) {
-  // Сэмплируем, раскладываем подграф, интерполируем остальное
-
-  const sampledNodes = stratifiedSampling(graph, {
-    sampleSize: alg.samplingMinNumNodes, 
-    method: "proportional", 
-    prioritizeImportantNodes: true
-  });
-
-  const sub = subgraph(graph, (node) => sampledNodes.includes(node));
-  setRandomCoords(sub);
-
-  const sensibleSettings = forceAtlas2.inferSettings(sub);
-  forceAtlas2.assign(sub, {
-    iterations: alg.forceAtlasIterations,
-    settings: {
-      ...sensibleSettings,
-      barnesHutOptimize: true,
-    }
-  });
-
-  setRandomCoords(sub, true);
-  interpolatePositions(graph, sub);
 }

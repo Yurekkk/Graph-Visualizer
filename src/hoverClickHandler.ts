@@ -1,6 +1,6 @@
 import type Graph from 'graphology';
 import * as vis from './configs/visualConfig';
-import type graphMetrics from './graphMetricsInterface';
+import type graphMetrics from './metric-module/graphMetricsInterface';
 import { blendWithBackground, edgeColor, edgeColorInterpolate, edgeSize, edgeSizeInterpolate, nodeColor, nodeSize } from './utilsVisual';
 import type Sigma from 'sigma';
 import findCloseImportantNeighbours from './findCloseImportantNeigbors';

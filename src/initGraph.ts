@@ -1,10 +1,10 @@
 import Sigma from 'sigma';
 import Graph from 'graphology';
-import { calculateEdgeMetrics, calculateGraphMetrics, calculateNodeMetrics, findCommunities } from './calculateGraphMetrics.ts';
+import { calculateEdgeMetrics, calculateGraphMetrics, calculateNodeMetrics, findCommunities } from './metric-module/calculateGraphMetrics.ts';
 import { createNodeBorderProgram } from "@sigma/node-border";
 import EdgeCurveProgram from '@sigma/edge-curve';
 import parseGraphFile from './graphParser.ts';
-import smartLayout from './layoutEngine.ts';
+import smartLayout from './layout-module/layoutEngine.ts';
 import * as vis from './configs/visualConfig.ts';
 import { fitViewportToNodes } from '@sigma/utils';
 import { clearHighlightState, deselectNode, edgeReducer, hoverNode, 

@@ -2,13 +2,14 @@ import Graph from 'graphology';
 // import labelPropagation from "./labelPropagation";
 import calculateModularity from 'graphology-metrics/graph/modularity';
 import louvain from 'graphology-communities-louvain';
-import type graphMetrics from './graphMetricsInterface';
-import * as alg from './configs/algorithmicConfig.ts';
+import type graphMetrics from './graphMetricsInterface.ts';
+import * as alg from '../configs/algorithmicConfig.ts';
 import seedrandom from 'seedrandom';
 // import betweennessCentrality from 'graphology-metrics/centrality/betweenness';
 import coreNumber from 'graphology-cores';
 // import pagerank from 'graphology-metrics/centrality/pagerank';
 import { connectedComponents } from 'graphology-components';
+// import computeSpectralGap from './spectralGap.ts';
 
 
 
@@ -24,6 +25,7 @@ import { connectedComponents } from 'graphology-components';
 
 export function calculateGraphMetrics(graph: Graph): graphMetrics {
   // const start = performance.now();
+  
   const {
     numNodes,
     numEdges,
@@ -36,6 +38,8 @@ export function calculateGraphMetrics(graph: Graph): graphMetrics {
     hubDominance
   } = findSimpleMetrics(graph);
   const degreeGini = findDegreeGini(graph);
+  // const spectralGap = computeSpectralGap(graph); // долго
+
   // const end = performance.now();
   // console.log(`Время вычисления простых метрик: ${(end - start).toFixed(3)} мс`)
 
