@@ -1,7 +1,7 @@
 import Graph from 'graphology';
 import { connectedComponents } from 'graphology-components';
-import * as alg from './configs/algorithmicConfig';
-import { findEigenvector, laplacianMultiply } from './utilsAlgorithmic';
+import * as alg from '../configs/algorithmicConfig';
+import { findEigenvector, laplacianMultiply } from '../utilsAlgorithmic';
 import { EigenvalueDecomposition, Matrix } from 'ml-matrix';
 
 /**

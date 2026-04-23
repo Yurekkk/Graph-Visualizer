@@ -1,5 +1,5 @@
 import Graph from 'graphology';
-import * as alg from './configs/algorithmicConfig.ts';
+import * as alg from '../configs/algorithmicConfig.ts';
 // import noverlap from 'graphology-layout-noverlap';
 
 // TODO?: сделать нормальную сортировку

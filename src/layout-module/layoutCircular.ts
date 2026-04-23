@@ -1,7 +1,7 @@
 import type Graph from "graphology";
 import { circular } from "graphology-layout";
-import * as vis from './configs/visualConfig.ts';
-import * as alg from './configs/algorithmicConfig.ts';
+import * as vis from '../configs/visualConfig.ts';
+import * as alg from '../configs/algorithmicConfig.ts';
 
 export default function circularLayout(graph: Graph) {
   circular.assign(graph);

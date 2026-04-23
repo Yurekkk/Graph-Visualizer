@@ -1,10 +1,10 @@
 import { subgraph } from 'graphology-operators';
-import interpolatePositions from './interpolatePositions';
-import stratifiedSampling from './stratifiedSampling';
+import interpolatePositions from '../interpolatePositions';
+import stratifiedSampling from '../stratifiedSampling';
 import forceAtlas2 from 'graphology-layout-forceatlas2';
-import { setRandomCoords } from './utilsAlgorithmic';
+import { setRandomCoords } from '../utilsAlgorithmic';
 import type Graph from 'graphology';
-import * as alg from './configs/algorithmicConfig.ts';
+import * as alg from '../configs/algorithmicConfig.ts';
 
 
 

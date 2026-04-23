@@ -57,7 +57,7 @@ export function blendWithBackground(
 export function nodeColor(community: number, metrics: graphMetrics): string {
   // Окрашиваем узлы в зависимости от номера их сообщества
 
-  const N = metrics.numCommunities;
+  const N = metrics.numCommunities!;
 
   // Ремап для того, чтобы близкие сообщества получили разные цвета
   // Находим step, взаимно простой с N (всегда найдётся за 0-2 итерации)

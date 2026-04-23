@@ -1,6 +1,6 @@
 import dagre from 'dagre';
 import type Graph from 'graphology';
-import * as alg from './configs/algorithmicConfig.ts';
+import * as alg from '../configs/algorithmicConfig.ts';
 
 
 
