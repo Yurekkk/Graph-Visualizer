@@ -21,6 +21,7 @@ function initSelectors() {
     'radial', 
     'random',
     'hierarchical', 
+    'spectral',
     'forceAtlas2', 
     'forceAtlas2wSampling'
   ];

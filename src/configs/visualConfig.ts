@@ -20,7 +20,7 @@ export const edgeDefaultSize = 3;
 export const edgeMinTurboT = 0.025; // Минимальный параметр для interpolateTurbo
 // Темно-фиолетовый цвет в начале палитры выглядит уродливо, поэтому так ^
 export const edgeTransparentAlpha = 0.05;
-export const edgeDefaultAlpha = 0.1;
+export const edgeDefaultAlpha = 0.2;
 export const edgeHoverAlpha = 1.0;
 export const edgeClickAlpha = 1.0;
 export const edgeHoverColor = '#ffffff';

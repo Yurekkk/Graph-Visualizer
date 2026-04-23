@@ -14,7 +14,7 @@ export interface SpectralLayoutOptions {
 export default function layoutSpectral(graph: Graph, options: SpectralLayoutOptions = {}): void {
   const { attrX = 'x', attrY = 'y', scale = 10, maxNodesPerComponent = 600 } = options;
 
-  // 1. Компоненты связности (возвращает string[][])
+  // Компоненты связности (возвращает string[][])
   const components = connectedComponents(graph);
   let offsetX = 0;
 
@@ -39,11 +39,11 @@ export default function layoutSpectral(graph: Graph, options: SpectralLayoutOpti
       continue;
     }
 
-    // 2. Маппинг ID → 0..n-1
+    // Маппинг ID → 0..n-1
     const idToIdx = new Map<string, number>();
     comp.forEach((id, i) => idToIdx.set(id, i));
 
-    // 3. Лапласиан L = D - A
+    // Лапласиан L = D - A
     const L = Matrix.zeros(n, n);
     for (const node of comp) {
       const i = idToIdx.get(node)!;
@@ -57,7 +57,7 @@ export default function layoutSpectral(graph: Graph, options: SpectralLayoutOpti
       }
     }
 
-    // 4. Собственное разложение
+    // Собственное разложение
     let eig: EigenvalueDecomposition;
     try {
       eig = new EigenvalueDecomposition(L, { assumeSymmetric: true });
@@ -66,17 +66,17 @@ export default function layoutSpectral(graph: Graph, options: SpectralLayoutOpti
       continue;
     }
 
-    // 5. Сортировка по возрастанию собственных значений
+    // Сортировка по возрастанию собственных значений
     const eigenvalues = eig.realEigenvalues;
     const eigMatrix = eig.eigenvectorMatrix;
     const sortedIndices = Array.from({ length: n }, (_, i) => i)
       .sort((a, b) => eigenvalues[a] - eigenvalues[b]);
 
-    // 6. Извлечение 2-го и 3-го векторов
+    // Извлечение 2-го и 3-го векторов
     const v2 = eigMatrix.getColumnVector(sortedIndices[1]).to1DArray();
     const v3 = eigMatrix.getColumnVector(sortedIndices[2] ?? sortedIndices[1]).to1DArray();
 
-    // 7. Нормализация в [-0.5, 0.5] × scale
+    // Нормализация в [-0.5, 0.5] × scale
     const minX = Math.min(...v2), maxX = Math.max(...v2);
     const minY = Math.min(...v3), maxY = Math.max(...v3);
     const rangeX = maxX - minX || 1;

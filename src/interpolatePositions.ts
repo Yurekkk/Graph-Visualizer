@@ -8,7 +8,7 @@ export default function interpolatePositions(
   laidOutSubgraph: Graph
 ): void {
 
-  const spacing = Math.sqrt(fullGraph.order) * (vis.nodeMaxSize + vis.nodeMinSize) * 2;
+  const spacing = Math.sqrt(fullGraph.order) * (vis.nodeMaxSize + vis.nodeMinSize) / 2;
   const rng = seedrandom(alg.seed);
 
   fullGraph.forEachNode((node) => {
@@ -20,7 +20,7 @@ export default function interpolatePositions(
     }
 
     // Находим соседей, у которых есть позиции
-    let sumX = 0, sumY = 0, totalWeight = 0;
+    let sumX = 0, sumY = 0, totalWeight = 0, count = 0;
     try {
       fullGraph.forEachNeighbor(node, (neighbor) => {
         if (laidOutSubgraph.hasNode(neighbor)) {
@@ -34,17 +34,18 @@ export default function interpolatePositions(
           sumX += laidOutSubgraph.getNodeAttribute(neighbor, 'x') * weight;
           sumY += laidOutSubgraph.getNodeAttribute(neighbor, 'y') * weight;
           totalWeight += weight;
+          count++;
         }
       });
     }
     catch(NotFoundGraphError) {}
 
-    if (totalWeight > 0) {
+    if (totalWeight !== 0 && count > 1) {
       // Позиция = взвешенное среднее позиций соседей
       fullGraph.setNodeAttribute(node, 'x', sumX / totalWeight);
       fullGraph.setNodeAttribute(node, 'y', sumY / totalWeight);
     } else {
-      // Изолированный узел - случайная позиция
+      // Изолированный узел или узел со всего одним соседом - случайная позиция
       fullGraph.setNodeAttribute(node, 'x', (rng() - 0.5) * spacing);
       fullGraph.setNodeAttribute(node, 'y', (rng() - 0.5) * spacing);
     }

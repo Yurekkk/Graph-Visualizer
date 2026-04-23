@@ -13,6 +13,7 @@ import dagre from 'dagre';
 import { calculateGraphMetrics, findCommunities } from './calculateGraphMetrics.ts';
 import { buildCommunityGraph, buildMetaGraph, getGraphCenterRadius, 
   setRandomCoords } from './utilsAlgorithmic.ts';
+import layoutSpectral from './layoutSpectral.ts';
 
 
 
@@ -59,6 +60,10 @@ export default function smartLayout(
     case 'hierarchical':
       logAlgoChoice(algorithm, _recursion_level, _meta_or_comm_prefix);
       hierarchicalLayout(graph);
+      return;
+    case 'spectral':
+      logAlgoChoice(algorithm, _recursion_level, _meta_or_comm_prefix);
+      layoutSpectral(graph);
       return;
     case 'forceAtlas2':
       logAlgoChoice(algorithm, _recursion_level, _meta_or_comm_prefix);
