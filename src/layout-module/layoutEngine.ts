@@ -1,15 +1,16 @@
 import Graph from 'graphology';
 import radialLayout from './layoutRadial.ts';
 import noverlap from 'graphology-layout-noverlap';
-import type graphMetrics from '../metric-module/graphMetricsInterface.ts';
+import type graphMetrics from '../metrics-module/graphMetricsInterface.ts';
 import * as alg from '../configs/algorithmicConfig.ts';
-import { calculateGraphMetrics, findCommunities } from '../metric-module/calculateGraphMetrics.ts';
+import { calculateGraphMetrics } from '../metrics-module/calculateGraphMetrics.ts';
 import { buildCommunityGraph, buildMetaGraph, getGraphCenterRadius, 
-  setRandomCoords } from '../utilsAlgorithmic.ts';
+  setRandomCoords } from '../misc/utilsAlgorithmic.ts';
 import layoutSpectral from './layoutSpectral.ts';
 import circularLayout from './layoutCircular.ts';
 import { forceAtlas2Layout, forceAtlas2SamplingLayout } from './layoutsForce.ts';
 import hierarchicalLayout from './layoutHierarchical.ts';
+import { findCommunities } from '../metrics-module/communitiesFinding.ts';
 
 
 

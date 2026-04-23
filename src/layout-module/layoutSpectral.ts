@@ -3,7 +3,7 @@ import { connectedComponents } from 'graphology-components';
 import * as alg from '../configs/algorithmicConfig.ts';
 import circularLayout from './layoutCircular.ts';
 import subgraph from 'graphology-operators/subgraph';
-import { denseSpectral, findEigenvector } from '../utilsAlgorithmic.ts';
+import { denseSpectral, findEigenvector } from '../misc/utilsAlgorithmic.ts';
 
 
 

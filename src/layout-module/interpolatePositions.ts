@@ -1,7 +1,7 @@
 import Graph from 'graphology';
-import * as alg from './configs/algorithmicConfig.ts';
+import * as alg from '../configs/algorithmicConfig.ts';
 import seedrandom from 'seedrandom';
-import * as vis from './configs/visualConfig.ts';
+import * as vis from '../configs/visualConfig.ts';
 
 export default function interpolatePositions(
   fullGraph: Graph,

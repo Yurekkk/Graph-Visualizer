@@ -1,6 +1,6 @@
 import Graph from 'graphology';
 import { parse as parseGEXFGraphology } from "graphology-gexf/browser";
-import { timestamp_threshold } from './configs/algorithmicConfig';
+import { timestamp_threshold } from '../configs/algorithmicConfig';
 
 
 

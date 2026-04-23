@@ -1,6 +1,6 @@
 import Graph from "graphology";
-import * as alg from './configs/algorithmicConfig.ts';
-import type graphMetrics from './metric-module/graphMetricsInterface.ts';
+import * as alg from '../configs/algorithmicConfig.ts';
+import type graphMetrics from '../metrics-module/graphMetricsInterface.ts';
 import { MinPriorityQueue } from '@datastructures-js/priority-queue';
 
 

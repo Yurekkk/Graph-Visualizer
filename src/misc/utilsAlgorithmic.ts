@@ -2,8 +2,8 @@ import Graph from 'graphology';
 import { toUndirected } from 'graphology-operators';
 import seedrandom from 'seedrandom';
 import { subgraph } from 'graphology-operators';
-import * as alg from './configs/algorithmicConfig.ts';
-import * as vis from './configs/visualConfig.ts';
+import * as alg from '../configs/algorithmicConfig.ts';
+import * as vis from '../configs/visualConfig.ts';
 import { EigenvalueDecomposition, Matrix } from 'ml-matrix';
 
 
