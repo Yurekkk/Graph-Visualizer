@@ -17,7 +17,7 @@ export const nodeDefaultAlpha = 1.0;
 export const edgeMinSize = 2;  // При минимальном весе ребра
 export const edgeMaxSize = 4;  // При максимальном весе ребра
 export const edgeDefaultSize = 3;
-export const edgeMinTurboT = 0.025; // Минимальный параметр для interpolateTurbo
+export const edgeMinTurboT = 0.05; // Минимальный параметр для interpolateTurbo
 // Темно-фиолетовый цвет в начале палитры выглядит уродливо, поэтому так ^
 export const edgeTransparentAlpha = 0.05;
 export const edgeDefaultAlpha = 0.2;

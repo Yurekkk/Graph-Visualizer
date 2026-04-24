@@ -1,11 +1,15 @@
 // ### Metrics ###
 // Importance calculations
-export const degreeWeight = 0.5;
-export const kCoreWeight = 0.5;
+export const degreeWeight = 0.1;
+export const kCoreWeight = 0.1;
+export const eigenvectorCentralityWeight = 0.8;
 
 // higher values (>1) produce more, smaller clusters, 
 // while lower values (<1) produce fewer, larger clusters
 export const louvainResolution = 1.0;
+
+export const eigCentralityMaxIterations = 100;
+export const eigCentralityTolerance = 1e-6;
 
 
 
@@ -46,12 +50,8 @@ export const samplingMinNumNodes = 200;
 
 // ### Node Focus ###
 export const maxHighlightedNeighborsNum = 20;
-export const maxAccumulatedCost = 4;
-export const minWeightCost = 3;   // Стоимость прохода по ребру с минимальным весом, > 0
-export const maxWeightCost = 0.1; // Стоимость прохода по ребру с максимальным весом, > 0
-// В случае, если maxWeight = minWeight, цена за вес ребра всегда = minWeightCost / 3
-export const nodeImportanceInfluence = 0.5; // Влияние важности степени на функцию цены
-// Больше значение => поиск больше тяготеет к хабам и подобному
+export const maxAccumulatedCost = 5;
+export const importanceInfluence = 3;
 
 
 

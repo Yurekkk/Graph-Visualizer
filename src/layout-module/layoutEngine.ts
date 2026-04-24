@@ -3,7 +3,7 @@ import radialLayout from './layoutRadial.ts';
 import noverlap from 'graphology-layout-noverlap';
 import type graphMetrics from '../metrics-module/graphMetricsInterface.ts';
 import * as alg from '../configs/algorithmicConfig.ts';
-import { calculateGraphMetrics } from '../metrics-module/calculateGraphMetrics.ts';
+import { calculateGraphMetrics } from '../metrics-module/metricsCalculations.ts';
 import { buildCommunityGraph, buildMetaGraph, getGraphCenterRadius, 
   setRandomCoords } from '../misc/utilsAlgorithmic.ts';
 import layoutSpectral from './layoutSpectral.ts';

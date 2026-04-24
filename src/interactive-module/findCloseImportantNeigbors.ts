@@ -13,9 +13,23 @@ export default function findCloseImportantNeighbours(
     
   // Расстояние от выбранного узла до всех достижимых
   const dist = new Map<string, number>([[selectedNodeId, 0]]);
-  // Очередь для Дейкстры: [узел, накопленная стоимость, ребро по которому пришли]
-  const queue = new MinPriorityQueue<{ node: string; cost: number, edge: string }>(x => x.cost);
-  queue.enqueue({ node: selectedNodeId, cost: 0, edge: '' });
+  // Очередь для Дейкстры: [узел, важность узла, накопленная стоимость, ребро по которому пришли]
+  const queue = new MinPriorityQueue<{ 
+    node: string; 
+    importance: number; 
+    cost: number; 
+    edge: string 
+  }>(
+    // Даем приоритет направлениям с наименьшей накопленной стоимостью и наибольшей важностью
+    // Важность ценим выше
+    x => x.cost - alg.importanceInfluence * x.importance
+  );
+  queue.enqueue({ 
+    node: selectedNodeId, 
+    importance: graph.getNodeAttribute(selectedNodeId, "importance"), 
+    cost: 0, 
+    edge: '' 
+  });
 
   // Найденные важные соседи и их важности
   const resultNodes = new Map<string, number>(); 
@@ -45,7 +59,12 @@ export default function findCloseImportantNeighbours(
 
       if (!dist.has(neighbor) || newCost < dist.get(neighbor)!) {
         dist.set(neighbor, newCost);
-        queue.push({ node: neighbor, cost: newCost, edge: newEdge });
+        queue.push({ 
+          node: neighbor, 
+          importance: neighborImportance, 
+          cost: newCost, 
+          edge: newEdge 
+        });
       }
     });
 
@@ -61,28 +80,15 @@ export default function findCloseImportantNeighbours(
 
 
 function buildCostFunction(metrics: graphMetrics) {
-  const weightsAreDifferent = (metrics.maxEdgeWeight != metrics.minEdgeWeight);
+  const weightsAreSame = (metrics.maxEdgeWeight == metrics.minEdgeWeight);
 
   // Функция учитывает вес ребра и важность узла, в который идет ребро
+  // cost = (1.5 - weightNorm) * (1.5 - importance)
+  // каждый множитель в [0.5, 1.5]
 
-  // Для веса ребра:
-  // По сути отрицательная экспонента e^(-w), но чтобы она проходила через
-  // точки (minEdgeWeight, minWeightCost) и (maxEdgeWeight, maxWeightCost)
-  let growth: number, amplitude: number;
-  if (weightsAreDifferent) {
-    growth = Math.log(alg.maxWeightCost / alg.minWeightCost) / 
-      (metrics.maxEdgeWeight - metrics.minEdgeWeight);
-    amplitude = alg.minWeightCost / Math.exp(growth * metrics.minEdgeWeight);
-  }
-
-  return (neighborImportance: number, w: number) => {
-    const importanceFactor = neighborImportance * alg.nodeImportanceInfluence;
-
-    let weightFactor;
-    if (weightsAreDifferent)
-      weightFactor = amplitude * Math.exp(growth * w);
-    else weightFactor = alg.minWeightCost / 3;
-    
-    return weightFactor + importanceFactor;
+  return (importance: number, w: number) => {
+    const weightFactor = weightsAreSame ? 1 : 
+      1.5 - (w - metrics.minEdgeWeight) / (metrics.maxEdgeWeight - metrics.minEdgeWeight);
+    return weightFactor * (1.5 - importance);
   }
 }

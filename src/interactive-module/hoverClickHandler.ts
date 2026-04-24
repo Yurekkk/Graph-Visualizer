@@ -205,6 +205,13 @@ export function selectNode(nodeId: string, graph: Graph, renderer: Sigma, metric
     return;
   }
   selectedNodeId = nodeId;
+
+  console.log(`- Выбран узел ${nodeId}.`);
+  const nodeMetrics = ["degree", "degreeCentrality", "community", 
+    "core", "eigenvectorCentrality", "importance"];
+  nodeMetrics.forEach((value) => 
+    console.log(`--- ${value}: ${graph.getNodeAttribute(nodeId, value)}`)
+  );
   
   const { importantNodes, importantEdges } = findCloseImportantNeighbours(nodeId, graph, metrics);
   setImportantCache(importantNodes, importantEdges);

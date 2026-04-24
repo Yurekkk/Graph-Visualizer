@@ -1,6 +1,6 @@
 import Sigma from 'sigma';
 import Graph from 'graphology';
-import { calculateEdgeMetrics, calculateGraphMetrics, calculateNodeMetrics } from './metrics-module/calculateGraphMetrics.ts';
+import { calculateEdgeMetrics, calculateGraphMetrics, calculateNodeMetrics } from './metrics-module/metricsCalculations.ts';
 import { createNodeBorderProgram } from "@sigma/node-border";
 import EdgeCurveProgram from '@sigma/edge-curve';
 import parseGraphFile from './misc/graphParser.ts';

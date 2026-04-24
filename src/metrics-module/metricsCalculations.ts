@@ -5,16 +5,15 @@ import coreNumber from 'graphology-cores';
 // import pagerank from 'graphology-metrics/centrality/pagerank';
 import { calculateEdgesImportance, calculateNodesImportance } from './importanceCalculations.ts';
 import { findDegreeGini, findSimpleMetrics } from './simpleMetricsCalculation.ts';
+import eigenvectorCentralityApprox from './eigenvectorCentralityApprox.ts';
 // import computeSpectralGap from './spectralGap.ts';
 
 
 
-// TODO: Все таки считать betweeness centrality, если граф маленький
+// TODO?: Все таки считать betweeness centrality, если граф маленький
+// TODO?: Все это пока не учитывает, что граф может быть ориентированным, может потом добавлю
 
-// TODO?: Все это пока не учитывает, что граф может быть ориентированным
-// Может потом добавлю
-
-// Также для каждого узла считает degree, degreeCentrality, community и core
+// Для каждого узла считает degree, degreeCentrality, community, core и eigenvectorCentrality
 
 
 
@@ -67,7 +66,11 @@ export function calculateNodeMetrics(graph: Graph) {
   //*/
 
   coreNumber.coreNumber.assign(graph); // k-core // оно горит красным, но все правильно
-  // pagerank.assign(graph);
+
+  // pagerank.assign(graph, {weighted: true});
+
+  eigenvectorCentralityApprox(graph);
+
   // graph.forEachNode(node => {
   //   const cc = localClusteringCoefficient(graph, node);
   //   graph.setNodeAttribute(node, 'clusteringCoef', cc);
