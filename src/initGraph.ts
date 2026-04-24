@@ -27,7 +27,7 @@ let graph: Graph | null = null;
 
 async function setStatus(text: string) {
   statusSpan.textContent = text;
-  await new Promise(r => setTimeout(r, 1)); // отдаём поток на repaint
+  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 }
 
 
