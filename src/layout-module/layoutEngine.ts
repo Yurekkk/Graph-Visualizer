@@ -27,6 +27,19 @@ ForceAtlas с сэмплированием всегда тянет узлы бл
 
 
 
+const LAYOUT_FUNCTIONS: Record<string, (graph: Graph, _recursion_level?: number) => void> = {
+  "meta": (g, l) => metaLayout(g, l!),
+  "circular": circularLayout,
+  "radial": radialLayout,
+  "random": (g, _l) => setRandomCoords(g),
+  "hierarchical": hierarchicalLayout,
+  "spectral": layoutSpectral,
+  "forceAtlas2": forceAtlas2Layout,
+  "forceAtlas2wSampling": forceAtlas2SamplingLayout,
+};
+
+
+
 export default function smartLayout(
   graph: Graph, 
   metrics: graphMetrics,
@@ -35,73 +48,42 @@ export default function smartLayout(
   _meta_or_comm_prefix = '' // чисто для отладки
 ) {
 
-  switch (algorithm) {
-    case 'auto':
-      break;
-    case 'meta':
-      logAlgoChoice(algorithm, _recursion_level, _meta_or_comm_prefix);
-      metaLayout(graph, _recursion_level);
-      return;
-    case 'circular':
-      logAlgoChoice(algorithm, _recursion_level, _meta_or_comm_prefix);
-      circularLayout(graph);
-      return;
-    case 'radial':
-      logAlgoChoice(algorithm, _recursion_level, _meta_or_comm_prefix);
-      radialLayout(graph);
-      return;
-    case 'random':
-      logAlgoChoice(algorithm, _recursion_level, _meta_or_comm_prefix);
-      setRandomCoords(graph);
-      return;
-    case 'hierarchical':
-      logAlgoChoice(algorithm, _recursion_level, _meta_or_comm_prefix);
-      hierarchicalLayout(graph);
-      return;
-    case 'spectral':
-      logAlgoChoice(algorithm, _recursion_level, _meta_or_comm_prefix);
-      layoutSpectral(graph);
-      return;
-    case 'forceAtlas2':
-      logAlgoChoice(algorithm, _recursion_level, _meta_or_comm_prefix);
-      forceAtlas2Layout(graph); 
-      return;
-    case 'forceAtlas2wSampling':
-      logAlgoChoice(algorithm, _recursion_level, _meta_or_comm_prefix);
-      forceAtlas2SamplingLayout(graph);
-      return;
-    default: 
-      throw new Error("Unknown algorithm.");
+  if (algorithm !== 'auto') {
+    applyLayout(algorithm, graph, _recursion_level, _meta_or_comm_prefix);
   }
-  
-  if (metrics.numNodes > alg.metaLayoutMinNodes &&
+  else if (metrics.numNodes > alg.metaLayoutMinNodes &&
       (metrics.modularity ?? -1) > alg.metaLayoutMinModularity &&
       _recursion_level < alg.metaLayoutRecursionLevelCap && 
       (metrics.numCommunities ?? 0) > 1) {
-    logAlgoChoice('meta', _recursion_level, _meta_or_comm_prefix);
-    metaLayout(graph, _recursion_level);
+    applyLayout('meta', graph, _recursion_level, _meta_or_comm_prefix);
   }
   else if (metrics.density >= alg.circularMinDensity && 
     metrics.numNodes <= alg.circularMaxNumNodes) {
-    logAlgoChoice('circular', _recursion_level, _meta_or_comm_prefix);
-    circularLayout(graph);
+    applyLayout('circular', graph, _recursion_level, _meta_or_comm_prefix);
   }
   else if (metrics.degreeGini >= alg.radialMinDegreeGini ||
            metrics.hubDominance >= alg.radialMinHubDominance) {
-    logAlgoChoice('radial', _recursion_level, _meta_or_comm_prefix);
-    radialLayout(graph);
+    applyLayout('radial', graph, _recursion_level, _meta_or_comm_prefix);
   }
-  // else if (metrics.numNodes > alg.samplingMinNumNodes) {
-  //   logAlgoChoice('forceAtlas2Sampling', _recursion_level, _meta_or_comm_prefix);
-  //   forceAtlas2SamplingLayout(graph);
-  // } 
+  else if (metrics.numNodes > alg.samplingMinNumNodes) {
+    applyLayout('forceAtlas2Sampling', graph, _recursion_level, _meta_or_comm_prefix);
+  } 
   else {
-    logAlgoChoice('forceAtlas2', _recursion_level, _meta_or_comm_prefix);
-    forceAtlas2Layout(graph);
+    applyLayout('forceAtlas2', graph, _recursion_level, _meta_or_comm_prefix);
   }
 
   // Убираем наложения узлов // Долго
   // noverlap.assign(graph);
+}
+
+
+
+function applyLayout(algo: string, graph: Graph, 
+  _recursion_level: number, _meta_or_comm_prefix: string) {
+  const layout = LAYOUT_FUNCTIONS[algo];
+  if (!layout) throw new Error(`Unknown algorithm: ${algo}`);
+  logAlgoChoice(algo, _recursion_level, _meta_or_comm_prefix);
+  layout(graph, _recursion_level);
 }
 
 
