@@ -61,13 +61,13 @@ export default function smartLayout(
     metrics.numNodes <= alg.circularMaxNumNodes) {
     applyLayout('circular', graph, _recursion_level, _meta_or_comm_prefix);
   }
-  else if (metrics.degreeGini >= alg.radialMinDegreeGini ||
-           metrics.hubDominance >= alg.radialMinHubDominance) {
-    applyLayout('radial', graph, _recursion_level, _meta_or_comm_prefix);
-  }
-  else if (metrics.numNodes > alg.samplingMinNumNodes) {
-    applyLayout('forceAtlas2Sampling', graph, _recursion_level, _meta_or_comm_prefix);
-  } 
+  // else if (metrics.degreeGini >= alg.radialMinDegreeGini ||
+  //          metrics.hubDominance >= alg.radialMinHubDominance) {
+  //   applyLayout('radial', graph, _recursion_level, _meta_or_comm_prefix);
+  // }
+  // else if (metrics.numNodes > alg.samplingMinNumNodes) {
+  //   applyLayout('forceAtlas2wSampling', graph, _recursion_level, _meta_or_comm_prefix);
+  // } 
   else {
     applyLayout('forceAtlas2', graph, _recursion_level, _meta_or_comm_prefix);
   }

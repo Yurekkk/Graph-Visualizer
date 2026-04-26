@@ -1,5 +1,5 @@
 // ### Общая отрисовка  ###
-export const edgesMaxDrawnLimit = 1000;
+export const edgesMaxDrawnLimit = 10000;
 
 
 
