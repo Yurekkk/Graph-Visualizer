@@ -35,7 +35,7 @@ export const spectralCgTolerance = 1e-6;
 // ### Layout Engine Decision Tree ###
 export const metaLayoutRecursionLevelCap = 5; 
 
-export const metaLayoutMinNodes = 250;   // &&
+export const metaLayoutMinNodes = 50;   // &&
 export const metaLayoutMinModularity = 0.1;
 
 export const circularMinDensity = 0.75;   // &&

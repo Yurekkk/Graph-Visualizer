@@ -10,8 +10,8 @@ import { fitViewportToNodes } from '@sigma/utils';
 import { clearHighlightState, deselectNode, edgeReducer, hoverNode, 
   nodeReducer, selectNode, unhoverNode } from './interactive-module/hoverClickHandler.ts';
 import { findCommunities } from './metrics-module/communitiesFinding.ts';
-import hideUnimportantNodes from './misc/hideUnimportantNodes.ts';
-import hideUnimportantEdges from './misc/hideUnimportantEdges.ts';
+// import hideUnimportantNodes from './misc/hideUnimportantNodes.ts';
+// import hideUnimportantEdges from './misc/hideUnimportantEdges.ts';
 
 
 
