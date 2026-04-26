@@ -10,6 +10,8 @@ import { fitViewportToNodes } from '@sigma/utils';
 import { clearHighlightState, deselectNode, edgeReducer, hoverNode, 
   nodeReducer, selectNode, unhoverNode } from './interactive-module/hoverClickHandler.ts';
 import { findCommunities } from './metrics-module/communitiesFinding.ts';
+import hideUnimportantNodes from './misc/hideUnimportantNodes.ts';
+import hideUnimportantEdges from './misc/hideUnimportantEdges.ts';
 
 
 
@@ -107,6 +109,15 @@ export default async function initGraph(path: string, title: string, algorithm: 
   smartLayout(graph, metrics, algorithm);
   end = performance.now();
   console.log(`Время работы раскладки: ${(end - start).toFixed(3)} мс`)
+
+
+
+  // await setStatus('Убираем неважные узле и ребра...');
+  // start = performance.now();
+  // hideUnimportantNodes(graph);
+  // hideUnimportantEdges(graph, metrics);
+  // end = performance.now();
+  // console.log(`Время убирания неважных узлов и ребер: ${(end - start).toFixed(3)} мс`)
 
 
 
