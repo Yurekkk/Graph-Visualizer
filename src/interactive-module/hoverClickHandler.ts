@@ -5,6 +5,7 @@ import { blendWithBackground, edgeColor, edgeColorInterpolate, edgeSize, edgeSiz
 import type Sigma from 'sigma';
 import findCloseImportantNeighbours from '../interactive-module/findCloseImportantNeigbors';
 import { fitViewportToNodes } from '@sigma/utils';
+import { themedColors, ThemeManager } from '../misc/themeManager';
 
 
 
@@ -43,6 +44,7 @@ function getNodeLevel(node: string) {
 
 function computeNodeVisuals(node: string, data: any, metrics: any) {
   const level = getNodeLevel(node);
+  const theme = ThemeManager.getTheme();
   
   switch (level) {
     case 'selected':
@@ -51,6 +53,7 @@ function computeNodeVisuals(node: string, data: any, metrics: any) {
         label: data.hiddenLabel,
         size: vis.nodeSizeSelected ?? nodeSize(data.degree, metrics),
         borderSize: vis.borderSizeSelect,
+        borderColor: themedColors.borderColor(theme),
         alpha: vis.nodeDefaultAlpha,
         zIndex: data.degree + 2 * vis.zLayerMargin,
         color: nodeColor(data.community, metrics),
@@ -63,6 +66,7 @@ function computeNodeVisuals(node: string, data: any, metrics: any) {
         label: data.hiddenLabel,
         size: vis.nodeSizeHover ?? nodeSize(data.degree, metrics),
         borderSize: vis.borderSizeHover,
+        borderColor: themedColors.borderColor(theme),
         alpha: vis.nodeDefaultAlpha,
         zIndex: data.degree + vis.zLayerMargin,
         color: nodeColor(data.community, metrics),
@@ -75,6 +79,7 @@ function computeNodeVisuals(node: string, data: any, metrics: any) {
         label: '',
         size: nodeSize(data.degree, metrics),
         borderSize: vis.borderSizeDefault,
+        borderColor: themedColors.borderColor(theme),
         alpha: vis.nodeDefaultAlpha,
         zIndex: data.degree,
         color: nodeColor(data.community, metrics),
@@ -87,6 +92,7 @@ function computeNodeVisuals(node: string, data: any, metrics: any) {
         label: '',
         size: nodeSize(data.degree, metrics),
         borderSize: 0,
+        borderColor: themedColors.borderColor(theme),
         alpha: vis.nodeTransparentAlpha,
         zIndex: data.degree - vis.zLayerMargin,
         color: nodeColor(data.community, metrics),
@@ -121,13 +127,14 @@ function getEdgeLevel(edge: string, graph: Graph) {
 function computeEdgeVisuals(edge: string, data: any, graph: Graph, metrics: graphMetrics) {
   const level = getEdgeLevel(edge, graph);
   const allWeightsEqual = metrics.maxEdgeWeight == metrics.minEdgeWeight;
+  const theme = ThemeManager.getTheme();
   
   switch (level) {
     case 'highlightedAndImportant':
       return {
         ...data,
         size: edgeSizeInterpolate(importantEdgesCache.get(edge)!, maxEdgeImportance!, minEdgeImportance!),
-        color: vis.edgeHoverColor,
+        color: themedColors.edgeHoverColor(theme),
         alpha: vis.edgeHoverAlpha,
         zIndex: (allWeightsEqual ? data.importance : data.weight) + 2 * vis.zLayerMargin,
         hidden: false,
@@ -137,7 +144,7 @@ function computeEdgeVisuals(edge: string, data: any, graph: Graph, metrics: grap
       return {
         ...data,
         size: edgeSize(data.weight, data.importance, metrics),
-        color: vis.edgeHoverColor,
+        color: themedColors.edgeHoverColor(theme),
         alpha: vis.edgeHoverAlpha,
         zIndex: (allWeightsEqual ? data.importance : data.weight) + 2 * vis.zLayerMargin,
         hidden: false,
@@ -228,13 +235,8 @@ export function deselectNode(_graph: Graph, renderer: Sigma) {
 
 
 
-// Кэшируем цвет фона, чтобы не парсить его на каждый кадр
-let cachedBgColor: string | null = null;
 function getBackgroundColor(): string {
-  if (!cachedBgColor) {
-    cachedBgColor = getComputedStyle(document.documentElement)
-    .getPropertyValue('--bg-color')
-    .trim();
-  }
-  return cachedBgColor;
+  return getComputedStyle(document.documentElement)
+  .getPropertyValue('--bg-color')
+  .trim();;
 }

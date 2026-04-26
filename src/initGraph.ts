@@ -10,6 +10,7 @@ import { fitViewportToNodes } from '@sigma/utils';
 import { clearHighlightState, deselectNode, edgeReducer, hoverNode, 
   nodeReducer, selectNode, unhoverNode } from './interactive-module/hoverClickHandler.ts';
 import { findCommunities } from './metrics-module/communitiesFinding.ts';
+import { ThemeManager } from './misc/themeManager.ts';
 // import hideUnimportantNodes from './misc/hideUnimportantNodes.ts';
 // import hideUnimportantEdges from './misc/hideUnimportantEdges.ts';
 
@@ -87,9 +88,7 @@ export default async function initGraph(path: string, title: string, algorithm: 
   graph.forEachNode((node, attrs) => {
     graph!.mergeNodeAttributes(node, {
       label: '', // Пустой изначально
-      hiddenLabel: attrs.label, // Сохраняем настоящий
-      labelColor: vis.labelColor,
-      borderColor: vis.borderColor
+      hiddenLabel: attrs.label // Сохраняем настоящий
     });
   });
 
@@ -165,6 +164,10 @@ export default async function initGraph(path: string, title: string, algorithm: 
 
   // Клик по пустому месту для сброса фокуса
   renderer.on('clickStage', () => deselectNode(graph!, renderer!));
+
+  // Изменение темы
+  ThemeManager.onChange(() => {renderer!.refresh()});
+  ThemeManager.init();
 
   // const camera = renderer.getCamera();
   // camera.on("updated", () => {

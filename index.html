@@ -15,9 +15,18 @@
         <select id="graph-selector">
             <option value="" disabled selected>Loading list...</option>
         </select>
+
         <select id="algorithm-selector">
             <option value="" disabled selected>Loading list...</option>
         </select>
+
+        <div class="theme-toggle" role="group" aria-label="Переключение темы">
+            <input type="checkbox" id="theme-switch" class="theme-checkbox"/>
+            <label for="theme-switch" class="theme-slider">
+                <span class="theme-icon icon-dark">🌙</span>
+                <span class="theme-icon icon-light">☀️</span>
+            </label>
+        </div>
     </div>
 
     <div id="sigma-container"></div>

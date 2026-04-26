@@ -1,4 +1,5 @@
 import initGraph from './initGraph';
+import { ThemeManager, initThemeToggle } from './misc/themeManager';
 
 
 
@@ -44,17 +45,7 @@ function initSelectors() {
     option.textContent = path.replace('../graphs/', '').replace(/\.[^.]+$/, ''); 
     graphSelector!.appendChild(option);
   });
-
-  // Загружаем miserables.json по умолчанию
-  const miserablesPath = '../graphs/miserables.json';
-  graphSelector!.value = '../graphs/miserables.json';
-  initGraph(miserablesPath, 'miserables');
 }
-
-
-
-graphSelector.addEventListener('change', () => start());
-algorithmSelector.addEventListener('change', () => start());
 
 
 
@@ -74,3 +65,13 @@ async function start() {
 
 
 initSelectors();
+ThemeManager.init();
+initThemeToggle();
+
+graphSelector.addEventListener('change', () => start());
+algorithmSelector.addEventListener('change', () => start());
+
+// Загружаем miserables.json по умолчанию
+const miserablesPath = '../graphs/miserables.json';
+graphSelector!.value = '../graphs/miserables.json';
+initGraph(miserablesPath, 'miserables');

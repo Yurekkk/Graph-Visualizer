@@ -1,6 +1,6 @@
-:root {
-  --bg-color: #2d2f32;
-}
+/* FIXME: flickering при запуске */
+
+
 
 body, html {
   margin: 0;
@@ -9,12 +9,14 @@ body, html {
   height: 100%;
   overflow: hidden;
   font-family: sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 #sigma-container {
   width: 100%;
   height: 100%;
-  background-color: var(--bg-color);
 }
 
 #controls {
@@ -27,15 +29,17 @@ body, html {
 }
 
 select {
-  padding: 8px 12px;
+  color: var(--text-color);
+  background-color: var(--panel-bg);
+  border-color: var(--border-color);
+  padding: 8px;
   font-size: 14px;
-  color: #f0f0f0;
   cursor: pointer;
+  height: 33px;
   min-width: 200px;
-  border-color: #00000000;
-  background-color: #454545;
   border-radius: 10px;
   margin: 5px;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 select:open {
@@ -43,6 +47,8 @@ select:open {
 }
 
 
+
+/* === Лоадер === */
 
 #loader {
   position: absolute;
@@ -58,8 +64,8 @@ select:open {
 
 .spinner {
   width: 40px; height: 40px;
-  border: 3px solid #ffffff33;
-  border-top-color: #60a5fa;
+  border: 3px solid var(--border-color);
+  border-top-color: #3b8df2;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -68,7 +74,88 @@ select:open {
 
 #loader span {
   margin-top: 12px;
-  color: #e2e8f0;
+  color: var(--text-color);
   font-family: system-ui, -apple-system, sans-serif;
   font-size: 14px;
+}
+
+
+
+/* === Переключатель темы === */
+.theme-toggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Скрываем нативный чекбокс */
+.theme-checkbox {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Трек слайдера */
+.theme-slider {
+  position: relative;
+  width: 57px;
+  height: 33px;
+  background: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease, border-color 0.3s ease;
+  margin: auto;
+}
+
+/* Ползунок (кружок) */
+.theme-slider::after {
+  content: "";
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  margin: 4.5px;
+  background: var(--text-color);
+  border-radius: 50%;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Сдвиг ползунка при активации */
+.theme-checkbox:checked + .theme-slider::after {
+  transform: translateX(24px);
+}
+
+/* Иконки внутри слайдера */
+.theme-icon {
+  position: absolute;
+  font-size: 14px;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  line-height: 1;
+}
+
+.icon-dark {
+  top: 9.5px;
+  left: 6px;
+  opacity: 0;
+}
+
+.icon-light {
+  top: 9.5px;
+  right: 6px;
+  opacity: 1;
+}
+
+/* Меняем видимость иконок при переключении */
+.theme-checkbox:checked + .theme-slider .icon-dark {
+  opacity: 1;
+}
+
+.theme-checkbox:checked + .theme-slider .icon-light {
+  opacity: 0;
 }
