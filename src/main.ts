@@ -61,8 +61,8 @@ algorithmSelector.addEventListener('change', () => start());
 async function start() {
   loader!.style.display = 'flex'; // показываем крутилку
   
-  // Ждём 1 кадр, чтобы браузер успел отрисовать лоадер
-  await new Promise(r => setTimeout(r, 1));
+  // Ждём, чтобы браузер успел отрисовать лоадер
+  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
   
   await initGraph(graphSelector.value, 
     graphSelector.options[graphSelector.selectedIndex].text, 

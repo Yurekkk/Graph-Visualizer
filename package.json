@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host 0.0.0.0",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
@@ -24,6 +24,7 @@
     "@sigma/node-border": "^3.0.0",
     "@sigma/utils": "^3.0.0",
     "@ts-graphviz/parser": "^0.6.1",
+    "@vitejs/plugin-react": "^5.2.0",
     "chroma-js": "^3.2.0",
     "culori": "^4.0.2",
     "d3-scale-chromatic": "^3.1.0",
@@ -38,6 +39,7 @@
     "graphology-layout-noverlap": "^0.4.2",
     "graphology-metrics": "^2.4.0",
     "graphology-operators": "^1.6.1",
+    "ml-matrix": "^6.12.2",
     "seedrandom": "^3.0.5",
     "sigma": "^3.0.2",
     "ts-graphviz": "^3.0.7"

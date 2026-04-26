@@ -73,7 +73,7 @@ export default function smartLayout(
     default: 
       throw new Error("Unknown algorithm.");
   }
-
+  
   if (metrics.numNodes > alg.metaLayoutMinNodes &&
       (metrics.modularity ?? -1) > alg.metaLayoutMinModularity &&
       _recursion_level < alg.metaLayoutRecursionLevelCap && 
@@ -81,16 +81,16 @@ export default function smartLayout(
     logAlgoChoice('meta', _recursion_level, _meta_or_comm_prefix);
     metaLayout(graph, _recursion_level);
   }
-  // else if (metrics.density >= alg.circularMinDensity && 
-  //   metrics.numNodes <= alg.circularMaxNumNodes) {
-  //   logAlgoChoice('circular', _recursion_level, _meta_or_comm_prefix);
-  //   circularLayout(graph);
-  // }
-  // else if (metrics.degreeGini >= alg.radialMinDegreeGini ||
-  //          metrics.hubDominance >= alg.radialMinHubDominance) {
-  //   logAlgoChoice('radial', _recursion_level, _meta_or_comm_prefix);
-  //   radialLayout(graph);
-  // }
+  else if (metrics.density >= alg.circularMinDensity && 
+    metrics.numNodes <= alg.circularMaxNumNodes) {
+    logAlgoChoice('circular', _recursion_level, _meta_or_comm_prefix);
+    circularLayout(graph);
+  }
+  else if (metrics.degreeGini >= alg.radialMinDegreeGini ||
+           metrics.hubDominance >= alg.radialMinHubDominance) {
+    logAlgoChoice('radial', _recursion_level, _meta_or_comm_prefix);
+    radialLayout(graph);
+  }
   // else if (metrics.numNodes > alg.samplingMinNumNodes) {
   //   logAlgoChoice('forceAtlas2Sampling', _recursion_level, _meta_or_comm_prefix);
   //   forceAtlas2SamplingLayout(graph);

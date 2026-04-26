@@ -20,7 +20,7 @@ export const hierarchicalSpacing = 0.2;
 export const radialSortByDegreeOnRing = false;
 export const forceAtlasIterations = 50;
 
-export const metaLayoutResolutionDecreaseStep = 0.2;
+export const metaLayoutResolutionDecreaseStep = 0.1;
 // На каждом шаге рекурсии разрешение Louvain уменьшается (начиная с louvainResolution), 
 // чтобы алгоритм не зацикливался на слишком маленьких сообществах
 
@@ -35,11 +35,11 @@ export const spectralCgTolerance = 1e-6;
 // ### Layout Engine Decision Tree ###
 export const metaLayoutRecursionLevelCap = 5; 
 
-export const metaLayoutMinNodes = 1000;   // &&
+export const metaLayoutMinNodes = 250;   // &&
 export const metaLayoutMinModularity = 0.1;
 
-export const circularMinDensity = 0.25;   // &&
-export const circularMaxNumNodes = 50;
+export const circularMinDensity = 0.75;   // &&
+export const circularMaxNumNodes = 500;
 
 export const radialMinDegreeGini = 0.75;   // ||
 export const radialMinHubDominance = 0.75;
