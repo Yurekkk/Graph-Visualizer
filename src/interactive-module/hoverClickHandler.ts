@@ -36,8 +36,8 @@ export function clearHighlightState() {
 
 
 function getNodeLevel(node: string) {
-  if (node === selectedNodeId) return 'selected';
-  else if (node === hoveredNodeId) return 'hovered';
+  if (node === hoveredNodeId) return 'hovered';
+  else if (node === selectedNodeId) return 'selected';
   else if (selectedNodeId == null || importantNodesCache.has(node)) return 'usual';
   else return 'transparent';
 }
@@ -57,6 +57,7 @@ function computeNodeVisuals(node: string, data: any, metrics: any) {
         alpha: vis.nodeDefaultAlpha,
         zIndex: data.degree + 2 * vis.zLayerMargin,
         color: nodeColor(data.community, metrics),
+        labelColor: themedColors.labelColor(theme),
         hidden: false,
       };
       
@@ -66,10 +67,11 @@ function computeNodeVisuals(node: string, data: any, metrics: any) {
         label: data.hiddenLabel,
         size: vis.nodeSizeHover ?? nodeSize(data.degree, metrics),
         borderSize: vis.borderSizeHover,
-        borderColor: themedColors.borderColor(theme),
+        borderColor: "#ffffff",
         alpha: vis.nodeDefaultAlpha,
         zIndex: data.degree + vis.zLayerMargin,
         color: nodeColor(data.community, metrics),
+        labelColor: "#000000",
         hidden: false,
       };
       

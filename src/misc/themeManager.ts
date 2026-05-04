@@ -8,7 +8,9 @@ export const themedColors = {
   edgeHoverColor: (theme: Theme) => 
     theme === 'dark' ? vis.edgeHoverColorDarkTheme : vis.edgeHoverColorLightTheme,
   borderColor: (theme: Theme) => 
-    theme === 'dark' ? vis.borderColorDarkTheme : vis.borderColorLightTheme
+    theme === 'dark' ? vis.borderColorDarkTheme : vis.borderColorLightTheme,
+  labelColor: (theme: Theme) =>
+    theme === 'dark' ? vis.labelColorDarkTheme : vis.labelColorLightTheme
 } as const;
 
 
@@ -24,8 +26,6 @@ export class ThemeManager {
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const initial = saved || (prefersDark ? 'dark' : 'light');
 
-    console.log(initial);
-    
     this.setTheme(initial);
   }
 

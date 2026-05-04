@@ -127,6 +127,7 @@ export default async function initGraph(path: string, title: string, algorithm: 
     defaultNodeType: 'circle',
     defaultEdgeType: 'line',
     labelSize: vis.labelSize,
+    labelColor: {attribute: "labelColor"},
     zIndex: true,
     autoRescale: false,
     edgeProgramClasses: {curved: EdgeCurveProgram},
