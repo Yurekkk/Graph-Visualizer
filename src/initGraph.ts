@@ -6,6 +6,7 @@ import EdgeCurveProgram from '@sigma/edge-curve';
 import parseGraphFile from './misc/graphParser.ts';
 import smartLayout from './layout-module/layoutEngine.ts';
 import * as vis from './configs/visualConfig.ts';
+import * as alg from './configs/algorithmicConfig.ts';
 import { fitViewportToNodes } from '@sigma/utils';
 import { clearHighlightState, deselectNode, edgeReducer, hoverNode, 
   nodeReducer, selectNode, unhoverNode } from './interactive-module/hoverClickHandler.ts';
@@ -85,16 +86,16 @@ export default async function initGraph(path: string, title: string, algorithm: 
   await setStatus('Расставляем атрибуты...');
   start = performance.now();
 
-  graph.forEachNode((node, attrs) => {
+  graph.forEachNode((node, _attrs) => {
     graph!.mergeNodeAttributes(node, {
-      label: '', // Пустой изначально
-      hiddenLabel: attrs.label // Сохраняем настоящий
+      hidden: true
     });
   });
 
   graph.forEachEdge((_edge, _attrs, source, target) => {
     graph!.mergeEdgeAttributes(source, target, {
-      type: 'curved'
+      type: 'curved',
+      hidden: true
     });
   });
 
@@ -130,6 +131,9 @@ export default async function initGraph(path: string, title: string, algorithm: 
     labelColor: {attribute: "labelColor"},
     zIndex: true,
     autoRescale: false,
+    enableEdgeEvents: false,
+    renderLabels: false,
+    renderEdgeLabels: false,
     edgeProgramClasses: {curved: EdgeCurveProgram},
 
     nodeProgramClasses: {
@@ -155,10 +159,13 @@ export default async function initGraph(path: string, title: string, algorithm: 
 
 
   // Hover с подсветкой узла
-  renderer.on('enterNode', ({ node }) => hoverNode(node, graph!, renderer!));
+  // Если слишком много ребер, то наведение работает слишком долго
+  if (metrics.numEdges < alg.edgesHoverHighlightLimit)
+    renderer.on('enterNode', ({ node }) => hoverNode(node, graph!, renderer!));
 
   // Unhover
-  renderer.on('leaveNode', () => unhoverNode(graph!, renderer!));
+  if (metrics.numEdges < alg.edgesHoverHighlightLimit)
+    renderer.on('leaveNode', () => unhoverNode(graph!, renderer!));
 
   // Node focus по клику
   renderer.on('clickNode', ({ node }) => selectNode(node, graph!, renderer!, metrics));

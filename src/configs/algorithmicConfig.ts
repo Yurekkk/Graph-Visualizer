@@ -49,6 +49,7 @@ export const samplingMinNumNodes = 200;
 
 
 // ### Node Focus ###
+export const edgesHoverHighlightLimit = 50000;
 export const maxHighlightedNeighborsNum = 20;
 export const maxAccumulatedCost = 5;
 export const importanceInfluence = 3;
@@ -56,7 +57,7 @@ export const importanceInfluence = 3;
 
 
 // ### Misc ###
-export const logAlgorithmChoices = true;
+export const logAlgorithmChoices = false;
 export const seed = '42';
 export const timestamp_threshold = 500_000_000;
 // Если все значения ребер больше этого порога, 

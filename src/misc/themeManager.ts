@@ -4,15 +4,6 @@ import * as vis from '../configs/visualConfig.ts';
 
 export type Theme = 'dark' | 'light';
 
-export const themedColors = {
-  edgeHoverColor: (theme: Theme) => 
-    theme === 'dark' ? vis.edgeHoverColorDarkTheme : vis.edgeHoverColorLightTheme,
-  borderColor: (theme: Theme) => 
-    theme === 'dark' ? vis.borderColorDarkTheme : vis.borderColorLightTheme,
-  labelColor: (theme: Theme) =>
-    theme === 'dark' ? vis.labelColorDarkTheme : vis.labelColorLightTheme
-} as const;
-
 
 
 export class ThemeManager {

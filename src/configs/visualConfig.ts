@@ -48,15 +48,12 @@ export const edgeHoverColorLightTheme = '#5b1885';
 export const borderColorDarkTheme  = '#ffffff';
 export const borderColorLightTheme = '#444444';
 export const borderSizeDefault = 0.125; // Дробь от размера всего узла, [0, 1]
-export const borderSizeNeighbor = 0.35; // [0, 1]
-export const borderSizeHover = 0.2;     // [0, 1]
-export const borderSizeSelect = 0.15;
+export const borderSizeHover = 0.2;
+export const borderSizeSelect = 0.35;
 
 
 
 // ### Misc ###
-export const labelColorDarkTheme  = '#ffffff';
-export const labelColorLightTheme = '#000000';
 export const labelSize = 20;
 export const cameraFitPadding = 50; // в пикселях
 export const zLayerMargin = 1e+12; // Запас на один z-слой для одного типа узлов

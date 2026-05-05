@@ -1,11 +1,20 @@
 import type Graph from 'graphology';
 import * as vis from '../configs/visualConfig';
+import * as alg from '../configs/algorithmicConfig.ts';
 import type graphMetrics from '../metrics-module/graphMetricsInterface';
 import { blendWithBackground, edgeColor, edgeColorInterpolate, edgeSize, edgeSizeInterpolate, nodeColor, nodeSize } from '../misc/utilsVisual';
 import type Sigma from 'sigma';
 import findCloseImportantNeighbours from '../interactive-module/findCloseImportantNeigbors';
 import { fitViewportToNodes } from '@sigma/utils';
-import { themedColors, ThemeManager } from '../misc/themeManager';
+import { ThemeManager } from '../misc/themeManager';
+
+
+
+type NodeLevel = "hovered" | "selected" | "usual" | "transparent";
+
+type EdgeLevel = "highlightedAndImportant" | "highlighted" | "important" | "usual" | "transparent";
+//                  При ховере важного     |   При ховере  |  Важные при |  Дефолт |  Неважные при 
+//                                                             селекте                  селекте
 
 
 
@@ -35,90 +44,86 @@ export function clearHighlightState() {
 
 
 
-function getNodeLevel(node: string) {
+function getNodeLevel(node: string): NodeLevel {
   if (node === hoveredNodeId) return 'hovered';
   else if (node === selectedNodeId) return 'selected';
   else if (selectedNodeId == null || importantNodesCache.has(node)) return 'usual';
   else return 'transparent';
 }
 
-function computeNodeVisuals(node: string, data: any, metrics: any) {
+export function nodeReducer(node: string, data: any, metrics: any) {
   const level = getNodeLevel(node);
   const theme = ThemeManager.getTheme();
-  
+  const bgColor = getBackgroundColor();
+  let color, borderColor, alpha;
+
   switch (level) {
     case 'selected':
+      color = nodeColor(data.community, metrics);
+      borderColor = theme === 'dark' ? vis.borderColorDarkTheme : vis.borderColorLightTheme;
+      alpha = vis.nodeDefaultAlpha;
       return {
         ...data,
-        label: data.hiddenLabel,
         size: vis.nodeSizeSelected ?? nodeSize(data.degree, metrics),
         borderSize: vis.borderSizeSelect,
-        borderColor: themedColors.borderColor(theme),
-        alpha: vis.nodeDefaultAlpha,
+        borderColor: blendWithBackground(borderColor, bgColor, alpha),
         zIndex: data.degree + 2 * vis.zLayerMargin,
-        color: nodeColor(data.community, metrics),
-        labelColor: themedColors.labelColor(theme),
+        color: blendWithBackground(color, bgColor, alpha),
         hidden: false,
       };
       
     case 'hovered':
+      color = nodeColor(data.community, metrics);
+      borderColor = "#ffffff"; // Потому что bgColor лейбла в sigma.js всегда белый, меняется это 
+                                 // через кастомную отрисовку лейблов, фу
+      alpha = vis.nodeDefaultAlpha;
       return {
         ...data,
-        label: data.hiddenLabel,
         size: vis.nodeSizeHover ?? nodeSize(data.degree, metrics),
         borderSize: vis.borderSizeHover,
-        borderColor: "#ffffff",
-        alpha: vis.nodeDefaultAlpha,
+        borderColor: blendWithBackground(borderColor, bgColor, alpha),
         zIndex: data.degree + vis.zLayerMargin,
-        color: nodeColor(data.community, metrics),
-        labelColor: "#000000",
+        color: blendWithBackground(color, bgColor, alpha),
         hidden: false,
       };
       
     case 'usual':
+      color = nodeColor(data.community, metrics);
+      borderColor = theme === 'dark' ? vis.borderColorDarkTheme : vis.borderColorLightTheme;
+      alpha = vis.nodeDefaultAlpha;
       return {
         ...data,
-        label: '',
         size: nodeSize(data.degree, metrics),
         borderSize: vis.borderSizeDefault,
-        borderColor: themedColors.borderColor(theme),
-        alpha: vis.nodeDefaultAlpha,
+        borderColor: blendWithBackground(borderColor, bgColor, alpha),
         zIndex: data.degree,
-        color: nodeColor(data.community, metrics),
+        color: blendWithBackground(color, bgColor, alpha),
         hidden: false,
       };
       
     case 'transparent':
+      color = nodeColor(data.community, metrics);
+      borderColor = theme === 'dark' ? vis.borderColorDarkTheme : vis.borderColorLightTheme;
+      alpha = vis.nodeTransparentAlpha;
       return {
         ...data,
-        label: '',
         size: nodeSize(data.degree, metrics),
         borderSize: 0,
-        borderColor: themedColors.borderColor(theme),
-        alpha: vis.nodeTransparentAlpha,
+        borderColor: blendWithBackground(borderColor, bgColor, alpha),
         zIndex: data.degree - vis.zLayerMargin,
-        color: nodeColor(data.community, metrics),
+        color: blendWithBackground(color, bgColor, alpha),
         hidden: false,
       };
   }
 }
 
-export function nodeReducer(node: string, data: any, metrics: any) {
-  data = computeNodeVisuals(node, data, metrics);
-
-  const alpha = data.alpha ?? 1;
-  const bgColor = getBackgroundColor();
-  const blended = blendWithBackground(data.color, bgColor, alpha);
-  const borderColorBlended = blendWithBackground(data.borderColor, bgColor, alpha);
-  return { ...data, color: blended, borderColor: borderColorBlended };
-}
 
 
-
-function getEdgeLevel(edge: string, graph: Graph) {
+function getEdgeLevel(edge: string, graph: Graph): EdgeLevel {
   const source = graph.extremities(edge)[0];
   const target = graph.extremities(edge)[1];
-  if ((source === hoveredNodeId || target === hoveredNodeId) && importantEdgesCache.has(edge))
+  
+  if ((source === hoveredNodeId || target === hoveredNodeId) && importantEdgesCache.has(edge)) 
     return 'highlightedAndImportant'; // При ховере важного
   else if (source === hoveredNodeId || target === hoveredNodeId) return 'highlighted'; // При ховере
   else if (importantEdgesCache.has(edge)) return 'important'; // Важные при селекте
@@ -126,72 +131,70 @@ function getEdgeLevel(edge: string, graph: Graph) {
   else return 'transparent';
 }
 
-function computeEdgeVisuals(edge: string, data: any, graph: Graph, metrics: graphMetrics) {
+export function edgeReducer(edge: string, data: any, graph: Graph, metrics: graphMetrics) {
   const level = getEdgeLevel(edge, graph);
   const allWeightsEqual = metrics.maxEdgeWeight == metrics.minEdgeWeight;
   const theme = ThemeManager.getTheme();
+  const bgColor = getBackgroundColor();
+  let color, alpha;
   
   switch (level) {
     case 'highlightedAndImportant':
+      color = theme === 'dark' ? vis.edgeHoverColorDarkTheme : vis.edgeHoverColorLightTheme;
+      alpha = vis.edgeHoverAlpha;
       return {
         ...data,
         size: edgeSizeInterpolate(importantEdgesCache.get(edge)!, maxEdgeImportance!, minEdgeImportance!),
-        color: themedColors.edgeHoverColor(theme),
-        alpha: vis.edgeHoverAlpha,
+        color: blendWithBackground(color, bgColor, alpha),
         zIndex: (allWeightsEqual ? data.importance : data.weight) + 2 * vis.zLayerMargin,
         hidden: false,
       };
 
     case 'highlighted':
+      color = theme === 'dark' ? vis.edgeHoverColorDarkTheme : vis.edgeHoverColorLightTheme;
+      alpha = vis.edgeHoverAlpha;
       return {
         ...data,
         size: edgeSize(data.weight, data.importance, metrics),
-        color: themedColors.edgeHoverColor(theme),
-        alpha: vis.edgeHoverAlpha,
+        color: blendWithBackground(color, bgColor, alpha),
         zIndex: (allWeightsEqual ? data.importance : data.weight) + 2 * vis.zLayerMargin,
         hidden: false,
       };
       
     case 'important':
       const importance = importantEdgesCache.get(edge);
+      color = edgeColorInterpolate(importance!, maxEdgeImportance!, minEdgeImportance!);
+      alpha = vis.edgeClickAlpha;
       return {
         ...data,
         size: edgeSizeInterpolate(importance!, maxEdgeImportance!, minEdgeImportance!),
-        color: edgeColorInterpolate(importance!, maxEdgeImportance!, minEdgeImportance!),
-        alpha: vis.edgeClickAlpha,
+        color: blendWithBackground(color, bgColor, alpha),
         zIndex: (allWeightsEqual ? data.importance : data.weight) + vis.zLayerMargin,
         hidden: false,
       };
       
     case 'usual':
+      color = edgeColor(data.weight, data.importance, metrics);
+      alpha = vis.edgeDefaultAlpha;
       return {
         ...data,
         size: edgeSize(data.weight, data.importance, metrics),
-        color: edgeColor(data.weight, data.importance, metrics),
-        alpha: vis.edgeDefaultAlpha,
+        color: blendWithBackground(color, bgColor, alpha),
         zIndex: (allWeightsEqual ? data.importance : data.weight),
         hidden: metrics.numEdges > vis.edgesMaxDrawnLimit,
       };
       
     case 'transparent':
+      color = edgeColor(data.weight, data.importance, metrics);
+      alpha = vis.edgeTransparentAlpha;
       return {
         ...data,
         size: edgeSize(data.weight, data.importance, metrics),
-        color: edgeColor(data.weight, data.importance, metrics),
-        alpha: vis.edgeTransparentAlpha,
+        color: blendWithBackground(color, bgColor, alpha),
         zIndex: (allWeightsEqual ? data.importance : data.weight) - vis.zLayerMargin,
         hidden: metrics.numEdges > vis.edgesMaxDrawnLimit,
       };
   }
-}
-
-export function edgeReducer(edge: string, data: any, graph: Graph, metrics: graphMetrics) {
-  data = computeEdgeVisuals(edge, data, graph, metrics);
-
-  const alpha = data.alpha ?? 1;
-  const bgColor = getBackgroundColor();
-  const colorBlended = blendWithBackground(data.color, bgColor, alpha);
-  return { ...data, color: colorBlended };
 }
 
 
