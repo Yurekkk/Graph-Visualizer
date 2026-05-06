@@ -218,7 +218,7 @@ export function selectNode(nodeId: string, graph: Graph, renderer: Sigma, metric
   }
   selectedNodeId = nodeId;
 
-  console.log(`- Выбран узел ${nodeId}.`);
+  console.log(`- Выбран узел ${nodeId}`);
   const nodeMetrics = ["degree", "degreeCentrality", "community", 
     "core", "eigenvectorCentrality", "importance"];
   nodeMetrics.forEach((value) => 

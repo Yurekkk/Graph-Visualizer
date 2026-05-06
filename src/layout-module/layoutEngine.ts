@@ -55,10 +55,10 @@ export function smartLayout(
       (metrics.numCommunities ?? 0) > 1) {
     applyLayout('meta', graph, _recursion_level, _meta_or_comm_prefix);
   }
-  else if (metrics.density >= alg.circularMinDensity && 
-    metrics.numNodes <= alg.circularMaxNumNodes) {
-    applyLayout('circular', graph, _recursion_level, _meta_or_comm_prefix);
-  }
+  // else if (metrics.density >= alg.circularMinDensity && 
+  //   metrics.numNodes <= alg.circularMaxNumNodes) {
+  //   applyLayout('circular', graph, _recursion_level, _meta_or_comm_prefix);
+  // }
   // else if (metrics.degreeGini >= alg.radialMinDegreeGini ||
   //          metrics.hubDominance >= alg.radialMinHubDominance) {
   //   applyLayout('radial', graph, _recursion_level, _meta_or_comm_prefix);
@@ -92,6 +92,6 @@ function logAlgoChoice(
   _meta_or_comm_prefix = '') {
   if (!alg.logAlgorithmChoices) return;
   if (_recursion_level > 0)
-    console.log(`- ${_meta_or_comm_prefix} - Выбран ${algorithm}Layout на уровне рекурсии: ${_recursion_level}`);
-  else console.log(`- Выбран ${algorithm}Layout`);
+    console.log(`# ${_meta_or_comm_prefix} - Выбран ${algorithm}Layout на уровне рекурсии: ${_recursion_level}`);
+  else console.log(`# Выбран ${algorithm}Layout`);
 }
