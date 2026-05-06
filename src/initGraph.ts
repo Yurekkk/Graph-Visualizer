@@ -5,7 +5,7 @@ import { calculateEdgeMetrics, calculateGraphMetrics, calculateNodeMetrics }
 import { createNodeBorderProgram } from "@sigma/node-border";
 import EdgeCurveProgram from '@sigma/edge-curve';
 import parseGraphFile from './misc/graphParser.ts';
-import smartLayout from './layout-module/layoutEngine.ts';
+import { smartLayout } from './layout-module/layoutEngine.ts';
 import * as vis from './configs/visualConfig.ts';
 import * as alg from './configs/algorithmicConfig.ts';
 import { fitViewportToNodes } from '@sigma/utils';

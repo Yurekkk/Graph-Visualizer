@@ -57,7 +57,7 @@ export const importanceInfluence = 3;
 
 
 // ### Misc ###
-export const logAlgorithmChoices = false;
+export const logAlgorithmChoices = true;
 export const seed = '42';
 export const timestamp_threshold = 500_000_000;
 // Если все значения ребер больше этого порога, 

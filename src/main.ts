@@ -1,5 +1,6 @@
 import initGraph from './initGraph';
 import { ThemeManager, initThemeToggle } from './misc/themeManager';
+import { layoutFunctions } from './layout-module/layoutEngine';
 
 
 
@@ -14,17 +15,7 @@ if (!loader) throw new Error('Загрузчик не найден!');
 
 function initSelectors() {
   algorithmSelector!.innerHTML = '';
-  const algorithms = [
-    'auto', 
-    'meta', 
-    'circular', 
-    'radial', 
-    'random',
-    'hierarchical', 
-    'spectral',
-    'forceAtlas2', 
-    'forceAtlas2wSampling'
-  ];
+  const algorithms = Object.keys(layoutFunctions);
   algorithms.forEach((algorithm) => {
     const option = document.createElement('option');
     option.textContent = algorithm;
