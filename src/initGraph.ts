@@ -1,6 +1,7 @@
 import Sigma from 'sigma';
 import Graph from 'graphology';
-import { calculateEdgeMetrics, calculateGraphMetrics, calculateNodeMetrics } from './metrics-module/metricsCalculations.ts';
+import { calculateEdgeMetrics, calculateGraphMetrics, calculateNodeMetrics } 
+  from './metrics-module/metricsCalculations.ts';
 import { createNodeBorderProgram } from "@sigma/node-border";
 import EdgeCurveProgram from '@sigma/edge-curve';
 import parseGraphFile from './misc/graphParser.ts';
@@ -158,18 +159,16 @@ export default async function initGraph(path: string, title: string, algorithm: 
 
 
 
-  // Hover с подсветкой узла
   // Если слишком много ребер, то наведение работает слишком долго
-  if (metrics.numEdges < alg.edgesHoverHighlightLimit)
+  if (metrics.numEdges < alg.edgesHoverHighlightLimit) {
+    // Hover с подсветкой узла
     renderer.on('enterNode', ({ node }) => hoverNode(node, graph!, renderer!));
-
-  // Unhover
-  if (metrics.numEdges < alg.edgesHoverHighlightLimit)
+    // Unhover
     renderer.on('leaveNode', () => unhoverNode(graph!, renderer!));
+  }
 
   // Node focus по клику
   renderer.on('clickNode', ({ node }) => selectNode(node, graph!, renderer!, metrics));
-
   // Клик по пустому месту для сброса фокуса
   renderer.on('clickStage', () => deselectNode(graph!, renderer!));
 

@@ -1,6 +1,6 @@
 import type Graph from 'graphology';
 import * as vis from '../configs/visualConfig';
-import * as alg from '../configs/algorithmicConfig.ts';
+// import * as alg from '../configs/algorithmicConfig.ts';
 import type graphMetrics from '../metrics-module/graphMetricsInterface';
 import { blendWithBackground, edgeColor, edgeColorInterpolate, edgeSize, edgeSizeInterpolate, nodeColor, nodeSize } from '../misc/utilsVisual';
 import type Sigma from 'sigma';
