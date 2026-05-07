@@ -1,5 +1,6 @@
 import type Graph from "graphology";
-import louvain from "graphology-communities-louvain";
+// import louvain from "graphology-communities-louvain";
+import leiden from '@aflsolutions/graphology-communities-leiden';
 import { connectedComponents } from "graphology-components";
 import seedrandom from "seedrandom";
 import * as alg from '../configs/algorithmicConfig.ts';
@@ -11,11 +12,23 @@ export function findCommunities(graph: Graph, resolution: number = alg.louvainRe
   // let start, end;
 
   // start = performance.now();
-  louvain.assign(graph, {
+
+  // louvain.assign(graph, {
+  //   rng: seedrandom(alg.seed), 
+  //   resolution: resolution,
+  //   nodeCommunityAttribute: 'community'
+  // });
+
+  leiden.assign(graph, {
     rng: seedrandom(alg.seed), 
     resolution: resolution,
-    nodeCommunityAttribute: 'community'
+    weighted: true,
+    attributes: {
+      weight: 'weight',
+      community: 'community'
+    }
   });
+
   // end = performance.now();
   // console.log(`Время нахождения сообществ (louvain): ${(end - start).toFixed(3)} мс`)
 

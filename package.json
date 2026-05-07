@@ -19,6 +19,7 @@
     "vite": "^7.3.1"
   },
   "dependencies": {
+    "@aflsolutions/graphology-communities-leiden": "^1.1.1",
     "@datastructures-js/priority-queue": "^6.3.5",
     "@sigma/edge-curve": "^3.1.0",
     "@sigma/node-border": "^3.0.0",
