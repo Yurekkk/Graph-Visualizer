@@ -26,14 +26,18 @@ function timed(accumulator: Timer, fn: () => any) {
 
 
 export default function metaLayout(graph: Graph, _recursion_level: number) {
+  // Мета-граф придется строить в любом случае
   const metaGraph = timed(buildingSubgraphsTimer, () => buildMetaGraph(graph));
   let metaMetrics = timed(metricsCalculationTimer, () => calculateGraphMetrics(metaGraph));
-  const resolution = alg.louvainResolution - alg.metaLayoutResolutionDecreaseStep * _recursion_level;
+  const resolution = alg.communitiesResolution - alg.metaLayoutResolutionDecreaseStep * _recursion_level;
   let {numCommunities, modularity} = timed(communitiesFindingTimer, () => findCommunities(metaGraph, resolution));
   metaMetrics = {...metaMetrics, numCommunities, modularity};
 
   const communities = new Map<string, {commGraph: Graph, 
     centerX: number, centerY: number, radius: number}>();
+
+  // На будущее: fixed работает, хоть его и нет в документации по неведомым причинам
+  // graph.forEachNode((node) => graph.setNodeAttribute(node, "fixed", true))
   
   // Рекурсивно раскладываем каждое сообщество по отдельности
   // Первый проход: раскладываем сообщества, считаем радиусы

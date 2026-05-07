@@ -2,6 +2,7 @@ import Graph from 'graphology';
 import * as alg from '../configs/algorithmicConfig.ts';
 // import noverlap from 'graphology-layout-noverlap';
 
+// TODO: сделать расстановку одного слоя в несколько подслоев
 // TODO?: сделать нормальную сортировку
 // Но надо ли оно теперь уже?
 

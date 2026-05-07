@@ -5,7 +5,7 @@ import * as alg from '../configs/algorithmicConfig.ts';
 import { setRandomCoords } from '../misc/utilsAlgorithmic.ts';
 import layoutSpectral from './layoutSpectral.ts';
 import circularLayout from './layoutCircular.ts';
-import forceAtlas2Layout from './layoutForce.ts';
+import forceLayout from './layoutForce.ts';
 import hierarchicalLayout from './layoutHierarchical.ts';
 import metaLayout from './layoutMeta.ts';
 import samplingLayout from './layoutSampling.ts';
@@ -13,14 +13,12 @@ import samplingLayout from './layoutSampling.ts';
 
 
 // TODO: A lot of tweaking is still needed
+// TODO: сделать radial
 
 /* 
 Просто meta layout'ом и force-алгоритмами как будто бы приятнее раскладывается всегда.
 Radial, circular и подобное не особо и нужно, если есть forceAtlas.
 ForceAtlas, ко всему прочему, еще и аномалии типа выбивающихся из паттерна узлов учтет.
-
-ForceAtlas с сэмплированием всегда тянет узлы ближе к центру сообщества, 
-хз че с этим делать. Но зато быстрее
 */
 
 
@@ -33,7 +31,7 @@ export const layoutFunctions: Record<string, (graph: Graph, _recursion_level?: n
   "random": (g, _l) => setRandomCoords(g),
   "hierarchical": hierarchicalLayout,
   "spectral": layoutSpectral,
-  "forceAtlas2": forceAtlas2Layout,
+  "force": forceLayout,
   "sampling": samplingLayout,
 };
 
@@ -65,10 +63,10 @@ export function smartLayout(
   //   applyLayout('radial', graph, _recursion_level, _meta_or_comm_prefix);
   // }
   // else if (metrics.numNodes > alg.samplingMinNumNodes) {
-  //   applyLayout('forceAtlas2wSampling', graph, _recursion_level, _meta_or_comm_prefix);
+  //   applyLayout('sampling', graph, _recursion_level, _meta_or_comm_prefix);
   // } 
   else {
-    applyLayout('forceAtlas2', graph, _recursion_level, _meta_or_comm_prefix);
+    applyLayout('force', graph, _recursion_level, _meta_or_comm_prefix);
   }
 
   // Убираем наложения узлов // Долго

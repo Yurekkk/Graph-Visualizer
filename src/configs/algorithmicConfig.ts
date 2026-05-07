@@ -6,7 +6,7 @@ export const eigenvectorCentralityWeight = 0.8;
 
 // higher values (>1) produce more, smaller clusters, 
 // while lower values (<1) produce fewer, larger clusters
-export const louvainResolution = 1.0;
+export const communitiesResolution = 1.0;
 
 export const eigCentralityMaxIterations = 100;
 export const eigCentralityTolerance = 1e-6;
@@ -18,10 +18,10 @@ export const circularSpacing = 2.0;
 export const radialRingSpacing = 100;
 export const hierarchicalSpacing = 0.2;
 export const radialSortByDegreeOnRing = false;
-export const forceAtlasIterations = 50;
+export const forceLayoutIterations = 50;
 
 export const metaLayoutResolutionDecreaseStep = 0.2;
-// На каждом шаге рекурсии разрешение Louvain уменьшается (начиная с louvainResolution), 
+// На каждом шаге рекурсии разрешение Louvain уменьшается (начиная с communitiesResolution), 
 // чтобы алгоритм не зацикливался на слишком маленьких сообществах + так быстрее, я проверял
 
 export const spectralSpacing = 1000.0;

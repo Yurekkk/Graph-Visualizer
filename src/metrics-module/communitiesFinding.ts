@@ -7,8 +7,10 @@ import * as alg from '../configs/algorithmicConfig.ts';
 import calculateModularity from 'graphology-metrics/graph/modularity';
 
 
+// TODO: Leiden возвращает и кол-во сообществ, и модулярность, свой код нужно убрать
 
-export function findCommunities(graph: Graph, resolution: number = alg.louvainResolution) {
+
+export function findCommunities(graph: Graph, resolution: number = alg.communitiesResolution) {
   // let start, end;
 
   // start = performance.now();

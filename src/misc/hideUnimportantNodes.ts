@@ -1,6 +1,6 @@
 import Graph from 'graphology';
 
-// TODO: Че-нибудь сделать с тем, что в radial layout скрывает не листы
+// TODO?,: Че-нибудь сделать с тем, что в radial layout скрывает не листы
 
 export default function hideUnimportantNodes(graph: Graph) {
   // Собираем узлы
