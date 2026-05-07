@@ -7,7 +7,7 @@ import * as alg from '../configs/algorithmicConfig.ts';
 
 
 export function findCommunities(graph: Graph, resolution: number = alg.communitiesResolution) {
-  const start = performance.now();
+  // const start = performance.now();
 
   // louvain.assign(graph, {
   //   rng: seedrandom(alg.seed), 
@@ -25,8 +25,11 @@ export function findCommunities(graph: Graph, resolution: number = alg.communiti
     }
   });
 
-  const end = performance.now();
-  console.log(`Время нахождения сообществ: ${(end - start).toFixed(3)} мс`)
+  for (const [node, commId] of Object.entries(details.communities))
+    graph.setNodeAttribute(node, "community", commId);
+
+  // const end = performance.now();
+  // console.log(`Время нахождения сообществ: ${(end - start).toFixed(3)} мс`)
 
   const numCommunities = details.count;
   const modularity = details.modularity;
