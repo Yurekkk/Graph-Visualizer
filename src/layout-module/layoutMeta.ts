@@ -36,7 +36,7 @@ export default function metaLayout(graph: Graph, _recursion_level: number) {
   const communities = new Map<string, {commGraph: Graph, 
     centerX: number, centerY: number, radius: number}>();
 
-  // На будущее: fixed работает, хоть его и нет в документации по неведомым причинам
+  // TODO: fixed работает, хоть его и нет в документации по неведомым причинам
   // graph.forEachNode((node) => graph.setNodeAttribute(node, "fixed", true))
   
   // Рекурсивно раскладываем каждое сообщество по отдельности
