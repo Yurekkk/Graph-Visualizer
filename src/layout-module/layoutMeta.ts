@@ -5,55 +5,43 @@ import { findCommunities } from "../metrics-module/communitiesFinding";
 import { calculateGraphMetrics } from "../metrics-module/metricsCalculations";
 import { smartLayout } from "./layoutEngine";
 import * as alg from '../configs/algorithmicConfig.ts';
+import type { Attributes } from "graphology-types";
 
 
 
-let buildingSubgraphsTime = 0;
-let metricsCalculationTime = 0;
-let communitiesFindingTime = 0;
-let start, end;
+type Timer = { value: number };
+
+let buildingSubgraphsTimer: Timer = {value: 0};
+let metricsCalculationTimer: Timer = {value: 0};
+let communitiesFindingTimer: Timer = {value: 0};
+
+function timed(accumulator: Timer, fn: () => any) {
+  const start = performance.now();
+  const result = fn();
+  const end = performance.now();
+  accumulator.value += end - start;
+  return result;
+}
 
 
 
 export default function metaLayout(graph: Graph, _recursion_level: number) {
-    start = performance.now();
-  const metaGraph = buildMetaGraph(graph);
-    end = performance.now();
-    buildingSubgraphsTime += end - start;
-
-    start = performance.now();
-  let metaMetrics = calculateGraphMetrics(metaGraph);
-    end = performance.now();
-    metricsCalculationTime += end - start;
-
-    start = performance.now();
+  const metaGraph = timed(buildingSubgraphsTimer, () => buildMetaGraph(graph));
+  let metaMetrics = timed(metricsCalculationTimer, () => calculateGraphMetrics(metaGraph));
   const resolution = alg.louvainResolution - alg.metaLayoutResolutionDecreaseStep * _recursion_level;
-  let {numCommunities, modularity} = findCommunities(metaGraph, resolution);
+  let {numCommunities, modularity} = timed(communitiesFindingTimer, () => findCommunities(metaGraph, resolution));
   metaMetrics = {...metaMetrics, numCommunities, modularity};
-    end = performance.now();
-    communitiesFindingTime += end - start;
 
   const communities = new Map<string, {commGraph: Graph, 
     centerX: number, centerY: number, radius: number}>();
   
   // Рекурсивно раскладываем каждое сообщество по отдельности
   // Первый проход: раскладываем сообщества, считаем радиусы
-  metaGraph.forEachNode((commId, metaAttrs) => {
-      start = performance.now();
-    const commGraph = buildCommunityGraph(graph, commId);
-      end = performance.now();
-      buildingSubgraphsTime += end - start;
-
-      start = performance.now();
-    let metricsComm = calculateGraphMetrics(commGraph);
-      end = performance.now();
-      metricsCalculationTime += end - start;
-
-      start = performance.now();
-    ({numCommunities, modularity} = findCommunities(commGraph));
+  metaGraph.forEachNode((commId: string, metaAttrs: Attributes) => {
+    const commGraph = timed(buildingSubgraphsTimer, () => buildCommunityGraph(graph, commId));
+    let metricsComm = timed(metricsCalculationTimer, () => calculateGraphMetrics(commGraph));
+    ({numCommunities, modularity} = timed(communitiesFindingTimer, () => findCommunities(commGraph)));
     metricsComm = {...metricsComm, numCommunities, modularity};
-      end = performance.now();
-      communitiesFindingTime += end - start;
 
     // Раскладываем сообщество
     smartLayout(commGraph, metricsComm, 'auto', _recursion_level + 1, 'commGraph');
@@ -74,7 +62,7 @@ export default function metaLayout(graph: Graph, _recursion_level: number) {
   noverlap.assign(metaGraph); // Тут быстро достаточно
 
   // Второй проход: композиция координат
-  metaGraph.forEachNode((commId, metaAttrs) => {
+  metaGraph.forEachNode((commId: string, metaAttrs: Attributes) => {
     const {commGraph, centerX: centerX, centerY: centerY, 
       radius: _radius} = communities.get(commId)!;
     commGraph.forEachNode((node, localAttrs) => {
@@ -88,11 +76,11 @@ export default function metaLayout(graph: Graph, _recursion_level: number) {
   });
 
   if (_recursion_level === 0) {
-    console.log(`- Время построения подграфов: ${buildingSubgraphsTime.toFixed(3)} мс`);
-    console.log(`- Время расчета метрик подграфов: ${metricsCalculationTime.toFixed(3)} мс`);
-    console.log(`- Время нахождения сообществ в подграфах: ${communitiesFindingTime.toFixed(3)} мс`);
-    buildingSubgraphsTime = 0;
-    metricsCalculationTime = 0;
-    communitiesFindingTime = 0;
+    console.log(`- Время построения подграфов: ${buildingSubgraphsTimer.value.toFixed(3)} мс`);
+    console.log(`- Время расчета метрик подграфов: ${metricsCalculationTimer.value.toFixed(3)} мс`);
+    console.log(`- Время нахождения сообществ в подграфах: ${communitiesFindingTimer.value.toFixed(3)} мс`);
+    buildingSubgraphsTimer.value = 0;
+    metricsCalculationTimer.value = 0;
+    communitiesFindingTimer.value = 0;
   }
 }
