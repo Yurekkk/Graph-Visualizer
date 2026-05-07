@@ -1,7 +1,7 @@
 import type Graph from "graphology";
 // import louvain from "graphology-communities-louvain";
 import leiden from '@aflsolutions/graphology-communities-leiden';
-import { connectedComponents } from "graphology-components";
+// import { connectedComponents } from "graphology-components";
 import seedrandom from "seedrandom";
 import * as alg from '../configs/algorithmicConfig.ts';
 import calculateModularity from 'graphology-metrics/graph/modularity';
@@ -33,7 +33,8 @@ export function findCommunities(graph: Graph, resolution: number = alg.louvainRe
   // console.log(`Время нахождения сообществ (louvain): ${(end - start).toFixed(3)} мс`)
 
   // Разделяем сообщества с несколькими компонентами связности на разные сообщества
-  remapCommunitiesPerComponent(graph);
+  // Не нужно, т. к. Leiden гарантирует, что каждое сообщество внутренне связно
+  // remapCommunitiesPerComponent(graph);
 
   const numCommunities = findCommunitiesNum(graph);
 
@@ -60,6 +61,7 @@ function findCommunitiesNum(graph: Graph): number {
 
 
 
+/*
 function remapCommunitiesPerComponent(graph: Graph) {
   // Louvain может узлы из разных компонент связности запихивать в одно сообщество
   // Разделяем сообщества с несколькими компонентами связности на разные сообщества
@@ -84,3 +86,4 @@ function remapCommunitiesPerComponent(graph: Graph) {
     }
   }
 }
+//*/
