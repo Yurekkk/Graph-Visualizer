@@ -20,9 +20,9 @@ export const hierarchicalSpacing = 0.2;
 export const radialSortByDegreeOnRing = false;
 export const forceAtlasIterations = 50;
 
-export const metaLayoutResolutionDecreaseStep = 0.1;
+export const metaLayoutResolutionDecreaseStep = 0.2;
 // На каждом шаге рекурсии разрешение Louvain уменьшается (начиная с louvainResolution), 
-// чтобы алгоритм не зацикливался на слишком маленьких сообществах
+// чтобы алгоритм не зацикливался на слишком маленьких сообществах + так быстрее, я проверял
 
 export const spectralSpacing = 1000.0;
 export const spectralMaxIterations = 20;    // макс. итераций степенного метода
@@ -57,7 +57,7 @@ export const importanceInfluence = 3;
 
 
 // ### Misc ###
-export const logAlgorithmChoices = true;
+export const logAlgorithmChoices = false;
 export const seed = '42';
 export const timestamp_threshold = 500_000_000;
 // Если все значения ребер больше этого порога, 

@@ -26,6 +26,7 @@ ForceAtlas с сэмплированием всегда тянет узлы бл
 
 
 export const layoutFunctions: Record<string, (graph: Graph, _recursion_level?: number) => void> = {
+  "auto": () => {},
   "meta": (g, l) => metaLayout(g, l!),
   "circular": circularLayout,
   "radial": radialLayout,
