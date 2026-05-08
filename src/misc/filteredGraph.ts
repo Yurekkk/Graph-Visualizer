@@ -14,6 +14,8 @@ export default class FilteredGraph extends Graph {
   public order: number;
   public type: GraphType;
   public multi: boolean;
+  private _nodes: Set<string>;
+  private _edges: Set<string>;
 
   /**
    * @param graph            Исходный граф Graphology
@@ -26,6 +28,13 @@ export default class FilteredGraph extends Graph {
     this.order = this.nodeIds.size;
     this.type = "undirected";
     this.multi = false;
+
+    this._nodes = this.nodeIds;
+    this._edges = new Set();
+    this.graph.forEachEdge((edge, _attr, source, target) => {
+      if (this.nodeIds.has(source) && this.nodeIds.has(target))
+        this._edges.add(edge);
+    });
   }
 
   /** Перебирает только выбранные узлы */
