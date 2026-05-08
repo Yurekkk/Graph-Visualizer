@@ -25,13 +25,13 @@ function timed(accumulator: Timer, fn: () => any) {
 
 
 
-export default function metaLayout(graph: Graph, _recursion_level: number) {
-  // Мета-граф придется строить в любом случае
-  const metaGraph = timed(buildingSubgraphsTimer, () => buildMetaGraph(graph));
-  let metaMetrics = timed(metricsCalculationTimer, () => calculateGraphMetrics(metaGraph));
+export default function metaLayout(graph: Graph, _recursion_level: number = 0) {
+  const currentCommAttr = _recursion_level === 0 ? "community" : "community_lvl" + _recursion_level;
+  const newCommAttr = "community_lvl" + (_recursion_level + 1);
   const resolution = alg.communitiesResolution - alg.metaLayoutResolutionDecreaseStep * _recursion_level;
-  let {numCommunities, modularity} = timed(communitiesFindingTimer, () => findCommunities(metaGraph, resolution));
-  metaMetrics = {...metaMetrics, numCommunities, modularity};
+
+  // Мета-граф придется строить в любом случае
+  const metaGraph = timed(buildingSubgraphsTimer, () => buildMetaGraph(graph, currentCommAttr));
 
   const communities = new Map<string, {commGraph: Graph, 
     centerX: number, centerY: number, radius: number}>();
@@ -42,9 +42,12 @@ export default function metaLayout(graph: Graph, _recursion_level: number) {
   // Рекурсивно раскладываем каждое сообщество по отдельности
   // Первый проход: раскладываем сообщества, считаем радиусы
   metaGraph.forEachNode((commId: string, metaAttrs: Attributes) => {
-    const commGraph = timed(buildingSubgraphsTimer, () => buildCommunityGraph(graph, commId));
+
+    const commGraph = timed(buildingSubgraphsTimer, () => buildCommunityGraph(graph, commId, currentCommAttr));
+
     let metricsComm = timed(metricsCalculationTimer, () => calculateGraphMetrics(commGraph));
-    ({numCommunities, modularity} = timed(communitiesFindingTimer, () => findCommunities(commGraph)));
+    const {numCommunities, modularity} = timed(communitiesFindingTimer, () => 
+      findCommunities(commGraph, resolution, newCommAttr));
     metricsComm = {...metricsComm, numCommunities, modularity};
 
     // Раскладываем сообщество
@@ -60,6 +63,12 @@ export default function metaLayout(graph: Graph, _recursion_level: number) {
     // Размер узла в мета-графе = радиус соответствующего разложенного commGraph
     metaAttrs.size = radius;
   });
+
+  // Находим метрики в мета-графе
+  let metaMetrics = timed(metricsCalculationTimer, () => calculateGraphMetrics(metaGraph));
+  const {numCommunities, modularity} = timed(communitiesFindingTimer, () => 
+    findCommunities(metaGraph, resolution, newCommAttr));
+  metaMetrics = {...metaMetrics, numCommunities, modularity};
 
   // Рекурсивно раскладываем мета-граф
   smartLayout(metaGraph, metaMetrics, 'auto', _recursion_level + 1, 'metaGraph');

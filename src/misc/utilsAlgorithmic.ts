@@ -40,11 +40,14 @@ export function getGraphCenterRadius(graph: Graph):
 
 
 
-export function buildCommunityGraph(graph: Graph, commId: any): FilteredGraph {
+export function buildCommunityGraph(graph: Graph, commId: any, 
+  communityAttribute: string = "community"): FilteredGraph {
   // Строим граф сообщества
+
   const currCommNodes = new Set<string>();
   graph.forEachNode((node, attrs) => {
-    if (attrs.community == commId) currCommNodes.add(node);
+    if (attrs[communityAttribute] == commId) 
+      currCommNodes.add(node);
   });
   
   // let commGraph = subgraph(graph, (node) => currCommNodes.has(node));
@@ -64,19 +67,21 @@ export function buildCommunityGraph(graph: Graph, commId: any): FilteredGraph {
 
 
 
-export function buildMetaGraph(graph: Graph): Graph {
+export function buildMetaGraph(graph: Graph, 
+  communityAttribute: string = "community"): Graph {
   // Строим мета-граф (сообщества как узлы)
-  let metaGraph = new Graph({});
+
+  let metaGraph = new Graph();
   graph.forEachNode((_node, attrs) => {
-    const commId = attrs.community;
+    const commId = attrs[communityAttribute];
     if (!metaGraph.hasNode(commId)) metaGraph.addNode(commId, {size: 1});
     else metaGraph.updateNodeAttribute(commId, 'size', n => n + 1);
   })
 
   // Рёбра между сообществами
   graph.forEachEdge((_, attrs, source, target) => {
-    const c1 = graph.getNodeAttribute(source, 'community');
-    const c2 = graph.getNodeAttribute(target, 'community');
+    const c1 = graph.getNodeAttribute(source, communityAttribute);
+    const c2 = graph.getNodeAttribute(target, communityAttribute);
     if (c1 && c2 && c1 != c2) {
       if (!metaGraph.hasEdge(c1, c2))
         metaGraph.addEdge(c1, c2, { weight: attrs?.weight ?? 1 });
