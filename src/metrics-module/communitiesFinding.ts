@@ -6,7 +6,12 @@ import * as alg from '../configs/algorithmicConfig.ts';
 
 
 
-export function findCommunities(graph: Graph, resolution: number = alg.communitiesResolution) {
+export function findCommunities(
+  graph: Graph, 
+  resolution: number = alg.communitiesResolution,
+  communityAttribute: string = "community",
+  weightAttribute: string = "weight"
+) {
   // const start = performance.now();
 
   // louvain.assign(graph, {
@@ -20,13 +25,13 @@ export function findCommunities(graph: Graph, resolution: number = alg.communiti
     resolution: resolution,
     weighted: true,
     attributes: {
-      weight: 'weight',
-      community: 'community'
+      weight: weightAttribute,
+      community: communityAttribute
     }
   });
 
   for (const [node, commId] of Object.entries(details.communities))
-    graph.setNodeAttribute(node, "community", commId);
+    graph.setNodeAttribute(node, communityAttribute, commId);
 
   // const end = performance.now();
   // console.log(`Время нахождения сообществ: ${(end - start).toFixed(3)} мс`)

@@ -1,10 +1,11 @@
 import Graph from 'graphology';
 import { toUndirected } from 'graphology-operators';
 import seedrandom from 'seedrandom';
-import { subgraph } from 'graphology-operators';
+// import { subgraph } from 'graphology-operators';
 import * as alg from '../configs/algorithmicConfig.ts';
 import * as vis from '../configs/visualConfig.ts';
 import { EigenvalueDecomposition, Matrix } from 'ml-matrix';
+import FilteredGraph from './filteredGraph.ts';
 
 
 
@@ -39,15 +40,17 @@ export function getGraphCenterRadius(graph: Graph):
 
 
 
-export function buildCommunityGraph(graph: Graph, commId: any): Graph {
+export function buildCommunityGraph(graph: Graph, commId: any): FilteredGraph {
   // Строим граф сообщества
   const currCommNodes = new Set<string>();
   graph.forEachNode((node, attrs) => {
-    if (attrs.community == commId)
-      currCommNodes.add(node);
+    if (attrs.community == commId) currCommNodes.add(node);
   });
-  let commGraph = subgraph(graph, (node) => currCommNodes.has(node));
-  commGraph = toUndirected(commGraph);
+  
+  // let commGraph = subgraph(graph, (node) => currCommNodes.has(node));
+
+  // Строить настоящий подграф долго, поэтому FilteredGraph
+  let commGraph = new FilteredGraph(graph, currCommNodes);
 
   // Расставляем
   const rng = seedrandom(alg.seed);
