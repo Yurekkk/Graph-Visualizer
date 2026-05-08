@@ -33,12 +33,8 @@ export default function metaLayout(graph: Graph, _recursion_level: number = 0) {
   // Мета-граф придется строить в любом случае
   const metaGraph = timed(buildingSubgraphsTimer, () => buildMetaGraph(graph, currentCommAttr));
 
-  const communities = new Map<string, {commGraph: Graph, 
-    centerX: number, centerY: number, radius: number}>();
+  const communities = new Map<string, {commGraph: Graph, centerX: number, centerY: number}>();
 
-  // TODO: fixed работает, хоть его и нет в документации по неведомым причинам
-  // graph.forEachNode((node) => graph.setNodeAttribute(node, "fixed", true))
-  
   // Рекурсивно раскладываем каждое сообщество по отдельности
   // Первый проход: раскладываем сообщества, считаем радиусы
   metaGraph.forEachNode((commId: string, metaAttrs: Attributes) => {
@@ -57,8 +53,7 @@ export default function metaLayout(graph: Graph, _recursion_level: number = 0) {
     // Считаем центры и радиусы
     const { centerX, centerY, radius } = getGraphCenterRadius(commGraph);
 
-    communities.set(commId, {commGraph: commGraph, 
-      centerX: centerX, centerY: centerY, radius: radius})
+    communities.set(commId, {commGraph, centerX, centerY})
 
     // Размер узла в мета-графе = радиус соответствующего разложенного commGraph
     metaAttrs.size = radius;
@@ -76,8 +71,7 @@ export default function metaLayout(graph: Graph, _recursion_level: number = 0) {
 
   // Второй проход: композиция координат
   metaGraph.forEachNode((commId: string, metaAttrs: Attributes) => {
-    const {commGraph, centerX: centerX, centerY: centerY, 
-      radius: _radius} = communities.get(commId)!;
+    const {commGraph, centerX, centerY} = communities.get(commId)!;
     commGraph.forEachNode((node, localAttrs) => {
       const metaX = metaAttrs.x;
       const metaY = metaAttrs.y;

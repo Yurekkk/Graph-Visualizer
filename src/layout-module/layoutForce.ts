@@ -11,11 +11,17 @@ import * as alg from '../configs/algorithmicConfig.ts';
 export default function forceLayout(graph: Graph) {
   setRandomCoords(graph);
   const sensibleSettings = forceAtlas2.inferSettings(graph);
-  forceAtlas2.assign(graph, {
+  const positions = forceAtlas2(graph, {
     iterations: alg.forceLayoutIterations,
     settings: {
       ...sensibleSettings,
       barnesHutOptimize: true
     }
+  });
+  graph.forEachNode((node) => {
+    graph.mergeNodeAttributes(node, {
+      x: positions[node].x,
+      y: positions[node].y
+    })
   });
 }

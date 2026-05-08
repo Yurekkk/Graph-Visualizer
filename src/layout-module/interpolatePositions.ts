@@ -25,7 +25,7 @@ export default function interpolatePositions(
     try {
       fullGraph.forEachNeighbor(node, (neighbor) => {
         if (laidOutSubgraph.hasNode(neighbor)) {
-          let edgeId = fullGraph.edge(node, neighbor) || fullGraph.edge(neighbor, node);;
+          let edgeId = fullGraph.edge(node, neighbor) || fullGraph.edge(neighbor, node);
           
           // Если ребра нет - пропускаем
           if (!edgeId) return;

@@ -46,71 +46,7 @@ export default class FilteredGraph extends Graph {
       }
     });
   }
-
-  /**
-   * Степень узла без учёта петель, но только среди выбранных соседей.
-   * Для направленного графа считает всех соседей (как undirectedDegree).
-   */
-  undirectedDegreeWithoutSelfLoops(node: string): number {
-    if (!this.nodeIds.has(node)) return 0;
-    const neighbors = this.graph.neighbors(node).filter((n) => this.nodeIds.has(n));
-    return neighbors.filter((n) => n !== node).length;
-  }
-
-  /** Установить атрибут узла, если он в выбранном множестве */
-  setNodeAttribute(node: string, attr: any, value: any): this {
-    if (this.nodeIds.has(node)) {
-      this.graph.setNodeAttribute(node, attr, value);
-    }
-    return this;
-  }
-
-  /** Объединить атрибуты узла, если узел выбран */
-  mergeNodeAttributes(node: string, attributes: { [key: string]: any }): this {
-    if (this.nodeIds.has(node)) {
-      this.graph.mergeNodeAttributes(node, attributes);
-    }
-    return this;
-  }
-
-  /**
-   * Обновить атрибуты для каждого выбранного узла.
-   * Функция operation получает узел и его текущие атрибуты,
-   * должна вернуть объект с новыми/изменёнными парами ключ-значение.
-   */
-  updateEachNodeAttributes(
-    operation: (node: string, attr: { [key: string]: any }) => { [key: string]: any } | void
-  ): void {
-    this.nodeIds.forEach((node) => {
-      if (this.graph.hasNode(node)) {
-        const attrs = this.graph.getNodeAttributes(node);
-        const newAttrs = operation(node, attrs);
-        if (newAttrs) {
-          this.graph.mergeNodeAttributes(node, newAttrs);
-        }
-      }
-    });
-  }
-
-  hasNode(node: string): boolean {
-    return this.nodeIds.has(node) && this.graph.hasNode(node);
-  }
-
-  getNodeAttributes(node: string): { [key: string]: any } {
-    if (!this.nodeIds.has(node)) return {};
-    return this.graph.getNodeAttributes(node);
-  }
-
-  neighbors(node: string): string[] {
-    if (!this.nodeIds.has(node)) return [];
-    return this.graph.neighbors(node).filter((n) => this.nodeIds.has(n));
-  }
-
-  degree(node: string): number {
-    if (!this.nodeIds.has(node)) return 0;
-    return this.graph.neighbors(node).filter(n => this.nodeIds.has(n)).length;
-  }
-
+  
   forEachNeighbor(
     node: string,
     callback: (neighbor: string, attributes: { [key: string]: any }) => void
@@ -123,11 +59,168 @@ export default class FilteredGraph extends Graph {
     });
   }
 
-  updateNodeAttribute(node: string, attr: any, updater: (currentValue: any | undefined) => any): this {
-    if (!this.nodeIds.has(node)) return this;
-    const currentValue = this.graph.getNodeAttribute(node, attr);
-    this.graph.setNodeAttribute(node, attr, updater(currentValue));
+  // ==================== Узлы ====================
+
+  override getNodeAttribute(node: string, attr: string | number): any {
+    if (!this.hasNode(node)) return undefined;
+    return this.graph.getNodeAttribute(String(node), String(attr));
+  }
+
+  override getNodeAttributes(node: string): { [key: string]: any } {
+    if (!this.hasNode(node)) return {};
+    return this.graph.getNodeAttributes(String(node));
+  }
+
+  override setNodeAttribute(node: string, attr: string | number, value: any): this {
+    if (this.nodeIds.has(node))
+      this.graph.setNodeAttribute(node, String(attr), value);
     return this;
+  }
+
+  override mergeNodeAttributes(node: string, attrs: { [key: string]: any }): this {
+    if (this.nodeIds.has(node))
+      this.graph.mergeNodeAttributes(node, attrs);
+    return this;
+  }
+
+  override updateNodeAttribute(
+    node: string,
+    attr: string | number,
+    updater: (currentValue: any) => any
+  ): this {
+    if (this.nodeIds.has(node)) {
+      const attrKey = String(attr);
+      const current = this.graph.getNodeAttribute(node, attrKey);
+      this.graph.setNodeAttribute(node, attrKey, updater(current));
+    }
+    return this;
+  }
+
+  override updateNodeAttributes(
+    node: string,
+    updater: (attributes: { [key: string]: any }) => { [key: string]: any } | void
+  ): this {
+    if (this.nodeIds.has(node)) {
+      const currentAttrs = this.graph.getNodeAttributes(node);
+      const newAttrs = updater(currentAttrs);
+      if (newAttrs) this.graph.mergeNodeAttributes(node, newAttrs);
+    }
+    return this;
+  }
+
+  override updateEachNodeAttributes(
+    updater: (node: string, attributes: { [key: string]: any }) => { [key: string]: any } | void
+  ): this {
+    this.forEachNode((node, attrs) => {
+      const newAttrs = updater(node, attrs);
+      if (newAttrs) {
+        this.graph.mergeNodeAttributes(node, newAttrs);
+      }
+    });
+    return this;
+  }
+
+  // ==================== Ребра ====================
+
+  override getEdgeAttribute(edge: string, attr: string | number): any {
+    if (!this.hasEdge(edge)) return undefined;
+    return this.graph.getEdgeAttribute(String(edge), String(attr));
+  }
+
+  override getEdgeAttributes(edge: string): { [key: string]: any } {
+    if (!this.hasEdge(edge)) {
+      throw new Error(`Graph has no edge '${String(edge)}'`);
+    }
+    return this.graph.getEdgeAttributes(String(edge));
+  }
+
+  override setEdgeAttribute(edge: string, attr: string | number, value: any): this {
+    if (!this.hasEdge(edge)) return this;
+    this.graph.setEdgeAttribute(String(edge), String(attr), value);
+    return this;
+  }
+
+  override mergeEdgeAttributes(edge: string, attrs: { [key: string]: any }): this {
+    if (!this.hasEdge(edge)) return this;
+    this.graph.mergeEdgeAttributes(String(edge), attrs);
+    return this;
+  }
+
+  override updateEdgeAttribute(
+    edge: string,
+    attr: string | number,
+    updater: (currentValue: any) => any
+  ): this {
+    if (!this.hasEdge(edge)) return this;
+    const edgeKey = String(edge);
+    const attrKey = String(attr);
+    const current = this.graph.getEdgeAttribute(edgeKey, attrKey);
+    this.graph.setEdgeAttribute(edgeKey, attrKey, updater(current));
+    return this;
+  }
+
+  override updateEdgeAttributes(
+    edge: string,
+    updater: (attributes: { [key: string]: any }) => { [key: string]: any } | void
+  ): this {
+    if (!this.hasEdge(edge)) return this;
+    const key = String(edge);
+    const currentAttrs = this.graph.getEdgeAttributes(key);
+    const newAttrs = updater(currentAttrs);
+    if (newAttrs) {
+      this.graph.mergeEdgeAttributes(key, newAttrs);
+    }
+    return this;
+  }
+
+  override updateEachEdgeAttributes(updater: any) {
+    this.forEachEdge((edge, attrs) => {
+      const newAttrs = updater(edge, attrs);
+      if (newAttrs) {
+        this.graph.mergeEdgeAttributes(edge, newAttrs);
+      }
+    });
+  }
+  
+  // ==================== Разное ====================
+
+  /**
+   * Степень узла без учёта петель, но только среди выбранных соседей.
+   * Для направленного графа считает всех соседей (как undirectedDegree).
+   */
+  undirectedDegreeWithoutSelfLoops(node: string): number {
+    if (!this.nodeIds.has(node)) return 0;
+    const neighbors = this.graph.neighbors(node).filter((n) => this.nodeIds.has(n));
+    return neighbors.filter((n) => n !== node).length;
+  }
+
+  hasNode(node: string): boolean {
+    return this.nodeIds.has(node) && this.graph.hasNode(node);
+  }
+
+  neighbors(node: string): string[] {
+    if (!this.nodeIds.has(node)) return [];
+    return this.graph.neighbors(node).filter((n) => this.nodeIds.has(n));
+  }
+
+  degree(node: string): number {
+    if (!this.nodeIds.has(node)) return 0;
+    return this.graph.neighbors(node).filter(n => this.nodeIds.has(n)).length;
+  }
+
+  nodes(): string[] {
+    return Array.from(this.nodeIds);
+  }
+
+  /**
+   * Возвращает ключ ребра между source и target,
+   * если оба узла принадлежат filtered-представлению и такое ребро существует.
+   */
+  override edge(source: unknown, target: unknown): string | undefined {
+    const s = String(source);
+    const t = String(target);
+    if (!this.nodeIds.has(s) || !this.nodeIds.has(t)) return undefined;
+    return this.graph.edge(s, t);  // делегируем исходному графу
   }
 }
 

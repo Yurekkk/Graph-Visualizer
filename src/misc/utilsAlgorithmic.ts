@@ -108,7 +108,7 @@ export function setRandomCoords(graph: Graph, replaceNansOnly: boolean = false) 
   const spacing = Math.sqrt(graph.order) * (vis.nodeMaxSize + vis.nodeMinSize) * 2;
   const rng = seedrandom(alg.seed);
   graph.forEachNode((node, attrs) => {
-    if (!replaceNansOnly || !attrs.x || !attrs.y) {
+    if (!attrs.fixed && (!replaceNansOnly || (!attrs.x || !attrs.y))) {
       graph.mergeNodeAttributes(node, {
         x: (rng() - 0.5) * spacing,
         y: (rng() - 0.5) * spacing
