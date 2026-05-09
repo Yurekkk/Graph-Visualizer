@@ -13,7 +13,6 @@ import samplingLayout from './layoutSampling.ts';
 
 
 // TODO: A lot of tweaking is still needed
-// TODO: сделать radial
 
 /* 
 Просто meta layout'ом и force-алгоритмами как будто бы приятнее раскладывается всегда.
@@ -54,14 +53,13 @@ export function smartLayout(
       (metrics.numCommunities ?? 0) > 1) {
     applyLayout('meta', graph, _recursion_level, _meta_or_comm_prefix);
   }
-  // else if (metrics.density >= alg.circularMinDensity && 
-  //   metrics.numNodes <= alg.circularMaxNumNodes) {
-  //   applyLayout('circular', graph, _recursion_level, _meta_or_comm_prefix);
-  // }
-  // else if (metrics.degreeGini >= alg.radialMinDegreeGini ||
-  //          metrics.hubDominance >= alg.radialMinHubDominance) {
-  //   applyLayout('radial', graph, _recursion_level, _meta_or_comm_prefix);
-  // }
+  else if (metrics.density >= alg.circularMinDensity) {
+    applyLayout('circular', graph, _recursion_level, _meta_or_comm_prefix);
+  }
+  else if (metrics.numNodes >= alg.radialMinNumNodes &&
+           metrics.hubDominance >= alg.radialMinHubDominance) {
+    applyLayout('radial', graph, _recursion_level, _meta_or_comm_prefix);
+  }
   // else if (metrics.numNodes > alg.samplingMinNumNodes) {
   //   applyLayout('sampling', graph, _recursion_level, _meta_or_comm_prefix);
   // } 

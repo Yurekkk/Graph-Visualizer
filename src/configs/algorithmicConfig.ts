@@ -14,10 +14,10 @@ export const eigCentralityTolerance = 1e-6;
 
 
 // ### Layouts Settings ###
-export const circularSpacing = 2.0;
-export const radialRingSpacing = 100;
+export const circularSpacing = 2.2;
+export const radialRingSpacing = 30;
+export const radialSubringSpacing = 2.0;
 export const hierarchicalSpacing = 0.2;
-export const radialSortByDegreeOnRing = false;
 export const forceLayoutIterations = 50;
 
 export const metaLayoutResolutionDecreaseStep = 0.2;
@@ -35,16 +35,13 @@ export const spectralCgTolerance = 1e-6;
 // ### Layout Engine Decision Tree ###
 export const metaLayoutRecursionLevelCap = 5; 
 
-export const metaLayoutMinNodes = 50;   // &&
+export const metaLayoutMinNodes = 50;     // &&
 export const metaLayoutMinModularity = 0.1;
 
-export const circularMinDensity = 0.75;   // &&
-export const circularMaxNumNodes = 500;
+export const circularMinDensity = 0.9;
 
-export const radialMinDegreeGini = 0.75;   // ||
-export const radialMinHubDominance = 0.75;
-
-export const samplingMinNumNodes = 200;
+export const radialMinHubDominance = 0.75; // &&
+export const radialMinNumNodes = 10;
 
 
 
