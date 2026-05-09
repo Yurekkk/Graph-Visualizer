@@ -56,11 +56,11 @@ export function buildCommunityGraph(graph: Graph, commId: any,
   let commGraph = new FilteredGraph(graph, currCommNodes);
 
   // Расставляем
-  const rng = seedrandom(alg.seed);
-  commGraph.forEachNode((node) => {
-    commGraph.updateNodeAttribute(node, 'x', _ => rng() - 0.5);
-    commGraph.updateNodeAttribute(node, 'y', _ => rng() - 0.5);
-  })
+  // const rng = seedrandom(alg.seed);
+  // commGraph.forEachNode((node) => {
+  //   commGraph.updateNodeAttribute(node, 'x', _ => rng() - 0.5);
+  //   commGraph.updateNodeAttribute(node, 'y', _ => rng() - 0.5);
+  // })
 
   return commGraph;
 }
@@ -93,11 +93,11 @@ export function buildMetaGraph(graph: Graph,
   metaGraph = toUndirected(metaGraph);
 
   // Расставляем
-  const rng = seedrandom(alg.seed);
-  metaGraph.forEachNode((node) => {
-    metaGraph.updateNodeAttribute(node, 'x', _ => rng() - 0.5);
-    metaGraph.updateNodeAttribute(node, 'y', _ => rng() - 0.5);
-  })
+  // const rng = seedrandom(alg.seed);
+  // metaGraph.forEachNode((node) => {
+  //   metaGraph.updateNodeAttribute(node, 'x', _ => rng() - 0.5);
+  //   metaGraph.updateNodeAttribute(node, 'y', _ => rng() - 0.5);
+  // })
 
   return metaGraph;
 }
