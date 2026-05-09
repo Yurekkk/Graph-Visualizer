@@ -21,21 +21,28 @@ export default class FilteredGraph extends Graph {
    * @param graph            Исходный граф Graphology
    * @param selectedNodeIds  ID узлов, которые участвуют в раскладке/алгоритме
    */
-  constructor(graph: Graph, selectedNodeIds: Set<string> | string[]) {
+  constructor(graph: Graph, selectedNodeIds: Set<string>) {
     super();
     this.graph = graph;
-    this.nodeIds = new Set(selectedNodeIds);
+    this.nodeIds = selectedNodeIds;
     this.edgeIds = new Set();
     this.order = this.nodeIds.size;
     this.type = "undirected";
     this.multi = false;
     this.size = 0;
 
-    this.graph.forEachEdge((edge, _attr, source, target) => {
-      if (this.nodeIds.has(source) && this.nodeIds.has(target)) {
-        this.edgeIds.add(edge);
-        this.size++;
-      }
+    // Заполняем edgeIds, обходя соседей каждого выбранного узла
+    this.nodeIds.forEach(node => {
+      this.graph.forEachNeighbor(node, (neighbor) => {
+        // Сосед тоже должен быть выбран, иначе ребро не включаем
+        if (this.nodeIds.has(neighbor)) {
+          const edge = this.graph.edge(node, neighbor);
+          if (edge && !this.edgeIds.has(edge)) {
+            this.edgeIds.add(edge);
+            this.size++;
+          }
+        }
+      });
     });
   }
 

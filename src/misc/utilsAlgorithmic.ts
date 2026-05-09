@@ -52,7 +52,7 @@ export function buildCommunityGraph(graph: Graph, commId: any,
   
   // let commGraph = subgraph(graph, (node) => currCommNodes.has(node));
 
-  // Строить настоящий подграф долго, поэтому FilteredGraph
+  // Строить настоящий подграф долго и затратно по памяти, поэтому FilteredGraph
   let commGraph = new FilteredGraph(graph, currCommNodes);
 
   // Расставляем
