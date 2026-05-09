@@ -11,7 +11,7 @@ import eigenvectorCentralityApprox from './eigenvectorCentralityApprox.ts';
 
 
 // TODO?: Все таки считать betweeness centrality, если граф маленький
-// TODO?: Все это пока не учитывает, что граф может быть ориентированным, может потом добавлю
+// TODO: Добавить поддержку ориентированного графа
 
 // Для каждого узла считает degree, degreeCentrality, community, core и eigenvectorCentrality
 

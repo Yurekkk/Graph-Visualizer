@@ -13,6 +13,7 @@ import samplingLayout from './layoutSampling.ts';
 
 
 // TODO: A lot of tweaking is still needed
+// TODO?: Сделать sampling
 
 /* 
 Просто meta layout'ом и force-алгоритмами как будто бы приятнее раскладывается всегда.
