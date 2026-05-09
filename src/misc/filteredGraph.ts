@@ -42,24 +42,22 @@ export default class FilteredGraph extends Graph {
   /** Перебирает только выбранные узлы */
   forEachNode(callback: (node: string, attributes: { [key: string]: any }) => void): void {
     this.nodeIds.forEach((node) => {
-      if (this.graph.hasNode(node)) callback(node, this.graph.getNodeAttributes(node));
+      callback(node, this.graph.getNodeAttributes(node));
     });
   }
 
   /** Перебирает рёбра, у которых оба конца принадлежат выбранным узлам */
   forEachEdge(callback: EdgeIterationCallback<Attributes, Attributes>): void {
     this.edgeIds.forEach((edge) => {
-      if (this.graph.hasEdge(edge)) {
-        const [source, target] = this.graph.extremities(edge);
-        callback(
-          edge, 
-          this.graph.getEdgeAttributes(edge), 
-          source, 
-          target, 
-          this.graph.getNodeAttributes(source), 
-          this.graph.getNodeAttributes(target), 
-          this.graph.isUndirected(edge));
-      }
+      const [source, target] = this.graph.extremities(edge);
+      callback(
+        edge, 
+        this.graph.getEdgeAttributes(edge), 
+        source, 
+        target, 
+        this.graph.getNodeAttributes(source), 
+        this.graph.getNodeAttributes(target), 
+        this.graph.isUndirected(edge));
     })
   }
   
@@ -67,7 +65,6 @@ export default class FilteredGraph extends Graph {
     node: string,
     callback: (neighbor: string, attributes: { [key: string]: any }) => void
   ): void {
-    if (!this.nodeIds.has(node)) return;
     this.graph.forEachNeighbor(node, (neighbor, attributes) => {
       if (this.nodeIds.has(neighbor)) callback(neighbor, attributes);
     });
@@ -80,22 +77,20 @@ export default class FilteredGraph extends Graph {
   }
 
   override getNodeAttribute(node: string, attr: string | number): any {
-    if (!this.hasNode(node)) return undefined;
     return this.graph.getNodeAttribute(String(node), String(attr));
   }
 
   override getNodeAttributes(node: string): { [key: string]: any } {
-    if (!this.hasNode(node)) return {};
     return this.graph.getNodeAttributes(String(node));
   }
 
   override setNodeAttribute(node: string, attr: string | number, value: any): this {
-    if (this.nodeIds.has(node)) this.graph.setNodeAttribute(node, String(attr), value);
+    this.graph.setNodeAttribute(node, String(attr), value);
     return this;
   }
 
   override mergeNodeAttributes(node: string, attrs: { [key: string]: any }): this {
-    if (this.nodeIds.has(node)) this.graph.mergeNodeAttributes(node, attrs);
+    this.graph.mergeNodeAttributes(node, attrs);
     return this;
   }
 
@@ -104,11 +99,9 @@ export default class FilteredGraph extends Graph {
     attr: string | number,
     updater: (currentValue: any) => any
   ): this {
-    if (this.nodeIds.has(node)) {
-      const attrKey = String(attr);
-      const current = this.graph.getNodeAttribute(node, attrKey);
-      this.graph.setNodeAttribute(node, attrKey, updater(current));
-    }
+    const attrKey = String(attr);
+    const current = this.graph.getNodeAttribute(node, attrKey);
+    this.graph.setNodeAttribute(node, attrKey, updater(current));
     return this;
   }
 
@@ -116,11 +109,9 @@ export default class FilteredGraph extends Graph {
     node: string,
     updater: (attributes: { [key: string]: any }) => { [key: string]: any } | void
   ): this {
-    if (this.nodeIds.has(node)) {
-      const currentAttrs = this.graph.getNodeAttributes(node);
-      const newAttrs = updater(currentAttrs);
-      if (newAttrs) this.graph.mergeNodeAttributes(node, newAttrs);
-    }
+    const currentAttrs = this.graph.getNodeAttributes(node);
+    const newAttrs = updater(currentAttrs);
+    if (newAttrs) this.graph.mergeNodeAttributes(node, newAttrs);
     return this;
   }
 
@@ -145,23 +136,19 @@ export default class FilteredGraph extends Graph {
   }
 
   override getEdgeAttribute(edge: string, attr: string | number): any {
-    if (!this.hasEdge(edge)) return undefined;
     return this.graph.getEdgeAttribute(String(edge), String(attr));
   }
 
   override getEdgeAttributes(edge: string): { [key: string]: any } {
-    if (!this.hasEdge(edge)) throw new Error(`Graph has no edge '${String(edge)}'`);
     return this.graph.getEdgeAttributes(String(edge));
   }
 
   override setEdgeAttribute(edge: string, attr: string | number, value: any): this {
-    if (!this.hasEdge(edge)) return this;
     this.graph.setEdgeAttribute(String(edge), String(attr), value);
     return this;
   }
 
   override mergeEdgeAttributes(edge: string, attrs: { [key: string]: any }): this {
-    if (!this.hasEdge(edge)) return this;
     this.graph.mergeEdgeAttributes(String(edge), attrs);
     return this;
   }
@@ -171,7 +158,6 @@ export default class FilteredGraph extends Graph {
     attr: string | number,
     updater: (currentValue: any) => any
   ): this {
-    if (!this.hasEdge(edge)) return this;
     const edgeKey = String(edge);
     const attrKey = String(attr);
     const current = this.graph.getEdgeAttribute(edgeKey, attrKey);
@@ -183,7 +169,6 @@ export default class FilteredGraph extends Graph {
     edge: string,
     updater: (attributes: { [key: string]: any }) => { [key: string]: any } | void
   ): this {
-    if (!this.hasEdge(edge)) return this;
     const key = String(edge);
     const currentAttrs = this.graph.getEdgeAttributes(key);
     const newAttrs = updater(currentAttrs);
@@ -198,11 +183,9 @@ export default class FilteredGraph extends Graph {
     });
   }
 
-  override edge(source: unknown, target: unknown): string | undefined {
-    const s = String(source);
-    const t = String(target);
-    if (!this.nodeIds.has(s) || !this.nodeIds.has(t)) return undefined;
-    return this.graph.edge(s, t);  // делегируем исходному графу
+  override edge(source: string, target: string): string | undefined {
+    if (!this.nodeIds.has(source) || !this.nodeIds.has(target)) return undefined;
+    return this.graph.edge(source, target);  // делегируем исходному графу
   }
 
   override extremities(edge: string): [string, string] {
@@ -217,23 +200,19 @@ export default class FilteredGraph extends Graph {
    * Для направленного графа считает всех соседей (как undirectedDegree).
    */
   override undirectedDegreeWithoutSelfLoops(node: string): number {
-    if (!this.nodeIds.has(node)) return 0;
     const neighbors = this.graph.neighbors(node).filter((n) => this.nodeIds.has(n));
     return neighbors.filter((n) => n !== node).length;
   }
 
   override neighbors(node: string): string[] {
-    if (!this.nodeIds.has(node)) return [];
     return this.graph.neighbors(node).filter((n) => this.nodeIds.has(n));
   }
 
   override degree(node: string): number {
-    if (!this.nodeIds.has(node)) return 0;
     return this.graph.neighbors(node).filter(n => this.nodeIds.has(n)).length;
   }
 
   override isUndirected(edge: string): boolean {
-    if (!this.hasEdge(edge)) return false;
     return this.graph.isUndirected(String(edge));
   }
 }
