@@ -12,7 +12,7 @@ export default function createLoggingGraph(graph: Graph) {
         callLog.push(`get ${String(propKey)}`);
       }
 
-      // Если это метод — оборачиваем, чтобы логировать вызов
+      // Если это метод - оборачиваем, чтобы логировать вызов
       if (typeof origValue === "function") {
         return new Proxy(origValue, {
           apply(fnTarget, thisArg, args) {

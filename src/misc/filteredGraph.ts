@@ -11,11 +11,11 @@ import type { EdgeIterationCallback, Attributes, GraphType } from "graphology-ty
 export default class FilteredGraph extends Graph {
   private graph: Graph;
   private nodeIds: Set<string>;
+  private edgeIds: Set<string>;
   public order: number;
+  public size: number;
   public type: GraphType;
   public multi: boolean;
-  private _nodes: Set<string>;
-  private _edges: Set<string>;
 
   /**
    * @param graph            Исходный граф Graphology
@@ -25,35 +25,42 @@ export default class FilteredGraph extends Graph {
     super();
     this.graph = graph;
     this.nodeIds = new Set(selectedNodeIds);
+    this.edgeIds = new Set();
     this.order = this.nodeIds.size;
     this.type = "undirected";
     this.multi = false;
+    this.size = 0;
 
-    this._nodes = this.nodeIds;
-    this._edges = new Set();
     this.graph.forEachEdge((edge, _attr, source, target) => {
-      if (this.nodeIds.has(source) && this.nodeIds.has(target))
-        this._edges.add(edge);
+      if (this.nodeIds.has(source) && this.nodeIds.has(target)) {
+        this.edgeIds.add(edge);
+        this.size++;
+      }
     });
   }
 
   /** Перебирает только выбранные узлы */
   forEachNode(callback: (node: string, attributes: { [key: string]: any }) => void): void {
     this.nodeIds.forEach((node) => {
-      if (this.graph.hasNode(node)) {
-        callback(node, this.graph.getNodeAttributes(node));
-      }
+      if (this.graph.hasNode(node)) callback(node, this.graph.getNodeAttributes(node));
     });
   }
 
   /** Перебирает рёбра, у которых оба конца принадлежат выбранным узлам */
   forEachEdge(callback: EdgeIterationCallback<Attributes, Attributes>): void {
-    this.graph.forEachEdge((edge, attr, source, target) => {
-      if (this.nodeIds.has(source) && this.nodeIds.has(target)) {
-        callback(edge, attr, source, target, this.graph.getNodeAttributes(source), 
-            this.graph.getNodeAttributes(target), this.graph.isUndirected(edge));
+    this.edgeIds.forEach((edge) => {
+      if (this.graph.hasEdge(edge)) {
+        const [source, target] = this.graph.extremities(edge);
+        callback(
+          edge, 
+          this.graph.getEdgeAttributes(edge), 
+          source, 
+          target, 
+          this.graph.getNodeAttributes(source), 
+          this.graph.getNodeAttributes(target), 
+          this.graph.isUndirected(edge));
       }
-    });
+    })
   }
   
   forEachNeighbor(
@@ -62,13 +69,15 @@ export default class FilteredGraph extends Graph {
   ): void {
     if (!this.nodeIds.has(node)) return;
     this.graph.forEachNeighbor(node, (neighbor, attributes) => {
-      if (this.nodeIds.has(neighbor)) {
-        callback(neighbor, attributes);
-      }
+      if (this.nodeIds.has(neighbor)) callback(neighbor, attributes);
     });
   }
 
   // ==================== Узлы ====================
+  
+  override hasNode(node: string): boolean {
+    return this.nodeIds.has(node) && this.graph.hasNode(node);
+  }
 
   override getNodeAttribute(node: string, attr: string | number): any {
     if (!this.hasNode(node)) return undefined;
@@ -81,14 +90,12 @@ export default class FilteredGraph extends Graph {
   }
 
   override setNodeAttribute(node: string, attr: string | number, value: any): this {
-    if (this.nodeIds.has(node))
-      this.graph.setNodeAttribute(node, String(attr), value);
+    if (this.nodeIds.has(node)) this.graph.setNodeAttribute(node, String(attr), value);
     return this;
   }
 
   override mergeNodeAttributes(node: string, attrs: { [key: string]: any }): this {
-    if (this.nodeIds.has(node))
-      this.graph.mergeNodeAttributes(node, attrs);
+    if (this.nodeIds.has(node)) this.graph.mergeNodeAttributes(node, attrs);
     return this;
   }
 
@@ -122,14 +129,20 @@ export default class FilteredGraph extends Graph {
   ): this {
     this.forEachNode((node, attrs) => {
       const newAttrs = updater(node, attrs);
-      if (newAttrs) {
-        this.graph.mergeNodeAttributes(node, newAttrs);
-      }
+      if (newAttrs) this.graph.mergeNodeAttributes(node, newAttrs);
     });
     return this;
   }
 
+  override nodes(): string[] {
+    return Array.from(this.nodeIds);
+  }
+
   // ==================== Ребра ====================
+  
+  override hasEdge(edge: string): boolean {
+    return this.edgeIds.has(edge) && this.graph.hasEdge(edge);
+  }
 
   override getEdgeAttribute(edge: string, attr: string | number): any {
     if (!this.hasEdge(edge)) return undefined;
@@ -137,9 +150,7 @@ export default class FilteredGraph extends Graph {
   }
 
   override getEdgeAttributes(edge: string): { [key: string]: any } {
-    if (!this.hasEdge(edge)) {
-      throw new Error(`Graph has no edge '${String(edge)}'`);
-    }
+    if (!this.hasEdge(edge)) throw new Error(`Graph has no edge '${String(edge)}'`);
     return this.graph.getEdgeAttributes(String(edge));
   }
 
@@ -176,19 +187,27 @@ export default class FilteredGraph extends Graph {
     const key = String(edge);
     const currentAttrs = this.graph.getEdgeAttributes(key);
     const newAttrs = updater(currentAttrs);
-    if (newAttrs) {
-      this.graph.mergeEdgeAttributes(key, newAttrs);
-    }
+    if (newAttrs) this.graph.mergeEdgeAttributes(key, newAttrs);
     return this;
   }
 
   override updateEachEdgeAttributes(updater: any) {
     this.forEachEdge((edge, attrs) => {
       const newAttrs = updater(edge, attrs);
-      if (newAttrs) {
-        this.graph.mergeEdgeAttributes(edge, newAttrs);
-      }
+      if (newAttrs) this.graph.mergeEdgeAttributes(edge, newAttrs);
     });
+  }
+
+  override edge(source: unknown, target: unknown): string | undefined {
+    const s = String(source);
+    const t = String(target);
+    if (!this.nodeIds.has(s) || !this.nodeIds.has(t)) return undefined;
+    return this.graph.edge(s, t);  // делегируем исходному графу
+  }
+
+  override extremities(edge: string): [string, string] {
+    if (this.hasEdge(edge)) return this.graph.extremities(edge);
+    else throw new Error(`Graph has no edge '${String(edge)}'`);
   }
   
   // ==================== Разное ====================
@@ -197,39 +216,25 @@ export default class FilteredGraph extends Graph {
    * Степень узла без учёта петель, но только среди выбранных соседей.
    * Для направленного графа считает всех соседей (как undirectedDegree).
    */
-  undirectedDegreeWithoutSelfLoops(node: string): number {
+  override undirectedDegreeWithoutSelfLoops(node: string): number {
     if (!this.nodeIds.has(node)) return 0;
     const neighbors = this.graph.neighbors(node).filter((n) => this.nodeIds.has(n));
     return neighbors.filter((n) => n !== node).length;
   }
 
-  hasNode(node: string): boolean {
-    return this.nodeIds.has(node) && this.graph.hasNode(node);
-  }
-
-  neighbors(node: string): string[] {
+  override neighbors(node: string): string[] {
     if (!this.nodeIds.has(node)) return [];
     return this.graph.neighbors(node).filter((n) => this.nodeIds.has(n));
   }
 
-  degree(node: string): number {
+  override degree(node: string): number {
     if (!this.nodeIds.has(node)) return 0;
     return this.graph.neighbors(node).filter(n => this.nodeIds.has(n)).length;
   }
 
-  nodes(): string[] {
-    return Array.from(this.nodeIds);
-  }
-
-  /**
-   * Возвращает ключ ребра между source и target,
-   * если оба узла принадлежат filtered-представлению и такое ребро существует.
-   */
-  override edge(source: unknown, target: unknown): string | undefined {
-    const s = String(source);
-    const t = String(target);
-    if (!this.nodeIds.has(s) || !this.nodeIds.has(t)) return undefined;
-    return this.graph.edge(s, t);  // делегируем исходному графу
+  override isUndirected(edge: string): boolean {
+    if (!this.hasEdge(edge)) return false;
+    return this.graph.isUndirected(String(edge));
   }
 }
 

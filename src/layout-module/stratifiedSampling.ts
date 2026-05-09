@@ -17,7 +17,7 @@ export default function stratifiedSampling(
 
   const totalNodes = graph.order;
   
-  // Если граф маленький — возвращаем все узлы
+  // Если граф маленький - возвращаем все узлы
   if (totalNodes <= sampleSize) {
     return graph.nodes();
   }
