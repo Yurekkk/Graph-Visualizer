@@ -1,7 +1,6 @@
 // ### Общая отрисовка ###
 export const edgesMaxDrawnLimit = 1000;
-export const communityDetectionMaxNumNodes = 1000; 
-// Если узлов много, то не ищем сообщества по дефолту, только если того требует layoutEngine
+
 
 
 // ### Общие цвета ###
