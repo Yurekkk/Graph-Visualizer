@@ -24,6 +24,11 @@ export function calculateNodesImportance(graph: Graph) {
     stats.eig.max = Math.max(stats.eig.max, eig);
   });
 
+  let maxNodeImportance = -Infinity;
+  let minNodeImportance = Infinity;
+  let avgNodeImportance = 0;
+  let count = 0;
+
   // Нормализация [0,1] + взвешивание
   graph.forEachNode((node, attrs) => {
     const norm = (val: number, s: { min: number; max: number }) =>
@@ -34,7 +39,13 @@ export function calculateNodesImportance(graph: Graph) {
                        alg.eigenvectorCentralityWeight * norm(attrs.eigenvectorCentrality, stats.eig);
 
     graph.setNodeAttribute(node, 'importance', importance);
+
+    maxNodeImportance = Math.max(importance, maxNodeImportance);
+    minNodeImportance = Math.min(importance, minNodeImportance);
+    avgNodeImportance += (importance - avgNodeImportance) / ++count;
   });
+
+  return {minNodeImportance, maxNodeImportance, avgNodeImportance};
 }
 
 
@@ -58,7 +69,6 @@ export function calculateEdgesImportance(graph: Graph) {
 
     maxEdgeImportance = Math.max(edgeImportance, maxEdgeImportance);
     minEdgeImportance = Math.min(edgeImportance, minEdgeImportance);
-
     avgEdgeImportance += (edgeImportance - avgEdgeImportance) / ++count;
   })
   return {minEdgeImportance, maxEdgeImportance, avgEdgeImportance};

@@ -1,7 +1,5 @@
 import Sigma from 'sigma';
 import Graph from 'graphology';
-import { calculateEdgeMetrics, calculateGraphMetrics, calculateNodeMetrics } 
-  from './metrics-module/metricsCalculations.ts';
 import { createNodeBorderProgram } from "@sigma/node-border";
 import EdgeCurveProgram from '@sigma/edge-curve';
 import parseGraphFile from './misc/graphParser.ts';
@@ -13,8 +11,17 @@ import { clearHighlightState, deselectNode, edgeReducer, hoverNode,
   nodeReducer, selectNode, unhoverNode } from './interactive-module/hoverClickHandler.ts';
 import { findCommunities } from './metrics-module/communitiesFinding.ts';
 import { ThemeManager } from './misc/themeManager.ts';
+import findSimpleMetrics from './metrics-module/simpleMetricsCalculation.ts';
+import calculateNodeMetrics from './metrics-module/calculateNodeMetrics.ts';
+import { calculateEdgesImportance } from './metrics-module/importanceCalculations.ts';
+import type graphMetrics from './metrics-module/graphMetricsInterface.ts';
 // import hideUnimportantNodes from './misc/hideUnimportantNodes.ts';
 // import hideUnimportantEdges from './misc/hideUnimportantEdges.ts';
+
+
+
+// TODO?: Все таки считать betweeness centrality, если граф маленький
+// TODO: Добавить поддержку ориентированного графа
 
 
 
@@ -64,17 +71,11 @@ export default async function initGraph(path: string, title: string, algorithm: 
 
   await setStatus('Считаем метрики...');
   start = performance.now();
-
-  let metrics = calculateGraphMetrics(graph);
-  calculateNodeMetrics(graph);
-  const {
-    minEdgeImportance, 
-    maxEdgeImportance, 
-    avgEdgeImportance} = calculateEdgeMetrics(graph);
-  let {numCommunities, modularity} = findCommunities(graph);
-  metrics = {...metrics, minEdgeImportance, maxEdgeImportance, 
-    avgEdgeImportance, numCommunities, modularity}
-
+  let metrics = {
+    ...findSimpleMetrics(graph),
+    ...calculateNodeMetrics(graph),
+    ...calculateEdgesImportance(graph)
+  } as graphMetrics;
   end = performance.now();
   console.log(`Время расчета метрик: ${(end - start).toFixed(3)} мс`)
   
@@ -103,7 +104,14 @@ export default async function initGraph(path: string, title: string, algorithm: 
 
   await setStatus('Раскладываем граф...');
   start = performance.now();
+
   smartLayout(graph, metrics, algorithm);
+
+  // Если узлов немного, то можно в любом случае быстро найти сообщества и 
+  // раскрашивать в зависимости от принадлежности к сообществу, так красивее. 
+  if (!metrics.numCommunities && metrics.numNodes < vis.communityDetectionMaxNumNodes)
+    metrics = {...metrics, ...findCommunities(graph)};
+
   end = performance.now();
   console.log(`Время работы раскладки: ${(end - start).toFixed(3)} мс`)
 
@@ -120,7 +128,7 @@ export default async function initGraph(path: string, title: string, algorithm: 
 
   await setStatus('Отрисовываем граф...');
   start = performance.now();
-
+  
   renderer = new Sigma(graph, sigmaContainer!, {
     defaultNodeType: 'circle',
     defaultEdgeType: 'line',

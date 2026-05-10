@@ -54,7 +54,7 @@ export function blendWithBackground(
 
 
 
-export function nodeColor(community: number, metrics: graphMetrics): string {
+export function nodeColorInterpolateComm(community: number, metrics: graphMetrics): string {
   // Окрашиваем узлы в зависимости от номера их сообщества
 
   const N = metrics.numCommunities!;
@@ -69,6 +69,22 @@ export function nodeColor(community: number, metrics: graphMetrics): string {
 
   const t = remappedComm / N; // 0.0 - 1.0
   return interpolateSinebow(t);
+}
+
+
+
+
+export function nodeColor(metrics: graphMetrics, importance?: number, community?: number): string {
+  // Окрашиваем узлы в зависимости от номера их сообщества, 
+  // если граф на них разбит, иначе в зависимости от важности узла
+  if (community !== undefined && metrics.numCommunities && metrics.numCommunities > 1) {
+    return nodeColorInterpolateComm(community, metrics);
+  }
+  else if (importance !== undefined && metrics.maxNodeImportance && 
+    metrics.maxNodeImportance !== metrics.minNodeImportance) {
+    return interpolateTurbo(importance / metrics.maxNodeImportance);
+  }
+  else return vis.nodeDefaultColor;
 }
 
 

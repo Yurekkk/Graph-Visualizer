@@ -55,11 +55,11 @@ export function nodeReducer(node: string, data: any, metrics: any) {
   const level = getNodeLevel(node);
   const theme = ThemeManager.getTheme();
   const bgColor = getBackgroundColor();
-  let color, borderColor, alpha;
+  const color = nodeColor(metrics, data.importance, data.community);
+  let borderColor, alpha;
 
   switch (level) {
     case 'selected':
-      color = nodeColor(data.community, metrics);
       borderColor = theme === 'dark' ? vis.borderColorDarkTheme : vis.borderColorLightTheme;
       alpha = vis.nodeDefaultAlpha;
       return {
@@ -73,9 +73,8 @@ export function nodeReducer(node: string, data: any, metrics: any) {
       };
       
     case 'hovered':
-      color = nodeColor(data.community, metrics);
-      borderColor = "#ffffff"; // Потому что bgColor лейбла в sigma.js всегда белый, меняется это 
-                                 // через кастомную отрисовку лейблов, фу
+      borderColor = "#ffffff"; // Потому что bgColor лейбла в sigma.js всегда белый, 
+                                 // Поменять это можно только через кастомную отрисовку лейблов, фу
       alpha = vis.nodeDefaultAlpha;
       return {
         ...data,
@@ -88,7 +87,6 @@ export function nodeReducer(node: string, data: any, metrics: any) {
       };
       
     case 'usual':
-      color = nodeColor(data.community, metrics);
       borderColor = theme === 'dark' ? vis.borderColorDarkTheme : vis.borderColorLightTheme;
       alpha = vis.nodeDefaultAlpha;
       return {
@@ -102,7 +100,6 @@ export function nodeReducer(node: string, data: any, metrics: any) {
       };
       
     case 'transparent':
-      color = nodeColor(data.community, metrics);
       borderColor = theme === 'dark' ? vis.borderColorDarkTheme : vis.borderColorLightTheme;
       alpha = vis.nodeTransparentAlpha;
       return {

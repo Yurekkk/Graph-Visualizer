@@ -5,10 +5,9 @@ import type Graph from 'graphology';
 import * as alg from '../configs/algorithmicConfig.ts';
 // import * as vis from '../configs/visualConfig.ts';
 import { smartLayout } from './layoutEngine.ts';
-import { calculateGraphMetrics } from '../metrics-module/metricsCalculations.ts';
-import { findCommunities } from '../metrics-module/communitiesFinding.ts';
 import FilteredGraph from '../misc/filteredGraph.ts';
 import radialLayout from './layoutRadial.ts';
+import findSimpleMetrics from '../metrics-module/simpleMetricsCalculation.ts';
 
 
 
@@ -22,9 +21,7 @@ export default function samplingLayout(graph: Graph) {
   const sampledNodes = sample(graph, sampleSize);
 
   const sampledGraph = new FilteredGraph(graph, new Set(sampledNodes));
-  let subMetrics = calculateGraphMetrics(sampledGraph);
-  let {numCommunities, modularity} = findCommunities(sampledGraph);
-  subMetrics = {...subMetrics, numCommunities, modularity};
+  const subMetrics = findSimpleMetrics(sampledGraph);
 
   smartLayout(sampledGraph, subMetrics);
 

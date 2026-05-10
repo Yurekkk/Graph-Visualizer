@@ -7,10 +7,14 @@ export default interface graphMetrics {
     minDegree: number,
     maxEdgeWeight: number,
     minEdgeWeight: number,
+    hubDominance: number,
     numCommunities?: number,
     modularity?: number,
-    hubDominance: number,
-    degreeGini: number,
+    degreeGini?: number,
+
+    minNodeImportance?: number, 
+    maxNodeImportance?: number, 
+    avgNodeImportance?: number,
     minEdgeImportance?: number, 
     maxEdgeImportance?: number,
     avgEdgeImportance?: number

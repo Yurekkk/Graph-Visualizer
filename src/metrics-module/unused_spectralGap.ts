@@ -9,6 +9,7 @@ import { EigenvalueDecomposition, Matrix } from 'ml-matrix';
  * Если граф несвязен, возвращает 0.
  * Использует итеративный метод (обратная итерация + CG) для больших графов
  * и плотное разложение для маленьких (n <= denseThreshold).
+ * Долго вычисляется, да и сама спектральная раскладка - хрень, поэтому не используется.
  */
 export default function computeSpectralGap(graph: Graph): number {
   const components = connectedComponents(graph);
