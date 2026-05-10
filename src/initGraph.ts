@@ -77,7 +77,15 @@ export default async function initGraph(path: string, title: string, algorithm: 
     ...calculateEdgesImportance(graph)
   } as graphMetrics;
   end = performance.now();
-  console.log(`Время расчета метрик: ${(end - start).toFixed(3)} мс`)
+  console.log(`Время расчета простых метрик: ${(end - start).toFixed(3)} мс`)
+
+
+
+  await setStatus('Находим сообщества...');
+  start = performance.now();
+  metrics = { ...metrics, ...findCommunities(graph) };
+  end = performance.now();
+  console.log(`Время нахождения сообществ (Leiden): ${(end - start).toFixed(3)} мс`)
   
 
 
@@ -104,20 +112,13 @@ export default async function initGraph(path: string, title: string, algorithm: 
 
   await setStatus('Раскладываем граф...');
   start = performance.now();
-
   smartLayout(graph, metrics, algorithm);
-
-  // Если узлов немного, то можно в любом случае быстро найти сообщества и 
-  // раскрашивать в зависимости от принадлежности к сообществу, так красивее. 
-  if (!metrics.numCommunities && metrics.numNodes < vis.communityDetectionMaxNumNodes)
-    metrics = {...metrics, ...findCommunities(graph)};
-
   end = performance.now();
   console.log(`Время работы раскладки: ${(end - start).toFixed(3)} мс`)
 
 
 
-  // await setStatus('Убираем неважные узле и ребра...');
+  // await setStatus('Убираем неважные узлы и ребра...');
   // start = performance.now();
   // hideUnimportantNodes(graph);
   // hideUnimportantEdges(graph, metrics);

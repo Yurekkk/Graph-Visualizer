@@ -1,6 +1,7 @@
 import Graph from "graphology";
 import * as alg from "../configs/algorithmicConfig";
 import * as vis from '../configs/visualConfig.ts';
+import type FilteredGraph from "../misc/filteredGraph.ts";
 
 
 
@@ -16,20 +17,24 @@ import * as vis from '../configs/visualConfig.ts';
  *   сортируются по среднему углу соседей из предыдущего уровня.
  */
 
-export default function radialLayout(graph: Graph, rootNode?: string) {
+export default function radialLayout(graph: Graph | FilteredGraph, rootNode?: string) {
   if (graph.order === 0) return;
 
-  // Корень - узел с максимальной степенью (если не задан)
+  // Корень - узел с максимальной невзвешенной степенью (если не задан)
   if (!rootNode) {
     let maxDegree = -Infinity;
-    graph.forEachNode((node, attrs) => {
-      if (attrs.degree > maxDegree) {
-        maxDegree = attrs.degree;
+    graph.forEachNode((node) => {
+      const deg = graph.degree(node);
+      if (deg > maxDegree) {
+        maxDegree = deg;
         rootNode = node;
       }
     });
   }
-  if (!rootNode) return;
+  if (!rootNode) {
+    console.log("Радиальная раскладка: не найден корневой узел");
+    return;
+  }
 
   // BFS по уровням
   const rings: string[][] = [];

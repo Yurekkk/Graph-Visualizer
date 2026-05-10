@@ -4,6 +4,8 @@ import noverlap from "graphology-layout-noverlap";
 import { smartLayout } from "./layoutEngine";
 import type { Attributes } from "graphology-types";
 import findSimpleMetrics from "../metrics-module/simpleMetricsCalculation.ts";
+import * as alg from '../configs/algorithmicConfig.ts';
+import { findCommunities } from "../metrics-module/communitiesFinding.ts";
 
 
 
@@ -11,6 +13,7 @@ type Timer = { value: number };
 
 let buildingSubgraphsTimer: Timer = {value: 0};
 let metricsCalculationTimer: Timer = {value: 0};
+let communitiesFindingTimer: Timer = {value: 0};
 
 function timed(accumulator: Timer, fn: () => any) {
   const start = performance.now();
@@ -23,10 +26,12 @@ function timed(accumulator: Timer, fn: () => any) {
 
 
 export default function metaLayout(graph: Graph, _recursion_level: number = 0) {
-  const commAttr = _recursion_level === 0 ? "community" : "community_lvl" + _recursion_level;
+  const currentCommAttr = _recursion_level === 0 ? "community" : "community_lvl" + _recursion_level;
+  const newCommAttr = "community_lvl" + (_recursion_level + 1);
+  const resolution = alg.communitiesResolution - alg.metaLayoutResolutionDecreaseStep * _recursion_level;
 
   // Мета-граф придется строить в любом случае
-  const metaGraph = timed(buildingSubgraphsTimer, () => buildMetaGraph(graph, commAttr));
+  const metaGraph = timed(buildingSubgraphsTimer, () => buildMetaGraph(graph, currentCommAttr));
 
   const communities = new Map<string, {commGraph: Graph, centerX: number, centerY: number}>();
 
@@ -34,8 +39,11 @@ export default function metaLayout(graph: Graph, _recursion_level: number = 0) {
   // Первый проход: раскладываем сообщества, считаем радиусы
   metaGraph.forEachNode((commId: string, metaAttrs: Attributes) => {
 
-    const commGraph = timed(buildingSubgraphsTimer, () => buildCommunityGraph(graph, commId, commAttr));
-    const metricsComm = timed(metricsCalculationTimer, () => findSimpleMetrics(commGraph));
+    const commGraph = timed(buildingSubgraphsTimer, () => buildCommunityGraph(graph, commId, currentCommAttr));
+    let metricsComm = timed(metricsCalculationTimer, () => findSimpleMetrics(commGraph));
+    metricsComm = timed(communitiesFindingTimer, () =>
+      ({ ...metricsComm, ...findCommunities(commGraph, resolution, newCommAttr) })
+    );
 
     // Раскладываем сообщество
     smartLayout(commGraph, metricsComm, 'auto', _recursion_level + 1, 'commGraph');
@@ -51,7 +59,10 @@ export default function metaLayout(graph: Graph, _recursion_level: number = 0) {
   });
 
   // Находим метрики в мета-графе
-  const metaMetrics = timed(metricsCalculationTimer, () => findSimpleMetrics(metaGraph));
+  let metaMetrics = timed(metricsCalculationTimer, () => findSimpleMetrics(metaGraph));
+  metaMetrics = timed(communitiesFindingTimer, () => 
+    ({ ...metaMetrics, ...findCommunities(metaGraph, resolution, newCommAttr) })
+  );
 
   // Рекурсивно раскладываем мета-граф
   smartLayout(metaGraph, metaMetrics, 'auto', _recursion_level + 1, 'metaGraph');
@@ -73,7 +84,9 @@ export default function metaLayout(graph: Graph, _recursion_level: number = 0) {
   if (_recursion_level === 0) {
     console.log(`- Время построения подграфов: ${buildingSubgraphsTimer.value.toFixed(3)} мс`);
     console.log(`- Время расчета метрик подграфов: ${metricsCalculationTimer.value.toFixed(3)} мс`);
+    console.log(`- Время нахождения сообществ в подграфах: ${communitiesFindingTimer.value.toFixed(3)} мс`);
     buildingSubgraphsTimer.value = 0;
     metricsCalculationTimer.value = 0;
+    communitiesFindingTimer.value = 0;
   }
 }

@@ -9,12 +9,14 @@ import forceLayout from './layoutForce.ts';
 import hierarchicalLayout from './layoutHierarchical.ts';
 import metaLayout from './layoutMeta.ts';
 import samplingLayout from './layoutSampling.ts';
-import { findCommunities } from '../metrics-module/communitiesFinding.ts';
 import findDegreeGini from '../metrics-module/findDegreeGini.ts';
+import type FilteredGraph from '../misc/filteredGraph.ts';
 
 
 
 // TODO: A lot of tweaking is still needed
+
+// Все-таки metaLayout лучше всего все отрисовывает и должен проверяться в первую очередь
 
 // noverlap.assign(graph); - Долго
 
@@ -24,18 +26,18 @@ export const layoutFunctions: Record<string, (graph: Graph, _recursion_level?: n
   "auto": () => {},
   "circular": circularLayout,
   "force": forceLayout,
-  "hierarchical": hierarchicalLayout,
+  "hierarchical": hierarchicalLayout,       // Не используется в smartLayout
   "meta": (g, l) => metaLayout(g, l!),
   "radial": (g, _l) => radialLayout(g),
-  "random": (g, _l) => setRandomCoords(g),
-  "sampling": samplingLayout,
-  "spectral": layoutSpectral,
+  "random": (g, _l) => setRandomCoords(g),  // Не используется в smartLayout
+  "sampling": (g, l) => samplingLayout(g, l!),
+  "spectral": layoutSpectral,               // Не используется в smartLayout
 };
 
 
 
 export function smartLayout(
-  graph: Graph, 
+  graph: Graph | FilteredGraph, 
   metrics: graphMetrics,
   algorithm: string = 'auto',
   _recursion_level: number = 0,
@@ -43,8 +45,15 @@ export function smartLayout(
 ) {
 
   if (algorithm !== 'auto') {
-    if (algorithm === 'meta') findCommsForCurrRecursionLevel(graph, metrics, _recursion_level);
     assignLayout(algorithm, graph, _recursion_level, _meta_or_comm_prefix);
+    return;
+  }
+
+  if (metrics.numNodes > alg.metaLayoutMinNodes &&
+      _recursion_level < alg.metaLayoutRecursionLevelCap && 
+      (metrics.modularity ?? -1) > alg.metaLayoutMinModularity &&
+      (metrics.numCommunities ?? 0) > 1) {
+    assignLayout('meta', graph, _recursion_level, _meta_or_comm_prefix);
     return;
   }
 
@@ -54,17 +63,8 @@ export function smartLayout(
   }
 
   if (metrics.numNodes >= alg.radialMinNumNodes &&
-           metrics.hubDominance >= alg.radialMinHubDominance) {
+      metrics.hubDominance >= alg.radialMinHubDominance) {
     assignLayout('radial', graph, _recursion_level, _meta_or_comm_prefix);
-    return;
-  }
-
-  findCommsForCurrRecursionLevel(graph, metrics, _recursion_level);
-  if (metrics.numNodes > alg.metaLayoutMinNodes &&
-      _recursion_level < alg.metaLayoutRecursionLevelCap && 
-      (metrics.modularity ?? -1) > alg.metaLayoutMinModularity &&
-      (metrics.numCommunities ?? 0) > 1) {
-    assignLayout('meta', graph, _recursion_level, _meta_or_comm_prefix);
     return;
   }
 
@@ -101,12 +101,4 @@ function logAlgoChoice(
   if (_recursion_level > 0)
     console.log(`# ${_meta_or_comm_prefix} - Выбран ${algorithm}Layout на уровне рекурсии: ${_recursion_level}`);
   else console.log(`# Выбран ${algorithm}Layout`);
-}
-
-
-
-function findCommsForCurrRecursionLevel(graph: Graph, metrics: graphMetrics, _recursion_level: number) {
-  const commAttr = _recursion_level === 0 ? "community" : "community_lvl" + _recursion_level;
-  const resolution = alg.communitiesResolution - alg.metaLayoutResolutionDecreaseStep * _recursion_level;
-  metrics = { ...metrics, ...findCommunities(graph, resolution, commAttr) };
 }
