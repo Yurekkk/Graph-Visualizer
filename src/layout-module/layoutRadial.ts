@@ -16,18 +16,19 @@ import * as vis from '../configs/visualConfig.ts';
  *   сортируются по среднему углу соседей из предыдущего уровня.
  */
 
-export default function radialLayout(graph: Graph) {
+export default function radialLayout(graph: Graph, rootNode?: string) {
   if (graph.order === 0) return;
 
-  // Корень - узел с максимальной степенью
-  let rootNode: string | undefined;
-  let maxDegree = -Infinity;
-  graph.forEachNode((node, attrs) => {
-    if (attrs.degree > maxDegree) {
-      maxDegree = attrs.degree;
-      rootNode = node;
-    }
-  });
+  // Корень - узел с максимальной степенью (если не задан)
+  if (!rootNode) {
+    let maxDegree = -Infinity;
+    graph.forEachNode((node, attrs) => {
+      if (attrs.degree > maxDegree) {
+        maxDegree = attrs.degree;
+        rootNode = node;
+      }
+    });
+  }
   if (!rootNode) return;
 
   // BFS по уровням

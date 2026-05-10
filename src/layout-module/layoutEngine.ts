@@ -27,7 +27,7 @@ export const layoutFunctions: Record<string, (graph: Graph, _recursion_level?: n
   "auto": () => {},
   "meta": (g, l) => metaLayout(g, l!),
   "circular": circularLayout,
-  "radial": radialLayout,
+  "radial": (g, _l) => radialLayout(g),
   "random": (g, _l) => setRandomCoords(g),
   "hierarchical": hierarchicalLayout,
   "spectral": layoutSpectral,
@@ -46,26 +46,27 @@ export function smartLayout(
 ) {
 
   if (algorithm !== 'auto') {
-    applyLayout(algorithm, graph, _recursion_level, _meta_or_comm_prefix);
+    assignLayout(algorithm, graph, _recursion_level, _meta_or_comm_prefix);
   }
   else if (metrics.numNodes > alg.metaLayoutMinNodes &&
       (metrics.modularity ?? -1) > alg.metaLayoutMinModularity &&
       _recursion_level < alg.metaLayoutRecursionLevelCap && 
       (metrics.numCommunities ?? 0) > 1) {
-    applyLayout('meta', graph, _recursion_level, _meta_or_comm_prefix);
+    assignLayout('meta', graph, _recursion_level, _meta_or_comm_prefix);
   }
   else if (metrics.density >= alg.circularMinDensity) {
-    applyLayout('circular', graph, _recursion_level, _meta_or_comm_prefix);
+    assignLayout('circular', graph, _recursion_level, _meta_or_comm_prefix);
   }
   else if (metrics.numNodes >= alg.radialMinNumNodes &&
            metrics.hubDominance >= alg.radialMinHubDominance) {
-    applyLayout('radial', graph, _recursion_level, _meta_or_comm_prefix);
+    assignLayout('radial', graph, _recursion_level, _meta_or_comm_prefix);
   }
-  // else if (metrics.numNodes > alg.samplingMinNumNodes) {
-  //   applyLayout('sampling', graph, _recursion_level, _meta_or_comm_prefix);
+  // else if (metrics.numNodes > alg.samplingMinNumNodes &&
+  //          metrics.degreeGini >= alg.samplingMinDegreeGini) {
+  //   assignLayout('sampling', graph, _recursion_level, _meta_or_comm_prefix);
   // } 
   else {
-    applyLayout('force', graph, _recursion_level, _meta_or_comm_prefix);
+    assignLayout('force', graph, _recursion_level, _meta_or_comm_prefix);
   }
 
   // Убираем наложения узлов // Долго
@@ -74,7 +75,7 @@ export function smartLayout(
 
 
 
-function applyLayout(algo: string, graph: Graph, 
+function assignLayout(algo: string, graph: Graph, 
   _recursion_level: number, _meta_or_comm_prefix: string) {
   const layout = layoutFunctions[algo];
   if (!layout) throw new Error(`Unknown algorithm: ${algo}`);

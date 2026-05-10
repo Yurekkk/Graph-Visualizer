@@ -75,10 +75,6 @@ export default async function initGraph(path: string, title: string, algorithm: 
   metrics = {...metrics, minEdgeImportance, maxEdgeImportance, 
     avgEdgeImportance, numCommunities, modularity}
 
-  for (const [key, value] of Object.entries(metrics)) {
-    console.log(`--- ${key}: ${value}`);
-  }
-
   end = performance.now();
   console.log(`Время расчета метрик: ${(end - start).toFixed(3)} мс`)
   
@@ -183,8 +179,11 @@ export default async function initGraph(path: string, title: string, algorithm: 
 
   fitViewportToNodes(renderer, graph.nodes());
 
-  await setStatus('');
-
   const overallEndTime = performance.now();
   console.log(`Всего прошло времени: ${(overallEndTime - overallStartTime).toFixed(3)} мс`)
+
+  for (const [key, value] of Object.entries(metrics))
+    console.log(`--- ${key}: ${value}`);
+
+  await setStatus('');
 }
