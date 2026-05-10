@@ -14,9 +14,8 @@ import type FilteredGraph from '../misc/filteredGraph.ts';
 
 
 
-// TODO: A lot of tweaking is still needed
-
 // Все-таки metaLayout лучше всего все отрисовывает и должен проверяться в первую очередь
+// Будем считать эту часть готовой, короче
 
 // noverlap.assign(graph); - Долго
 

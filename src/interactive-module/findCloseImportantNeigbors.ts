@@ -3,7 +3,7 @@ import * as alg from '../configs/algorithmicConfig.ts';
 import type graphMetrics from '../metrics-module/graphMetricsInterface.ts';
 import { MinPriorityQueue } from '@datastructures-js/priority-queue';
 
-
+// TODO: Учитывать буквальные координаты узлов
 
 export default function findCloseImportantNeighbours(
   selectedNodeId: string, graph: Graph, metrics: graphMetrics): 
@@ -84,7 +84,7 @@ function buildCostFunction(metrics: graphMetrics) {
 
   // Функция учитывает вес ребра и важность узла, в который идет ребро
   // cost = (1.5 - weightNorm) * (1.5 - importance)
-  // каждый множитель в [0.5, 1.5]
+  // каждый множитель в [0.5, 1.5], cost в [0.25, 2.25]
 
   return (importance: number, w: number) => {
     const weightFactor = weightsAreSame ? 1 : 
