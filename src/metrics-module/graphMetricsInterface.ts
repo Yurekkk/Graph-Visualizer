@@ -2,7 +2,6 @@ export default interface graphMetrics {
     numNodes: number,
     numEdges: number,
     density: number,
-    avgDegree: number,
     maxDegree: number,
     minDegree: number,
     maxEdgeWeight: number,

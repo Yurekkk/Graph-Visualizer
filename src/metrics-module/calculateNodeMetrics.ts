@@ -19,6 +19,18 @@ export default function calculateNodeMetrics(graph: Graph) {
   console.log(`Время вычисления центральности: ${(end - start).toFixed(3)} мс`);
   //*/
 
+  // Степени узлов
+  const degreeMap = new Map<string, number>();
+  graph.forEachEdge((_edgeId, attributes, source, target) => {
+    degreeMap.set(source, (degreeMap.get(source) || 0) + (attributes.weight || 1));
+    degreeMap.set(target, (degreeMap.get(target) || 0) + (attributes.weight || 1));
+  });
+
+  graph.forEachNode((node) => {
+    graph.setNodeAttribute(node, 'degree', degreeMap.get(node)!);
+    graph.setNodeAttribute(node, 'degreeCentrality', degreeMap.get(node)! / (graph.order - 1));
+  });
+
   coreNumber.coreNumber.assign(graph); // k-core // оно горит красным, но все правильно
 
   // pagerank.assign(graph, {weighted: true});

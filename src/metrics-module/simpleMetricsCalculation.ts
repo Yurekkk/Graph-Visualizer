@@ -5,7 +5,6 @@ export default function findSimpleMetrics(graph: Graph) {
   const numEdges = graph.size;
   const maxPossibleEdges = numNodes * (numNodes - 1) / 2;
   const density = maxPossibleEdges > 0 ? numEdges / maxPossibleEdges : 0;
-  const avgDegree = numNodes > 0 ? (2 * numEdges) / numNodes : 0;
   
   // Степени узлов
   const degreeMap = new Map<string, number>();
@@ -13,19 +12,14 @@ export default function findSimpleMetrics(graph: Graph) {
     degreeMap.set(source, (degreeMap.get(source) || 0) + (attributes.weight || 1));
     degreeMap.set(target, (degreeMap.get(target) || 0) + (attributes.weight || 1));
   });
-
-  graph.forEachNode((node) => {
-    graph.setNodeAttribute(node, 'degree', degreeMap.get(node)!);
-    graph.setNodeAttribute(node, 'degreeCentrality', degreeMap.get(node)! / (numNodes - 1));
-  });
   
   let maxDegree = -Infinity;
   let minDegree = +Infinity;
   let sumDegrees = 0;
-  graph.forEachNode((_node, attrs) => {
-    maxDegree = Math.max(attrs.degree, maxDegree);
-    minDegree = Math.min(attrs.degree, minDegree);
-    sumDegrees += attrs.degree;
+  graph.forEachNode((node) => {
+    maxDegree = Math.max(degreeMap.get(node)!, maxDegree);
+    minDegree = Math.min(degreeMap.get(node)!, minDegree);
+    sumDegrees += degreeMap.get(node)!;
   });
 
   let maxEdgeWeight = -Infinity;
@@ -42,7 +36,6 @@ export default function findSimpleMetrics(graph: Graph) {
     numNodes,
     numEdges,
     density,
-    avgDegree,
     maxDegree,
     minDegree,
     maxEdgeWeight,
