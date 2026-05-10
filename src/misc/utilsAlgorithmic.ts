@@ -109,9 +109,11 @@ export function setRandomCoords(graph: Graph, replaceNansOnly: boolean = false) 
   const rng = seedrandom(alg.seed);
   graph.forEachNode((node, attrs) => {
     if (!attrs.fixed && (!replaceNansOnly || (!attrs.x || !attrs.y))) {
+      const r = Math.sqrt(rng());
+      const ang = rng() * 2 * Math.PI;
       graph.mergeNodeAttributes(node, {
-        x: (rng() - 0.5) * spacing,
-        y: (rng() - 0.5) * spacing
+        x: r * Math.cos(ang) * spacing,
+        y: r * Math.sin(ang) * spacing
       });
     }
   });
