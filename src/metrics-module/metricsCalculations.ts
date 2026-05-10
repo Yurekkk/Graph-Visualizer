@@ -4,7 +4,7 @@ import type graphMetrics from './graphMetricsInterface.ts';
 import coreNumber from 'graphology-cores';
 // import pagerank from 'graphology-metrics/centrality/pagerank';
 import { calculateEdgesImportance, calculateNodesImportance } from './importanceCalculations.ts';
-import { findSimpleMetrics } from './simpleMetricsCalculation.ts';
+import { findDegreeGini, findSimpleMetrics } from './simpleMetricsCalculation.ts';
 import eigenvectorCentralityApprox from './eigenvectorCentralityApprox.ts';
 // import computeSpectralGap from './spectralGap.ts';
 
@@ -31,7 +31,7 @@ export function calculateGraphMetrics(graph: Graph): graphMetrics {
     minEdgeWeight,
     hubDominance
   } = findSimpleMetrics(graph);
-  // const degreeGini = findDegreeGini(graph); // ненужно
+  const degreeGini = findDegreeGini(graph);
   // const spectralGap = computeSpectralGap(graph); // долго
 
   // const end = performance.now();
@@ -47,7 +47,7 @@ export function calculateGraphMetrics(graph: Graph): graphMetrics {
     maxEdgeWeight,
     minEdgeWeight,
     hubDominance,
-    // degreeGini
+    degreeGini
   };
 }
 

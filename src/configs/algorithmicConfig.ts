@@ -14,7 +14,7 @@ export const eigCentralityTolerance = 1e-6;
 
 
 // ### Layouts Settings ###
-export const circularSpacing = 2.2;
+export const circularSpacing = 1.0;
 export const radialRingSpacing = 30;
 export const radialSubringSpacing = 2.0;
 export const hierarchicalSpacing = 0.2;
