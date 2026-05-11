@@ -16,5 +16,10 @@ export default interface graphMetrics {
     avgNodeImportance?: number,
     minEdgeImportance?: number, 
     maxEdgeImportance?: number,
-    avgEdgeImportance?: number
+    avgEdgeImportance?: number,
+
+    maxX?: number,
+    minX?: number,
+    maxY?: number,
+    minY?: number
 }
