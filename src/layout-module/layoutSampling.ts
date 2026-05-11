@@ -12,6 +12,11 @@ import { findCommunities } from '../metrics-module/communitiesFinding.ts';
 
 
 
+// TODO: Сделать отталкивание для несэмплированных узлов
+// TODO?: Сделать несколько интерполирований для узлов, у которых нет семплированных соседей изначально
+
+
+
 export default function samplingLayout(graph: Graph, _recursion_level: number = 0) {
   // Сэмплируем, раскладываем подграф, интерполируем остальное
 
