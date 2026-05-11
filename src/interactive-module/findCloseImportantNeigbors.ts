@@ -3,7 +3,7 @@ import * as alg from '../configs/algorithmicConfig.ts';
 import type graphMetrics from '../metrics-module/graphMetricsInterface.ts';
 import { MinPriorityQueue } from '@datastructures-js/priority-queue';
 
-
+// TODO: Учитывать буквальные координаты узлов
 
 export default function findCloseImportantNeighbours(
   selectedNodeId: string, graph: Graph, metrics: graphMetrics): 
@@ -54,7 +54,7 @@ export default function findCloseImportantNeighbours(
 
       const weight = attrs?.weight ?? 1;
       const neighborImportance = graph.getNodeAttribute(neighbor, 'importance');
-      const edgeCost = costFunc(graph, node, neighbor, neighborImportance, weight);
+      const edgeCost = costFunc(neighborImportance, weight);
       const newCost = cost + edgeCost;
 
       if (!dist.has(neighbor) || newCost < dist.get(neighbor)!) {
@@ -82,28 +82,13 @@ export default function findCloseImportantNeighbours(
 function buildCostFunction(metrics: graphMetrics) {
   const weightsAreSame = (metrics.maxEdgeWeight == metrics.minEdgeWeight);
 
-  // Функция учитывает вес ребра; важность узла, в который идет ребро; 
-  // и расстояние между нормированными координатами узлов
-  // cost = (1.5 - weightNorm) * (1.5 - importance) * (0.5 + normDistance)
-  // первые два множителя в [0.5, 1.5]
-  // normDistance в [0.5, 1.9142]
-  // cost в [0.125, 4.3]
+  // Функция учитывает вес ребра и важность узла, в который идет ребро
+  // cost = (1.5 - weightNorm) * (1.5 - importance)
+  // каждый множитель в [0.5, 1.5], cost в [0.25, 2.25]
 
-  return (graph: Graph, node: string, neighbor: string, neighborImportance: number, w: number) => {
-    const nodeX = graph.getNodeAttribute(node, 'x') ?? 0;
-    const nodeY = graph.getNodeAttribute(node, 'y') ?? 0;
-    const neighborX = graph.getNodeAttribute(neighbor, 'x') ?? 0;
-    const neighborY = graph.getNodeAttribute(neighbor, 'y') ?? 0;
-
-    const normNodeX = (nodeX - metrics.minX!) / (metrics.maxX! - metrics.minX! + 1e-15);
-    const normNodeY = (nodeY - metrics.minY!) / (metrics.maxY! - metrics.minY! + 1e-15);
-    const normNeighborX = (neighborX - metrics.minX!) / (metrics.maxX! - metrics.minX! + 1e-15);
-    const normNeighborY = (neighborY - metrics.minY!) / (metrics.maxY! - metrics.minY! + 1e-15);
-
-    const euclideanDistance = Math.sqrt((normNodeX - normNeighborX) ** 2 + (normNodeY - normNeighborY) ** 2);
-    
+  return (importance: number, w: number) => {
     const weightFactor = weightsAreSame ? 1 : 
       1.5 - (w - metrics.minEdgeWeight) / (metrics.maxEdgeWeight - metrics.minEdgeWeight);
-    return weightFactor * (1.5 - neighborImportance) * (0.5 + euclideanDistance);
+    return weightFactor * (1.5 - importance);
   }
 }

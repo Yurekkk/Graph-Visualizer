@@ -15,7 +15,6 @@ import findSimpleMetrics from './metrics-module/simpleMetricsCalculation.ts';
 import calculateNodeMetrics from './metrics-module/calculateNodeMetrics.ts';
 import { calculateEdgesImportance } from './metrics-module/importanceCalculations.ts';
 import type graphMetrics from './metrics-module/graphMetricsInterface.ts';
-import findExtremeCoordinates from './metrics-module/findExtremeCoordinates.ts';
 // import hideUnimportantNodes from './misc/hideUnimportantNodes.ts';
 // import hideUnimportantEdges from './misc/hideUnimportantEdges.ts';
 
@@ -114,7 +113,6 @@ export default async function initGraph(path: string, title: string, algorithm: 
   await setStatus('Раскладываем граф...');
   start = performance.now();
   smartLayout(graph, metrics, algorithm);
-  metrics = { ...metrics, ...findExtremeCoordinates(graph) };
   end = performance.now();
   console.log(`Время работы раскладки: ${(end - start).toFixed(3)} мс`)
 
