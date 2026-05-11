@@ -22,6 +22,7 @@ import type graphMetrics from './metrics-module/graphMetricsInterface.ts';
 
 // TODO?: Все таки считать betweeness centrality, если граф маленький
 // TODO: Добавить поддержку ориентированного графа
+// TODO: Сделать окошко, при клике на узел отображающее параметры узла
 
 
 
