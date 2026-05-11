@@ -3,7 +3,7 @@ import * as alg from '../configs/algorithmicConfig.ts';
 import type graphMetrics from '../metrics-module/graphMetricsInterface.ts';
 import { MinPriorityQueue } from '@datastructures-js/priority-queue';
 
-// TODO: Учитывать буквальные координаты узлов
+// Учитывать Евклидово расстояние все же не очень, так оно пропустит удаленные хабы
 
 export default function findCloseImportantNeighbours(
   selectedNodeId: string, graph: Graph, metrics: graphMetrics): 
