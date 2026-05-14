@@ -19,6 +19,7 @@ export const radialRingSpacing = 30;
 export const radialSubringSpacing = 2.0;
 export const hierarchicalSpacing = 0.2;
 export const forceLayoutIterations = 50;
+export const samplingLayoutIterations = 50;
 export const sampleSizeCoefficient = 0.67; // [0, 1]. Кол-во узлов в выборке = N^sampleSizeCoefficient
 export const samplingLayoutSpacing = 5.0; // Коэффициент, на который умножаются координаты разложенного сэмпла, 
                                           // чтобы увеличить расстояия между узлами при интерполяции
