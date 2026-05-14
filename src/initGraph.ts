@@ -15,6 +15,7 @@ import findSimpleMetrics from './metrics-module/simpleMetricsCalculation.ts';
 import calculateNodeMetrics from './metrics-module/calculateNodeMetrics.ts';
 import { calculateEdgesImportance } from './metrics-module/importanceCalculations.ts';
 import type graphMetrics from './metrics-module/graphMetricsInterface.ts';
+import { updateGraphMetrics } from './interactive-module/uiPanel.ts';
 // import hideUnimportantNodes from './misc/hideUnimportantNodes.ts';
 // import hideUnimportantEdges from './misc/hideUnimportantEdges.ts';
 
@@ -188,6 +189,7 @@ export default async function initGraph(path: string, title: string, algorithm: 
   // });
 
   fitViewportToNodes(renderer, graph.nodes());
+  updateGraphMetrics(metrics);
 
   const overallEndTime = performance.now();
   console.log(`Всего прошло времени: ${(overallEndTime - overallStartTime).toFixed(3)} мс`)

@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-
 <html lang="ru">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,27 +7,33 @@
     <link rel="icon" type="image/x-icon" href="src/icon.png">
     <title>Sigma.js Graph</title>
 </head>
-
 <body>
-    <div id="controls">
-        <select id="graph-selector">
-            <option value="" disabled selected>Loading list...</option>
-        </select>
+    <aside id="sidebar">
+        <section class="panel-block">
+            <select id="graph-selector"><option value="" disabled selected>Загрузка списка...</option></select>
+            <select id="algorithm-selector"><option value="" disabled selected>Загрузка списка...</option></select>
+        </section>
 
-        <select id="algorithm-selector">
-            <option value="" disabled selected>Loading list...</option>
-        </select>
+        <section class="panel-block">
+            <h3>Метрики графа</h3>
+            <div id="graph-metrics" class="metrics-list"><span class="placeholder">Ожидание загрузки...</span></div>
+        </section>
 
-        <div class="theme-toggle" role="group" aria-label="Переключение темы">
-            <input type="checkbox" id="theme-switch" class="theme-checkbox"/>
-            <label for="theme-switch" class="theme-slider">
-                <span class="theme-icon icon-dark">🌙</span>
-                <span class="theme-icon icon-light">☀️</span>
-            </label>
-        </div>
+        <section class="panel-block">
+            <h3>Метрики узла</h3>
+            <div id="node-metrics" class="metrics-list"><span class="placeholder">Выберите узел</span></div>
+        </section>
+    </aside>
+
+    <div class="theme-toggle" role="group" aria-label="Переключение темы">
+        <input type="checkbox" id="theme-switch" class="theme-checkbox"/>
+        <label for="theme-switch" class="theme-slider">
+            <span class="theme-icon icon-dark">🌙</span>
+            <span class="theme-icon icon-light">☀️</span>
+        </label>
     </div>
 
-    <div id="sigma-container"></div>
+    <main id="sigma-container"></main>
 
     <div id="loader" style="display: none;">
         <div class="spinner"></div>
@@ -38,5 +42,4 @@
     
     <script type="module" src="/src/main.ts"></script>
 </body>
-
 </html>

@@ -7,6 +7,7 @@ import type Sigma from 'sigma';
 import findCloseImportantNeighbours from '../interactive-module/findCloseImportantNeigbors';
 import { fitViewportToNodes } from '@sigma/utils';
 import { ThemeManager } from '../misc/themeManager';
+import { resetNodeMetrics, updateNodeMetrics } from './uiPanel';
 
 
 
@@ -214,6 +215,7 @@ export function selectNode(nodeId: string, graph: Graph, renderer: Sigma, metric
     return;
   }
   selectedNodeId = nodeId;
+  updateNodeMetrics(nodeId, graph); // обновляем панель метрик узла
 
   console.log(`- Выбран узел ${nodeId}`);
   const nodeMetrics = ["degree", "degreeCentrality", "community", 
@@ -232,6 +234,7 @@ export function selectNode(nodeId: string, graph: Graph, renderer: Sigma, metric
 export function deselectNode(_graph: Graph, renderer: Sigma) {
   selectedNodeId = null;
   clearHighlightState();
+  resetNodeMetrics(); // сбрасываем панель метрик узла
   renderer.refresh({skipIndexation: true});
 }
 
