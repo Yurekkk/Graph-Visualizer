@@ -25,7 +25,6 @@ select:open {
 
 :root {
   --sidebar-width: 320px;
-  --panel-bg: var(--bg-color);
   --panel-text: var(--text-color);
   --panel-border: var(--border-color);
   --accent: var(--accent-color);
@@ -110,6 +109,31 @@ select {
 .metric-value { font-weight: 500; font-variant-numeric: tabular-nums; }
 .node-header { font-weight: bold; margin-bottom: 8px; color: var(--accent); }
 .placeholder { opacity: 0.5; text-align: center; padding: 12px 0; }
+
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  padding-right: 28px; /* место под стрелку */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5z' fill='%23888'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 12px 8px;
+}
+
+/* Ховер больше не трогает стрелку, но можно явно зафиксировать фон */
+select:hover, select:focus {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5z' fill='%23888'/%3E%3C/svg%3E");
+  outline: none;
+}
+
+/* Цвет выделения для опций при наведении */
+select option:hover,
+select option:focus,
+select option:active,
+select option:checked {
+  background-color: var(--panel-border) !important;
+}
 
 
 
@@ -228,17 +252,6 @@ select {
 
 
 /* === Scroll track === */
-
-:root { /* Тёмная (default) */
-  --scroll-track: #414141;
-  --scroll-thumb: #555;
-  --scroll-thumb-hover: #777;
-}
-:root[data-theme="light"] {
-  --scroll-track: #f0f0f0;
-  --scroll-thumb: #ccc;
-  --scroll-thumb-hover: #aaa;
-}
 
 /* WebKit/Blink */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
