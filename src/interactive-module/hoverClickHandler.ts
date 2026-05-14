@@ -6,7 +6,7 @@ import { blendWithBackground, edgeColor, edgeColorInterpolate, edgeSize, edgeSiz
 import type Sigma from 'sigma';
 import findCloseImportantNeighbours from '../interactive-module/findCloseImportantNeigbors';
 import { fitViewportToNodes } from '@sigma/utils';
-import { ThemeManager } from '../misc/themeManager';
+import { ThemeManager } from './themeManager';
 import { resetNodeMetrics, updateNodeMetrics } from './uiPanel';
 
 

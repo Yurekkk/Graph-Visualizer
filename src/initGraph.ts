@@ -10,7 +10,7 @@ import { fitViewportToNodes } from '@sigma/utils';
 import { clearHighlightState, deselectNode, edgeReducer, hoverNode, 
   nodeReducer, selectNode, unhoverNode } from './interactive-module/hoverClickHandler.ts';
 import { findCommunities } from './metrics-module/communitiesFinding.ts';
-import { ThemeManager } from './misc/themeManager.ts';
+import { ThemeManager } from './interactive-module/themeManager.ts';
 import findSimpleMetrics from './metrics-module/simpleMetricsCalculation.ts';
 import calculateNodeMetrics from './metrics-module/calculateNodeMetrics.ts';
 import { calculateEdgesImportance } from './metrics-module/importanceCalculations.ts';
