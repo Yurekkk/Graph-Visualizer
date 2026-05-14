@@ -1,20 +1,21 @@
-// ### Общая отрисовка ###
-export const edgesMaxDrawnLimit = 1000;
-
-
-
 // ### Общие цвета ###
 export const DarkTheme = {
   backgroundColor: "#2d2f32",
   textColor: '#e2e8f0',
   panelBackgroundColor: "#27292b",
-  cssBorderColor: "#1e1f21"
+  cssBorderColor: "#1e1f21",
+  scrollTrack: "#414141",
+  scrollThumb: "#555",
+  scrollThumbHover: "#777"
 }
 export const LightTheme = {
   backgroundColor: "#ffffff",
   textColor: '#1e1f21',
   panelBackgroundColor: "#e2e8f0",
-  cssBorderColor: "#ced1d4"
+  cssBorderColor: "#ced1d4",
+  scrollTrack: "#f0f0f0",
+  scrollThumb: "#ccc",
+  scrollThumbHover: "#aaa"
 }
 
 
@@ -57,5 +58,4 @@ export const borderSizeSelect = 0.35;
 // ### Misc ###
 export const labelSize = 20;
 export const cameraFitPadding = 50; // в пикселях
-export const zLayerMargin = 1e+12; // Запас на один z-слой для одного типа узлов
-// [0, zLayerMargin] для usual узлов, [zLayerMargin, 2 * zLayerMargin] для selected узлов и т. д.
+export const edgesMaxDrawnLimit = 1000;

@@ -32,7 +32,13 @@ export class ThemeManager {
       theme === 'dark' ? vis.DarkTheme.panelBackgroundColor : vis.LightTheme.panelBackgroundColor);
     document.documentElement.style.setProperty('--border-color', 
       theme === 'dark' ? vis.DarkTheme.cssBorderColor : vis.LightTheme.cssBorderColor);
-    
+    document.documentElement.style.setProperty('--scroll-track', 
+      theme === 'dark' ? vis.DarkTheme.scrollTrack : vis.LightTheme.scrollTrack);
+    document.documentElement.style.setProperty('--scroll-thumb', 
+      theme === 'dark' ? vis.DarkTheme.scrollThumb : vis.LightTheme.scrollThumb);
+    document.documentElement.style.setProperty('--scroll-thumb-hover', 
+      theme === 'dark' ? vis.DarkTheme.scrollThumbHover : vis.LightTheme.scrollThumbHover);
+
     // Уведомляем подписчиков (Sigma и т.п.)
     for (const cb of this.listeners) cb();
     

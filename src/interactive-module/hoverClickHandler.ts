@@ -11,6 +11,9 @@ import { resetNodeMetrics, updateNodeMetrics } from './uiPanel';
 
 
 
+const zLayerMargin = 1e+12; // Запас на один z-слой для одного типа узлов
+// [0, zLayerMargin] для usual узлов, [zLayerMargin, 2 * zLayerMargin] для selected узлов и т. д.
+
 type NodeLevel = "hovered" | "selected" | "usual" | "transparent";
 
 type EdgeLevel = "highlightedAndImportant" | "highlighted" | "important" | "usual" | "transparent";
@@ -68,7 +71,7 @@ export function nodeReducer(node: string, data: any, metrics: any) {
         size: vis.nodeSizeSelected ?? nodeSize(data.degree, metrics),
         borderSize: vis.borderSizeSelect,
         borderColor: blendWithBackground(borderColor, bgColor, alpha),
-        zIndex: data.degree + 2 * vis.zLayerMargin,
+        zIndex: data.degree + 2 * zLayerMargin,
         color: blendWithBackground(color, bgColor, alpha),
         hidden: false,
       };
@@ -82,7 +85,7 @@ export function nodeReducer(node: string, data: any, metrics: any) {
         size: vis.nodeSizeHover ?? nodeSize(data.degree, metrics),
         borderSize: vis.borderSizeHover,
         borderColor: blendWithBackground(borderColor, bgColor, alpha),
-        zIndex: data.degree + vis.zLayerMargin,
+        zIndex: data.degree + zLayerMargin,
         color: blendWithBackground(color, bgColor, alpha),
         hidden: false,
       };
@@ -108,7 +111,7 @@ export function nodeReducer(node: string, data: any, metrics: any) {
         size: nodeSize(data.degree, metrics),
         borderSize: 0,
         borderColor: blendWithBackground(borderColor, bgColor, alpha),
-        zIndex: data.degree - vis.zLayerMargin,
+        zIndex: data.degree - zLayerMargin,
         color: blendWithBackground(color, bgColor, alpha),
         hidden: false,
       };
@@ -144,7 +147,7 @@ export function edgeReducer(edge: string, data: any, graph: Graph, metrics: grap
         ...data,
         size: edgeSizeInterpolate(importantEdgesCache.get(edge)!, maxEdgeImportance!, minEdgeImportance!),
         color: blendWithBackground(color, bgColor, alpha),
-        zIndex: (allWeightsEqual ? data.importance : data.weight) + 2 * vis.zLayerMargin,
+        zIndex: (allWeightsEqual ? data.importance : data.weight) + 2 * zLayerMargin,
         hidden: false,
       };
 
@@ -155,7 +158,7 @@ export function edgeReducer(edge: string, data: any, graph: Graph, metrics: grap
         ...data,
         size: edgeSize(data.weight, data.importance, metrics),
         color: blendWithBackground(color, bgColor, alpha),
-        zIndex: (allWeightsEqual ? data.importance : data.weight) + 2 * vis.zLayerMargin,
+        zIndex: (allWeightsEqual ? data.importance : data.weight) + 2 * zLayerMargin,
         hidden: false,
       };
       
@@ -167,7 +170,7 @@ export function edgeReducer(edge: string, data: any, graph: Graph, metrics: grap
         ...data,
         size: edgeSizeInterpolate(importance!, maxEdgeImportance!, minEdgeImportance!),
         color: blendWithBackground(color, bgColor, alpha),
-        zIndex: (allWeightsEqual ? data.importance : data.weight) + vis.zLayerMargin,
+        zIndex: (allWeightsEqual ? data.importance : data.weight) + zLayerMargin,
         hidden: false,
       };
       
@@ -189,7 +192,7 @@ export function edgeReducer(edge: string, data: any, graph: Graph, metrics: grap
         ...data,
         size: edgeSize(data.weight, data.importance, metrics),
         color: blendWithBackground(color, bgColor, alpha),
-        zIndex: (allWeightsEqual ? data.importance : data.weight) - vis.zLayerMargin,
+        zIndex: (allWeightsEqual ? data.importance : data.weight) - zLayerMargin,
         hidden: metrics.numEdges > vis.edgesMaxDrawnLimit,
       };
   }

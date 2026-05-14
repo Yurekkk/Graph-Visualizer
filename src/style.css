@@ -224,3 +224,27 @@ select {
 .theme-checkbox:checked + .theme-slider .icon-light {
   opacity: 0;
 }
+
+
+
+/* === Scroll track === */
+
+:root { /* Тёмная (default) */
+  --scroll-track: #414141;
+  --scroll-thumb: #555;
+  --scroll-thumb-hover: #777;
+}
+:root[data-theme="light"] {
+  --scroll-track: #f0f0f0;
+  --scroll-thumb: #ccc;
+  --scroll-thumb-hover: #aaa;
+}
+
+/* WebKit/Blink */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--scroll-track); }
+::-webkit-scrollbar-thumb { background: var(--scroll-thumb); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-hover); }
+
+/* Firefox */
+* { scrollbar-width: thin; scrollbar-color: var(--scroll-thumb) var(--scroll-track); }
