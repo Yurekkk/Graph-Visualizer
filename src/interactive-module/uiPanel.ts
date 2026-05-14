@@ -2,24 +2,35 @@ import type Graph from 'graphology';
 import type graphMetrics from '../metrics-module/graphMetricsInterface';
 
 const graphMetricsLabels: Record<string, string> = {
-  numNodes: 'Кол-во узлов', numEdges: 'Кол-во ребер', density: 'Плотность',
-  avgDegree: 'Средняя степень', maxDegree: 'Макс. степень', minDegree: 'Мин. степень',
-  maxEdgeWeight: 'Макс. вес', minEdgeWeight: 'Мин. вес', hubDominance: 'Доминирование хаба',
-  degreeGini: 'Индекс Джини', numCommunities: 'Кол-во сообществ', modularity: 'Модулярность'
+  numNodes: 'Кол-во узлов', 
+  numEdges: 'Кол-во ребер', 
+  density: 'Плотность',
+  avgDegree: 'Средняя степень узла', 
+  maxDegree: 'Макс. степень узла', 
+  minDegree: 'Мин. степень узла',
+  maxEdgeWeight: 'Макс. вес ребра', 
+  minEdgeWeight: 'Мин. вес ребра',
+  degreeGini: 'Индекс Джини', 
+  numCommunities: 'Кол-во сообществ',
+  modularity: 'Модулярность'
 };
 
 const nodeMetricsLabels: Record<string, string> = {
-  degree: 'Степень', degreeCentrality: 'Степенная центральность', core: 'k-core',
-  eigenvectorCentrality: 'Собств. центральность', importance: 'Важность', community: 'Номер сообщества'
+  degree: 'Степень', 
+  degreeCentrality: 'Степенная центр-ть', 
+  core: 'k-core',
+  eigenvectorCentrality: 'Собств. центр-ть', 
+  importance: 'Важность', 
+  community: 'Номер сообщества'
 };
 
 export function updateGraphMetrics(metrics: graphMetrics): void {
   const container = document.getElementById('graph-metrics')!;
   container.innerHTML = '';
   
-  for (const [key, value] of Object.entries(metrics)) {
+  for (const [key, label] of Object.entries(graphMetricsLabels)) {
+    const value = metrics[key as keyof graphMetrics];
     if (value === undefined || value === null) continue;
-    const label = graphMetricsLabels[key] || key;
 
     let formatted;
     if (typeof value === 'number')

@@ -23,7 +23,6 @@ import { updateGraphMetrics } from './interactive-module/uiPanel.ts';
 
 // TODO?: Все таки считать betweeness centrality, если граф маленький
 // TODO: Добавить поддержку ориентированного графа
-// TODO: Сделать окошко, при клике на узел отображающее параметры узла
 
 
 
