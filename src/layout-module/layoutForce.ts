@@ -15,7 +15,9 @@ export default function forceLayout(graph: Graph) {
     iterations: alg.forceLayoutIterations,
     settings: {
       ...sensibleSettings,
-      barnesHutOptimize: true
+      barnesHutOptimize: true,
+      scalingRatio: alg.forceLayoutScalingRatio,
+      edgeWeightInfluence: 1.0
     }
   });
   graph.forEachNode((node) => {
