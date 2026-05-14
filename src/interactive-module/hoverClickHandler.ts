@@ -207,6 +207,7 @@ export function hoverNode(nodeId: string, _graph: Graph, renderer: Sigma) {
 }
 
 export function unhoverNode(_graph: Graph, renderer: Sigma) {
+  if (hoveredNodeId === null) return;
   hoveredNodeId = null;
   renderer.refresh({skipIndexation: true});
 }
@@ -235,6 +236,7 @@ export function selectNode(nodeId: string, graph: Graph, renderer: Sigma, metric
 }
 
 export function deselectNode(_graph: Graph, renderer: Sigma) {
+  if (selectedNodeId === null) return;
   selectedNodeId = null;
   clearHighlightState();
   resetNodeMetrics(); // сбрасываем панель метрик узла
