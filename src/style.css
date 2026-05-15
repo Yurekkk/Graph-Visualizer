@@ -37,7 +37,7 @@ body {
   height: 100vh;
   overflow: hidden;
   font-family: system-ui, -apple-system, sans-serif;
-  background: var(--panel-bg);
+  background: var(--bg-color);
   color: var(--panel-text);
 }
 
