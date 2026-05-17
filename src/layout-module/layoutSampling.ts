@@ -131,7 +131,7 @@ export default function samplingLayout(graph: Graph, _recursion_level: number = 
     }
 
     if (!changed) break;
-
-    forceAtlas2.assign(graph, {iterations: 1, settings: {barnesHutOptimize: true}});
   }
+
+  forceAtlas2.assign(graph, {iterations: 1, settings: {barnesHutOptimize: true}});
 }
