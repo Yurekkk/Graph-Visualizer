@@ -15,7 +15,7 @@ import findSimpleMetrics from './metrics-module/simpleMetricsCalculation.ts';
 import calculateNodeMetrics from './metrics-module/calculateNodeMetrics.ts';
 import { calculateEdgesImportance } from './metrics-module/importanceCalculations.ts';
 import type graphMetrics from './metrics-module/graphMetricsInterface.ts';
-import { updateGraphMetrics } from './interactive-module/uiPanel.ts';
+import { resetLayoutMetrics, updateGraphMetrics, updateLayoutMetrics } from './interactive-module/uiPanel.ts';
 // import hideUnimportantNodes from './misc/hideUnimportantNodes.ts';
 // import hideUnimportantEdges from './misc/hideUnimportantEdges.ts';
 
@@ -57,6 +57,7 @@ export default async function initGraph(path: string, title: string, algorithm: 
     renderer = null;
   }
   clearHighlightState();
+  resetLayoutMetrics();
   graph = null;
   let start, end;
 
@@ -66,7 +67,8 @@ export default async function initGraph(path: string, title: string, algorithm: 
   start = performance.now();
   graph = await parseGraphFile(path);
   end = performance.now();
-  console.log(`Время парсинга графа: ${(end - start).toFixed(3)} мс`)
+  const parsingTime = (end - start);
+  console.log(`Время парсинга графа: ${parsingTime.toFixed(3)} мс`)
 
 
 
@@ -78,7 +80,8 @@ export default async function initGraph(path: string, title: string, algorithm: 
     ...calculateEdgesImportance(graph)
   } as graphMetrics;
   end = performance.now();
-  console.log(`Время расчета простых метрик: ${(end - start).toFixed(3)} мс`)
+  const metricsTime = (end - start);
+  console.log(`Время расчета простых метрик: ${metricsTime.toFixed(3)} мс`)
 
 
 
@@ -86,7 +89,8 @@ export default async function initGraph(path: string, title: string, algorithm: 
   start = performance.now();
   metrics = { ...metrics, ...findCommunities(graph) };
   end = performance.now();
-  console.log(`Время нахождения сообществ (Leiden): ${(end - start).toFixed(3)} мс`)
+  const communitiesTime = (end - start);
+  console.log(`Время нахождения сообществ (Leiden): ${communitiesTime.toFixed(3)} мс`)
   
 
 
@@ -107,7 +111,8 @@ export default async function initGraph(path: string, title: string, algorithm: 
   });
 
   end = performance.now();
-  console.log(`Время расставления атрибутов: ${(end - start).toFixed(3)} мс`)
+  const attributesTime = (end - start);
+  console.log(`Время расставления атрибутов: ${attributesTime.toFixed(3)} мс`)
 
 
 
@@ -115,7 +120,8 @@ export default async function initGraph(path: string, title: string, algorithm: 
   start = performance.now();
   smartLayout(graph, metrics, algorithm);
   end = performance.now();
-  console.log(`Время работы раскладки: ${(end - start).toFixed(3)} мс`)
+  const layoutTime = (end - start);
+  console.log(`Время работы раскладки: ${layoutTime.toFixed(3)} мс`)
 
 
 
@@ -160,7 +166,8 @@ export default async function initGraph(path: string, title: string, algorithm: 
   });
 
   end = performance.now();
-  console.log(`Время отрисовки: ${(end - start).toFixed(3)} мс`)
+  const renderingTime = (end - start);
+  console.log(`Время отрисовки: ${renderingTime.toFixed(3)} мс`)
   await setStatus('Почти готово...');
 
 
@@ -191,10 +198,25 @@ export default async function initGraph(path: string, title: string, algorithm: 
   updateGraphMetrics(metrics);
 
   const overallEndTime = performance.now();
-  console.log(`Всего прошло времени: ${(overallEndTime - overallStartTime).toFixed(3)} мс`)
+  const overallTime = (overallEndTime - overallStartTime);
+  console.log(`Всего прошло времени: ${overallTime.toFixed(3)} мс`)
 
   for (const [key, value] of Object.entries(metrics))
     console.log(`--- ${key}: ${value}`);
 
   await setStatus('');
+
+
+
+  // Расчет метрик самой раскладки
+  const worker = new Worker(
+    new URL('./layout-analysis-module/metricsWorker.ts', import.meta.url),
+    { type: 'module' }
+  );
+  worker.postMessage({ graphData: graph.export() });
+  worker.onmessage = (e) => {
+    updateLayoutMetrics({...e.data, parsingTime, metricsTime, communitiesTime, 
+      attributesTime, layoutTime, renderingTime, overallTime});
+    worker.terminate();
+  }
 }
