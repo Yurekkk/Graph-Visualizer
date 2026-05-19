@@ -35,6 +35,7 @@ if (!statusSpan) throw new Error('Span статуса не найден!');
 
 let renderer: Sigma | null = null;
 let graph: Graph | null = null;
+let layoutMetricsWorker: Worker | null = null;
 
 
 
@@ -56,6 +57,7 @@ export default async function initGraph(path: string, title: string, algorithm: 
     renderer.kill(); 
     renderer = null;
   }
+  if (layoutMetricsWorker) layoutMetricsWorker.terminate();
   clearHighlightState();
   resetLayoutMetrics();
   graph = null;
@@ -209,14 +211,14 @@ export default async function initGraph(path: string, title: string, algorithm: 
 
 
   // Расчет метрик самой раскладки
-  const worker = new Worker(
+  layoutMetricsWorker = new Worker(
     new URL('./layout-analysis-module/metricsWorker.ts', import.meta.url),
     { type: 'module' }
   );
-  worker.postMessage({ graphData: graph.export() });
-  worker.onmessage = (e) => {
+  layoutMetricsWorker.postMessage({ graphData: graph.export() });
+  layoutMetricsWorker.onmessage = (e) => {
     updateLayoutMetrics({...e.data, parsingTime, metricsTime, communitiesTime, 
       attributesTime, layoutTime, renderingTime, overallTime});
-    worker.terminate();
+    layoutMetricsWorker!.terminate();
   }
 }
