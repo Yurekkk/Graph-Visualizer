@@ -101,23 +101,45 @@ export function resetNodeMetrics(): void {
 
 
 
-export function updateLayoutMetrics(metrics: { crossings: number; stress: number }): void {
+export function updateLayoutMetrics(metrics: Record<string, number>): void {
   const panel = document.getElementById('layout-metrics-panel')!;
   const content = document.getElementById('layout-metrics')!;
   content.innerHTML = '';
 
+  // Заполняем строки метрик
   for (const [key, label] of Object.entries(layoutMetricsLabels)) {
     const value = metrics[key as keyof typeof metrics];
     if (value === undefined || value === null) continue;
 
-    const formatted = Number.isInteger(value) ? value : value.toFixed(1);
+    const formatted = Number.isInteger(value) ? value : Number(value.toFixed(4));
     const row = document.createElement('div');
     row.className = 'metric-row';
     row.innerHTML = `<span class="metric-label">${label}</span><span class="metric-value">${formatted}</span>`;
     content.appendChild(row);
   }
 
-  panel.style.display = 'block'; // показываем панель
+  // Кнопка копирования
+  const copyBtn = document.createElement('button');
+  copyBtn.textContent = 'Скопировать';
+  copyBtn.className = 'copy-metrics-btn';
+  copyBtn.addEventListener('click', () => {
+    const values: string[] = [];
+    content.querySelectorAll('.metric-value').forEach(el => {
+      values.push(el.textContent || '');
+    });
+    if (values.length === 0) return;
+
+    const textToCopy = values.map(v => v.replace('.', ',')).join('\t');
+    navigator.clipboard.writeText(textToCopy)
+      .then(() => {
+        copyBtn.textContent = 'Скопировано!';
+        setTimeout(() => { copyBtn.textContent = 'Скопировать'; }, 1500);
+      })
+      .catch(() => alert('Не удалось скопировать'));
+  });
+  content.appendChild(copyBtn);
+
+  panel.style.display = 'block';
 }
 
 
