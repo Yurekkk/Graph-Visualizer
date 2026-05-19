@@ -102,7 +102,6 @@ export function resetNodeMetrics(): void {
 
 
 export function updateLayoutMetrics(metrics: Record<string, number>): void {
-  const panel = document.getElementById('layout-metrics-panel')!;
   const content = document.getElementById('layout-metrics')!;
   content.innerHTML = '';
 
@@ -138,15 +137,11 @@ export function updateLayoutMetrics(metrics: Record<string, number>): void {
       .catch(() => alert('Не удалось скопировать'));
   });
   content.appendChild(copyBtn);
-
-  panel.style.display = 'block';
 }
 
 
 
 export function resetLayoutMetrics(): void {
-  const panel = document.getElementById('layout-metrics-panel');
-  if (panel) panel.style.display = 'none';
   const content = document.getElementById('layout-metrics');
   if (content) content.innerHTML = ''; // очищаем все метрики
 }
