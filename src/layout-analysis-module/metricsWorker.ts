@@ -4,10 +4,21 @@ import calculateStress from './calculateStress';
 import computeEdgeLengthCV from './computeEdgeLengthCV';
 
 self.onmessage = (e) => {
-  const { graphData } = e.data;
+  const { graphData, executionTimes } = e.data;
   const graph = Graph.from(graphData);
-  const crossings = countEdgeCrossings(graph);
-  const stress = calculateStress(graph);
+  const metrics: Record<string, number> = { ...executionTimes };
+
+  self.postMessage({ metrics: { ...metrics } });
+
   const edgeLengthCV = computeEdgeLengthCV(graph);
-  self.postMessage({ crossings, stress, edgeLengthCV });
+  metrics.edgeLengthCV = edgeLengthCV;
+  self.postMessage({ metrics: { ...metrics } });
+
+  const crossings = countEdgeCrossings(graph);
+  metrics.crossings = crossings;
+  self.postMessage({ metrics: { ...metrics } });
+
+  const stress = calculateStress(graph);
+  metrics.stress = stress;
+  self.postMessage({ metrics: { ...metrics } });
 };

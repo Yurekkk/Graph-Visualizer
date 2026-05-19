@@ -210,15 +210,16 @@ export default async function initGraph(path: string, title: string, algorithm: 
 
 
 
-  // Расчет метрик самой раскладки
+  // Расчет и обновление метрик самой раскладки
+  const executionTimes = {parsingTime, metricsTime, communitiesTime, 
+      attributesTime, layoutTime, renderingTime, overallTime};
+
   layoutMetricsWorker = new Worker(
     new URL('./layout-analysis-module/metricsWorker.ts', import.meta.url),
     { type: 'module' }
   );
-  layoutMetricsWorker.postMessage({ graphData: graph.export() });
+  layoutMetricsWorker.postMessage({ graphData: graph.export(), executionTimes });
   layoutMetricsWorker.onmessage = (e) => {
-    updateLayoutMetrics({...e.data, parsingTime, metricsTime, communitiesTime, 
-      attributesTime, layoutTime, renderingTime, overallTime});
-    layoutMetricsWorker!.terminate();
+    if (e.data.metrics) updateLayoutMetrics(e.data.metrics);
   }
 }
