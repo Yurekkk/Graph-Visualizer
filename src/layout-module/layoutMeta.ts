@@ -30,7 +30,7 @@ export default function metaLayout(graph: Graph, _recursion_level: number = 0) {
   const newCommAttr = "community_lvl" + (_recursion_level + 1);
   const resolution = alg.communitiesResolution - alg.metaLayoutResolutionDecreaseStep * _recursion_level;
 
-  // Мета-граф придется строить в любом случае
+  // Подграф для мета-графа придется строить в любом случае
   const metaGraph = timed(buildingSubgraphsTimer, () => buildMetaGraph(graph, currentCommAttr));
 
   const communities = new Map<string, {commGraph: Graph, centerX: number, centerY: number}>();

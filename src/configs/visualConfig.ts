@@ -58,4 +58,4 @@ export const borderSizeSelect = 0.35;
 // ### Misc ###
 export const labelSize = 20;
 export const cameraFitPadding = 50; // в пикселях
-export const edgesMaxDrawnLimit = 1000;
+export const edgesMaxDrawnLimit = 100000;
