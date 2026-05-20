@@ -150,6 +150,13 @@ export default async function initGraph(path: string, title: string, algorithm: 
     renderLabels: false,
     renderEdgeLabels: false,
     edgeProgramClasses: {curved: EdgeCurveProgram},
+    
+    zoomToSizeRatioFunction: (zoomRatio) => {
+      // Стандартное поведение: размер ~ zoomRatio^0.5
+      // Ограничиваем снизу, чтобы при сильном отдалении размер не падал ниже порога
+      const base = Math.pow(zoomRatio, 0.5);
+      return Math.max(base, 0.2);
+    },
 
     nodeProgramClasses: {
       circle: createNodeBorderProgram({
