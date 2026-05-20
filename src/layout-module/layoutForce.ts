@@ -10,6 +10,15 @@ import * as alg from '../configs/algorithmicConfig.ts';
 
 export default function forceLayout(graph: Graph, barnesHutOptimize: boolean = true) {
   setRandomCoords(graph);
+
+  graph.updateEachEdgeAttributes((_edge, attr) => {
+    const w = attr.weight;
+    if (w == null) return {};
+    const scaled = Math.sign(w) * Math.pow(Math.abs(w), 0.4);
+    // Сильно сжимаем веса, чтобы не было слишком больших разниц в притяжении/отталкивании
+    return { weight: scaled };
+  });
+
   const sensibleSettings = forceAtlas2.inferSettings(graph);
   const positions = forceAtlas2(graph, {
     iterations: alg.forceLayoutIterations,

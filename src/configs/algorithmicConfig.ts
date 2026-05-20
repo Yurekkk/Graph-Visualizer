@@ -45,7 +45,7 @@ export const metaLayoutMinModularity = 0.1;
 
 export const circularMinDensity = 0.9;
 
-export const radialMinHubDominance = 0.75; // &&
+export const radialMinHubDominance = 0.85; // &&
 export const radialMinNumNodes = 10;
 
 export const samplingMinDegreeGini = 0.4; // &&
