@@ -8,14 +8,14 @@ import * as alg from '../configs/algorithmicConfig.ts';
 
 
 
-export default function forceLayout(graph: Graph) {
+export default function forceLayout(graph: Graph, barnesHutOptimize: boolean = true) {
   setRandomCoords(graph);
   const sensibleSettings = forceAtlas2.inferSettings(graph);
   const positions = forceAtlas2(graph, {
     iterations: alg.forceLayoutIterations,
     settings: {
       ...sensibleSettings,
-      barnesHutOptimize: true,
+      barnesHutOptimize: barnesHutOptimize,
       scalingRatio: alg.forceLayoutScalingRatio,
       edgeWeightInfluence: 1.0
     }

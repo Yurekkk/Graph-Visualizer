@@ -24,7 +24,8 @@ import type FilteredGraph from '../misc/filteredGraph.ts';
 export const layoutFunctions: Record<string, (graph: Graph, _recursion_level?: number) => void> = {
   "auto": () => {},
   "circular": circularLayout,
-  "force": forceLayout,
+  "force": (g, _l) => forceLayout(g),
+  "forceNoBH": (g, _l) => forceLayout(g, false),
   "hierarchical": hierarchicalLayout,       // Не используется в smartLayout
   "meta": (g, l) => metaLayout(g, l!),
   "radial": (g, _l) => radialLayout(g),

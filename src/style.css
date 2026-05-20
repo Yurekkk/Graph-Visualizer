@@ -272,7 +272,7 @@ select option:checked {
   padding: 6px 0;
   border: 1px solid var(--border-color);
   border-radius: 5px;
-  background: var(--border-color);
+  background: var(--panel-bg);
   color: var(--text-color);
   font-size: 14px;
   cursor: pointer;

@@ -69,8 +69,8 @@ export default function layoutSpectral(graph: Graph): void {
     // запись координат в граф
     for (let i = 0; i < n; i++) {
       const nodeId = comp[i];
-      graph.setNodeAttribute(nodeId, 'x', xCoords[i]);
-      graph.setNodeAttribute(nodeId, 'y', yCoords[i]);
+      graph.setNodeAttribute(nodeId, 'x', xCoords[i] * 10);
+      graph.setNodeAttribute(nodeId, 'y', yCoords[i] * 10);
     }
 
     offsetX += alg.spectralSpacing * 1.5; // сдвиг для следующей компоненты
