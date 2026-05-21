@@ -57,10 +57,11 @@ export function updateGraphMetrics(metrics: graphMetrics): void {
     if (typeof value === 'number')
       formatted = Number.isInteger(value) ? value : value.toFixed(3);
     else formatted = value;
-    
+    const str = String(formatted).replace('.', ',');
+
     const row = document.createElement('div');
     row.className = 'metric-row';
-    row.innerHTML = `<span class="metric-label">${label}</span><span class="metric-value">${formatted}</span>`;
+    row.innerHTML = `<span class="metric-label">${label}</span><span class="metric-value">${str}</span>`;
     container.appendChild(row);
   }
 }
@@ -84,9 +85,10 @@ export function updateNodeMetrics(nodeId: string, graph: Graph): void {
       if (typeof value === 'number')
         formatted = Number.isInteger(value) ? value : value.toFixed(3);
       else formatted = value;
+      const str = String(formatted).replace('.', ',');
       const row = document.createElement('div');
       row.className = 'metric-row';
-      row.innerHTML = `<span class="metric-label">${displayKey}</span><span class="metric-value">${formatted}</span>`;
+      row.innerHTML = `<span class="metric-label">${displayKey}</span><span class="metric-value">${str}</span>`;
       container.appendChild(row);
     }
   }
@@ -111,9 +113,10 @@ export function updateLayoutMetrics(metrics: Record<string, number>): void {
     if (value === undefined || value === null) continue;
 
     const formatted = Number.isInteger(value) ? value : Number(value.toFixed(4));
+    const str = String(formatted).replace('.', ',');
     const row = document.createElement('div');
     row.className = 'metric-row';
-    row.innerHTML = `<span class="metric-label">${label}</span><span class="metric-value">${formatted}</span>`;
+    row.innerHTML = `<span class="metric-label">${label}</span><span class="metric-value">${str}</span>`;
     content.appendChild(row);
   }
 
