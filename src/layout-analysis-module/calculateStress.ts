@@ -38,9 +38,18 @@ export default function calculateStress(graph: Graph): number {
     }
   }
 
+  let maxDistance = 0;
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const dx = positions[i].x - positions[j].x;
+      const dy = positions[i].y - positions[j].y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist > maxDistance) maxDistance = dist;
+    }
+  }
+
   // Вычисляем стресс
-  let numerator = 0;
-  let denominator = 0;
+  let stress = 0;
 
   for (let i = 0; i < n; i++) {
     for (let j = i + 1; j < n; j++) {
@@ -50,13 +59,12 @@ export default function calculateStress(graph: Graph): number {
       const dx = positions[i].x - positions[j].x;
       const dy = positions[i].y - positions[j].y;
       const geomDist = Math.sqrt(dx * dx + dy * dy);
+      const normDist = geomDist / maxDistance;
 
-      const diff = dg - geomDist;
-      numerator += diff * diff / (dg * dg);
-      denominator += dg * dg / (dg * dg);
+      const diff = dg - normDist;
+      stress += diff * diff / (dg * dg);
     }
   }
 
-  if (denominator === 0) return 0;
-  return numerator / denominator;
+  return stress;
 }
