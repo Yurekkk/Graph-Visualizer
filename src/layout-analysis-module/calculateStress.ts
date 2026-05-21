@@ -8,7 +8,7 @@ export default function calculateStress(graph: Graph): number {
     y: graph.getNodeAttribute(id, 'y'),
   }));
 
-  // 1. Вычисляем все кратчайшие расстояния (невзвешенный BFS)
+  // Вычисляем все кратчайшие расстояния (невзвешенный BFS)
   const graphDistances: number[][] = Array.from({ length: n }, () => Array(n).fill(Infinity));
 //   const indexMap = new Map<string, number>(nodes.map((id, i) => [id, i]));
 
@@ -38,26 +38,7 @@ export default function calculateStress(graph: Graph): number {
     }
   }
 
-  // 2. Вычисляем среднее декартово расстояние между узлами
-  let sumGeomDist = 0;
-  let countPairs = 0;
-
-  for (let i = 0; i < n; i++) {
-    for (let j = i + 1; j < n; j++) {
-      const dg = graphDistances[i][j];
-      if (!isFinite(dg)) continue;
-
-      const dx = positions[i].x - positions[j].x;
-      const dy = positions[i].y - positions[j].y;
-      const geomDist = Math.sqrt(dx * dx + dy * dy);
-      sumGeomDist += geomDist;
-      countPairs++;
-    }
-  }
-
-  const avgGeomDist = countPairs > 0 ? sumGeomDist / countPairs : 1;
-
-  // 3. Вычисляем стресс
+  // Вычисляем стресс
   let numerator = 0;
   let denominator = 0;
 
@@ -71,11 +52,11 @@ export default function calculateStress(graph: Graph): number {
       const geomDist = Math.sqrt(dx * dx + dy * dy);
 
       const diff = dg - geomDist;
-      numerator += diff * diff;
-      denominator += dg * dg;
+      numerator += diff * diff / (dg * dg);
+      denominator += dg * dg / (dg * dg);
     }
   }
 
-  if (denominator === 0 || avgGeomDist === 0) return 0;
-  return Math.sqrt(numerator / denominator) / avgGeomDist; // нормализованный стресс с учётом масштаба
+  if (denominator === 0) return 0;
+  return numerator / denominator;
 }
