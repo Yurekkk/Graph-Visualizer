@@ -25,13 +25,13 @@ export const layoutFunctions: Record<string, (graph: Graph, _recursion_level?: n
   "auto": () => {},
   "circular": circularLayout,
   "force": (g, _l) => forceLayout(g),
-  "forceNoBH": (g, _l) => forceLayout(g, false),
-  "hierarchical": hierarchicalLayout,       // Не используется в smartLayout
+  "forceNoBH": (g, _l) => forceLayout(g, false),  // Не используется в smartLayout
+  "hierarchical": hierarchicalLayout,             // Не используется в smartLayout
   "meta": (g, l) => metaLayout(g, l!),
   "radial": (g, _l) => radialLayout(g),
-  "random": (g, _l) => setRandomCoords(g),  // Не используется в smartLayout
+  "random": (g, _l) => setRandomCoords(g),        // Не используется в smartLayout
   "sampling": (g, l) => samplingLayout(g, l!),
-  "spectral": layoutSpectral,               // Не используется в smartLayout
+  "spectral": layoutSpectral,                     // Не используется в smartLayout
 };
 
 
