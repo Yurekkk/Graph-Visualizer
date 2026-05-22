@@ -66,5 +66,5 @@ export default function calculateStress(graph: Graph): number {
     }
   }
 
-  return stress;
+  return stress / (n * (n - 1) / 2);
 }
