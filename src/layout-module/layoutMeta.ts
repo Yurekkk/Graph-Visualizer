@@ -1,7 +1,7 @@
 import type Graph from "graphology";
 import { buildCommunityGraph, buildMetaGraph, getGraphCenterRadius } from "../misc/utilsAlgorithmic";
 import noverlap from "graphology-layout-noverlap";
-import { smartLayout } from "./layoutEngine";
+import { smartLayout } from "./smartLayout.ts";
 import type { Attributes } from "graphology-types";
 import findSimpleMetrics from "../metrics-module/simpleMetricsCalculation.ts";
 import * as alg from '../configs/algorithmicConfig.ts';

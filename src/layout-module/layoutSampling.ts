@@ -3,7 +3,7 @@ import { setRandomCoords } from '../misc/utilsAlgorithmic.ts';
 import type Graph from 'graphology';
 import * as alg from '../configs/algorithmicConfig.ts';
 // import * as vis from '../configs/visualConfig.ts';
-import { smartLayout } from './layoutEngine.ts';
+import { smartLayout } from './smartLayout.ts';
 import FilteredGraph from '../misc/filteredGraph.ts';
 import radialLayout from './layoutRadial.ts';
 import findSimpleMetrics from '../metrics-module/simpleMetricsCalculation.ts';
