@@ -55,7 +55,7 @@ export const samplingMinNumNodes = 100;
 
 // ### Node Focus ###
 export const edgesHoverHighlightLimit = 50000;
-export const maxHighlightedNeighborsNum = 20;
+export const maxHighlightedNeighborsNum = 30;
 export const maxAccumulatedCost = 5;
 export const importanceInfluence = 3;
 

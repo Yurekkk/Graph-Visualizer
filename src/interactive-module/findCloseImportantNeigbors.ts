@@ -17,17 +17,17 @@ export default function findCloseImportantNeighbours(
   const queue = new MinPriorityQueue<{ 
     node: string; 
     importance: number; 
-    cost: number; 
+    accumulatedCost: number; 
     edge: string 
   }>(
     // Даем приоритет направлениям с наименьшей накопленной стоимостью и наибольшей важностью
     // Важность ценим выше
-    x => x.cost - alg.importanceInfluence * x.importance
+    x => x.accumulatedCost - alg.importanceInfluence * x.importance
   );
   queue.enqueue({ 
     node: selectedNodeId, 
     importance: graph.getNodeAttribute(selectedNodeId, "importance"), 
-    cost: 0, 
+    accumulatedCost: 0, 
     edge: '' 
   });
 
@@ -40,13 +40,13 @@ export default function findCloseImportantNeighbours(
 
   while (!queue.isEmpty() && resultNodes.size < alg.maxHighlightedNeighborsNum) {
     // Извлекаем узел
-    const { node, cost, edge } = queue.dequeue()!;
+    const { node, importance, accumulatedCost, edge } = queue.dequeue()!;
 
     // Пропускаем устаревшие записи (стандартная "ленивая" проверка Дейкстры)
-    if (dist.has(node) && cost > dist.get(node)!) continue;
+    if (dist.has(node) && accumulatedCost > dist.get(node)!) continue;
 
     // Если вышли за порог стоимости, не идём дальше по этой ветке
-    if (cost > alg.maxAccumulatedCost) continue;
+    if (accumulatedCost > alg.maxAccumulatedCost) continue;
 
     // Релаксация соседей
     graph.forEachEdge(node, (newEdge, attrs, source, target) => {
@@ -55,22 +55,26 @@ export default function findCloseImportantNeighbours(
       const weight = attrs?.weight ?? 1;
       const neighborImportance = graph.getNodeAttribute(neighbor, 'importance');
       const edgeCost = costFunc(neighborImportance, weight);
-      const newCost = cost + edgeCost;
+      const newCost = accumulatedCost + edgeCost;
+
+      // Не идем дальше, если важность узла начинает падать
+      if (node !== selectedNodeId && neighborImportance < importance) 
+        return;
 
       if (!dist.has(neighbor) || newCost < dist.get(neighbor)!) {
         dist.set(neighbor, newCost);
         queue.push({ 
           node: neighbor, 
           importance: neighborImportance, 
-          cost: newCost, 
+          accumulatedCost: newCost, 
           edge: newEdge 
         });
       }
     });
 
     if (node !== selectedNodeId) {
-      resultNodes.set(node, 1 / (cost || 1e-15));
-      resultEdges.set(edge, 1 / (cost || 1e-15));
+      resultNodes.set(node, 1 / (accumulatedCost || 1e-15));
+      resultEdges.set(edge, 1 / (accumulatedCost || 1e-15));
     }
   }
 
