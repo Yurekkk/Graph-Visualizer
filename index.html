@@ -10,7 +10,16 @@
 <body>
     <aside id="sidebar">
         <section class="panel-block">
-            <select id="graph-selector"><option value="" disabled selected>Загрузка списка...</option></select>
+            <div id="file-upload-zone" class="upload-zone">
+                <input type="file" id="file-input" accept=".json,.csv,.mtx,.gexf,.dot" style="display: none;">
+                <div class="upload-placeholder">
+                    <p>Перетащите файл сюда</p>
+                    <p>или <a href="#" id="upload-link">кликните для выбора</a></p>
+                </div>
+            </div>
+            <div id="current-graph-name" class="current-graph-name">
+              Открыт: <span id="graph-name-value">не загружен</span>
+            </div>
             <select id="algorithm-selector"><option value="" disabled selected>Загрузка списка...</option></select>
         </section>
 

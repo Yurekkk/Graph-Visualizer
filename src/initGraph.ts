@@ -41,7 +41,7 @@ async function setStatus(text: string) {
 
 
 
-export default async function initGraph(path: string, title: string, algorithm: string = 'auto') {
+export default async function initGraph(graphFile: File, title: string, algorithm: string = 'auto') {
   console.log(`=============== Отрисовка графа ${title} ===============`)
 
   const overallStartTime = performance.now();
@@ -62,7 +62,7 @@ export default async function initGraph(path: string, title: string, algorithm: 
 
   await setStatus('Парсим граф...');
   start = performance.now();
-  graph = await parseGraphFile(path);
+  graph = await parseGraphFile(graphFile);
   end = performance.now();
   const parsingTime = (end - start);
   console.log(`Время парсинга графа: ${parsingTime.toFixed(3)} мс`)

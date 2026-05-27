@@ -5,13 +5,12 @@ import { timestamp_threshold } from '../configs/algorithmicConfig';
 
 
 export default async function parseGraphFile(
-  filePath: string,
+  graphFile: File,
   format: string = 'auto'
 ): Promise<Graph> {
-  const response = await fetch(filePath);
-  const content = await response.text();
+  const content = await graphFile.text();
 
-  if (format === 'auto') format = detectFormat(filePath);
+  if (format === 'auto') format = detectFormat(graphFile.name);
 
   switch (format) {
     case 'json':
