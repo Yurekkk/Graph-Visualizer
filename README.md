@@ -4,8 +4,9 @@
 
 ## Скриншоты
 
-![Скриншот №1](./screenshot_got.png)
-![Скриншот №2](./screenshot_usair97.png)
+![Скриншот №1](./screenshots/screenshot_got.png)
+![Скриншот №2](./screenshots/screenshot_usair97.png)
+![Скриншот №3](./screenshots/screenshot_onedir.png)
 
 ## Возможности
 
