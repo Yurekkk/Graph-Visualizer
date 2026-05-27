@@ -80,7 +80,7 @@ body {
 }
 
 select {
-  width: 100%;
+  width: 50%;
   padding: 8px;
   background-color: var(--panel-bg);
   color: var(--panel-text);
@@ -89,6 +89,10 @@ select {
   cursor: pointer;
   font-size: 14px;
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#algorithm-selector-container {
+  text-align: center;
 }
 
 .metrics-list {
