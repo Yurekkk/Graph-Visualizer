@@ -54,7 +54,6 @@ export const samplingMinNumNodes = 100;
 
 
 // ### Node Focus ###
-export const edgesHoverHighlightLimit = 50000;
 export const maxHighlightedNeighborsNum = 30;
 export const maxAccumulatedCost = 5;
 export const importanceInfluence = 3;
@@ -62,6 +61,10 @@ export const importanceInfluence = 3;
 
 
 // ### Misc ###
+export const edgesHoverHighlightLimit = 5000; 
+// Если в графе больше такого количества рёбер, то подсветка соседей 
+// при наведении отключается, чтобы не тормозить интерфейс
+
 export const logAlgorithmChoices = false;
 export const seed = '42';
 export const timestamp_threshold = 500_000_000;
