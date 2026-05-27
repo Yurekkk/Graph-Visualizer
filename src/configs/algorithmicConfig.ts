@@ -27,7 +27,7 @@ export const samplingLayoutSpacing = 5.0; // Коэффициент, на кот
 
 export const metaLayoutResolutionDecreaseStep = 0.2;
 // На каждом шаге рекурсии разрешение Louvain уменьшается (начиная с communitiesResolution), 
-// чтобы алгоритм не зацикливался на слишком маленьких сообществах + так быстрее, я проверял
+// чтобы алгоритм не зацикливался на слишком маленьких сообществах + так быстрее
 
 export const spectralSpacing = 1000.0;
 export const spectralMaxIterations = 20;    // макс. итераций степенного метода
@@ -40,7 +40,7 @@ export const spectralCgTolerance = 1e-6;
 // ### Layout Engine Decision Tree ###
 export const metaLayoutRecursionLevelCap = 5; 
 
-export const metaLayoutMinNodes = 50;     // &&
+export const metaLayoutMinNodes = 50;      // &&
 export const metaLayoutMinModularity = 0.1;
 
 export const circularMinDensity = 0.9;
@@ -48,7 +48,7 @@ export const circularMinDensity = 0.9;
 export const radialMinHubDominance = 0.85; // &&
 export const radialMinNumNodes = 10;
 
-export const samplingMinDegreeGini = 0.4; // &&
+export const samplingMinDegreeGini = 0.4;  // &&
 export const samplingMinNumNodes = 100;
 
 

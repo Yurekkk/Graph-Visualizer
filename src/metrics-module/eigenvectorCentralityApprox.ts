@@ -2,6 +2,9 @@ import Graph from 'graphology';
 import * as alg from '../configs/algorithmicConfig.ts';
 
 export default function eigenvectorCentralityApprox(graph: Graph) {
+  // 'graphology-metrics/centrality/eigenvector' работает только до сходимости, иначе выбрасывает ошибку
+  // Здесь же реализован степенной метод с ограничением по итерациям 
+
   const nodes = graph.nodes();
   const n = nodes.length;
   if (n === 0) return;

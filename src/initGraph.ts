@@ -12,17 +12,12 @@ import { clearHighlightState, deselectNode, edgeReducer, hoverNode,
 import { findCommunities } from './metrics-module/communitiesFinding.ts';
 import { ThemeManager } from './interactive-module/themeManager.ts';
 import findSimpleMetrics from './metrics-module/simpleMetricsCalculation.ts';
-import calculateNodeMetrics from './metrics-module/calculateNodeMetrics.ts';
+import calculateNodeMetrics from './metrics-module/nodeMetricsCalculations.ts';
 import { calculateEdgesImportance } from './metrics-module/importanceCalculations.ts';
 import type graphMetrics from './metrics-module/graphMetricsInterface.ts';
 import { resetLayoutMetrics, updateGraphMetrics, updateLayoutMetrics } from './interactive-module/uiPanel.ts';
 // import hideUnimportantNodes from './misc/hideUnimportantNodes.ts';
 // import hideUnimportantEdges from './misc/hideUnimportantEdges.ts';
-
-
-
-// TODO?: Все таки считать betweeness centrality, если граф маленький
-// TODO: Добавить поддержку ориентированного графа
 
 
 
@@ -126,6 +121,9 @@ export default async function initGraph(path: string, title: string, algorithm: 
   console.log(`Время работы раскладки: ${layoutTime.toFixed(3)} мс`)
 
 
+
+  // Решил не убирать неважные узлы и рёбра, так как на больших графах это все равно не сильно 
+  // помогает с производительностью, а на маленьких графах может ухудшить визуализацию
 
   // await setStatus('Убираем неважные узлы и ребра...');
   // start = performance.now();

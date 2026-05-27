@@ -3,7 +3,7 @@ import type Graph from "graphology";
 import coreNumber from 'graphology-cores';
 // import pagerank from 'graphology-metrics/centrality/pagerank';
 import eigenvectorCentralityApprox from './eigenvectorCentralityApprox.ts';
-import { calculateNodesImportance } from "./importanceCalculations";
+import { calculateNodesImportance } from "./importanceCalculations.ts";
 
 // Для каждого узла считает degree, degreeCentrality, community, core, eigenvectorCentrality и importance
 
