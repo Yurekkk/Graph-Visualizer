@@ -91,7 +91,7 @@
 
 ```bash
 # 1. Клонировать репозиторий
-git clone <repo-url>
+git clone https://github.com/Yurekkk/Graph-Visualizer
 cd graph-visualizer
 
 # 2. Установить зависимости
