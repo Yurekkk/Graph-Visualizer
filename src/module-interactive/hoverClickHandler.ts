@@ -1,10 +1,10 @@
 import type Graph from 'graphology';
 import * as vis from '../configs/visualConfig';
 // import * as alg from '../configs/algorithmicConfig.ts';
-import type graphMetrics from '../metrics-module/graphMetricsInterface';
+import type graphMetrics from '../module-metrics/graphMetricsInterface';
 import { blendWithBackground, edgeColor, edgeColorInterpolate, edgeSize, edgeSizeInterpolate, nodeColor, nodeSize } from '../misc/utilsVisual';
 import type Sigma from 'sigma';
-import findCloseImportantNeighbours from '../interactive-module/findCloseImportantNeigbors';
+import findCloseImportantNeighbours from './findCloseImportantNeigbors';
 import { fitViewportToNodes } from '@sigma/utils';
 import { ThemeManager } from './themeManager';
 import { resetNodeMetrics, updateNodeMetrics } from './uiPanel';

@@ -1,5 +1,5 @@
 import Graph from 'graphology';
-import type graphMetrics from '../metrics-module/graphMetricsInterface';
+import type graphMetrics from '../module-metrics/graphMetricsInterface';
 
 export default function hideUnimportantEdges(graph: Graph, metrics: graphMetrics) {
   // Текущие степени по нескрытым ребрам

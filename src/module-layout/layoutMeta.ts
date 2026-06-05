@@ -3,9 +3,9 @@ import { buildCommunityGraph, buildMetaGraph, getGraphCenterRadius } from "../mi
 import noverlap from "graphology-layout-noverlap";
 import { smartLayout } from "./smartLayout.ts";
 import type { Attributes } from "graphology-types";
-import findSimpleMetrics from "../metrics-module/simpleMetricsCalculation.ts";
+import findSimpleMetrics from "../module-metrics/simpleMetricsCalculation.ts";
 import * as alg from '../configs/algorithmicConfig.ts';
-import { findCommunities } from "../metrics-module/communitiesFinding.ts";
+import { findCommunities } from "../module-metrics/communitiesFinding.ts";
 
 
 

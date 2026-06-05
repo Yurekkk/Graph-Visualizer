@@ -1,6 +1,6 @@
 import Graph from 'graphology';
 import radialLayout from './layoutRadial.ts';
-import type graphMetrics from '../metrics-module/graphMetricsInterface.ts';
+import type graphMetrics from '../module-metrics/graphMetricsInterface.ts';
 import * as alg from '../configs/algorithmicConfig.ts';
 import { setRandomCoords } from '../misc/utilsAlgorithmic.ts';
 import layoutSpectral from './layoutSpectral.ts';
@@ -9,7 +9,7 @@ import forceLayout from './layoutForce.ts';
 import hierarchicalLayout from './layoutHierarchical.ts';
 import metaLayout from './layoutMeta.ts';
 import samplingLayout from './layoutSampling.ts';
-import findDegreeGini from '../metrics-module/findDegreeGini.ts';
+import findDegreeGini from '../module-metrics/findDegreeGini.ts';
 import type FilteredGraph from '../misc/filteredGraph.ts';
 
 

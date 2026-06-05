@@ -6,8 +6,8 @@ import * as alg from '../configs/algorithmicConfig.ts';
 import { smartLayout } from './smartLayout.ts';
 import FilteredGraph from '../misc/filteredGraph.ts';
 import radialLayout from './layoutRadial.ts';
-import findSimpleMetrics from '../metrics-module/simpleMetricsCalculation.ts';
-import { findCommunities } from '../metrics-module/communitiesFinding.ts';
+import findSimpleMetrics from '../module-metrics/simpleMetricsCalculation.ts';
+import { findCommunities } from '../module-metrics/communitiesFinding.ts';
 import forceAtlas2 from 'graphology-layout-forceatlas2';
 
 

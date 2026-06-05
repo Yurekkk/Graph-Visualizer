@@ -1,6 +1,6 @@
 import initGraph from './initGraph';
-import { ThemeManager, initThemeToggle } from './interactive-module/themeManager';
-import { layoutFunctions } from './layout-module/smartLayout';
+import { ThemeManager, initThemeToggle } from './module-interactive/themeManager';
+import { layoutFunctions } from './module-layout/smartLayout';
 
 
 

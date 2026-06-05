@@ -1,6 +1,6 @@
 import Graph from "graphology";
 import * as alg from '../configs/algorithmicConfig.ts';
-import type graphMetrics from '../metrics-module/graphMetricsInterface.ts';
+import type graphMetrics from '../module-metrics/graphMetricsInterface.ts';
 import { MinPriorityQueue } from '@datastructures-js/priority-queue';
 
 // Учитывать Евклидово расстояние все же не очень, так оно пропустит удаленные хабы
