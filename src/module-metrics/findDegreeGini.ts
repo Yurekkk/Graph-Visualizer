@@ -6,9 +6,7 @@ export default function findDegreeGini(graph: Graph): number {
 
   // Собираем степени всех узлов
   const degrees: number[] = [];
-  graph.forEachNode((node) => {
-    degrees.push(graph.degree(node));
-  });
+  graph.forEachNode((node) => degrees.push(graph.degree(node)));
 
   degrees.sort((a, b) => a - b);
 

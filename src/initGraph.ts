@@ -72,9 +72,9 @@ export default async function initGraph(graphFile: File, title: string, algorith
   await setStatus('Считаем метрики...');
   start = performance.now();
   let metrics = {
-    ...findSimpleMetrics(graph),
     ...calculateNodeMetrics(graph),
-    ...calculateEdgesImportance(graph)
+    ...calculateEdgesImportance(graph),
+    ...findSimpleMetrics(graph)
   } as graphMetrics;
   end = performance.now();
   const metricsTime = (end - start);
