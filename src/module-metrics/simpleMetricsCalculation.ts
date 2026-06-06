@@ -8,7 +8,8 @@ export default function findSimpleMetrics(graph: Graph) {
   
   // Степени узлов
   const degreeMap = new Map<string, number>();
-  graph.forEachNode((node) => degreeMap.set(node, graph.degree(node)));
+  graph.forEachNode((node) => degreeMap.set(node, 
+    graph.getNodeAttribute(node, 'degree') || graph.degree(node)));
   
   let maxDegree = -Infinity;
   let minDegree = +Infinity;
