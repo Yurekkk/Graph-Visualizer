@@ -220,7 +220,7 @@ export default async function initGraph(graphFile: File, title: string, algorith
       attributesTime, layoutTime, renderingTime, overallTime};
 
   layoutMetricsWorker = new Worker(
-    new URL('./layout-analysis-module/metricsWorker.ts', import.meta.url),
+    new URL('./module-layout-analysis/metricsWorker.ts', import.meta.url),
     { type: 'module' }
   );
   layoutMetricsWorker.postMessage({ graphData: graph.export(), executionTimes });
